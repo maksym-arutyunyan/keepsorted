@@ -16,6 +16,9 @@ if ! cargo build --release; then
   exit 1
 fi
 
+# Track if any test fails
+all_tests_passed=true
+
 # Run tests
 echo ""
 echo "Running tests..."
@@ -45,6 +48,7 @@ for src_file in "$TEST_DIR"/*_in*; do
         echo -e "test $base_name ... ${RED}FAILED${NC}"
         echo "Differences:"
         diff "$TEMP_FILE" "$expected_file"
+        all_tests_passed=false
     fi
 
     # Clean up the temporary file
@@ -52,3 +56,8 @@ for src_file in "$TEST_DIR"/*_in*; do
 done
 
 echo "Tests completed."
+
+# Exit with non-zero status if any test failed
+if [ "$all_tests_passed" = false ]; then
+    exit 1
+fi
