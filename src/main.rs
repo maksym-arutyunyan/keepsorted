@@ -168,17 +168,17 @@ mod test {
             ),
             (
                 "# Keep sorted.
-                 d
-                 c
+                 d_yes
+                 c_yes
                     \n
-                 b
-                 a",
+                 b_no
+                 a_no",
                 "# Keep sorted.
-                 c
-                 d
+                 c_yes
+                 d_yes
                     \n
-                 b
-                 a",
+                 b_no
+                 a_no",
             ),
         ];
         for (input, expected) in test_cases {
