@@ -61,7 +61,7 @@ fn process_file(path: &Path) -> io::Result<()> {
         } else if is_sorting_block && line.trim().is_empty() {
             is_sorting_block = false;
             block.sort_unstable();
-            output_lines.extend(block.drain(..));
+            output_lines.append(&mut block);
             output_lines.push(line);
         } else if is_sorting_block {
             block.push(line);
@@ -72,7 +72,7 @@ fn process_file(path: &Path) -> io::Result<()> {
 
     if is_sorting_block {
         block.sort_unstable();
-        output_lines.extend(block.drain(..));
+        output_lines.append(&mut block);
     }
 
     let output_file = File::create(path)?;
