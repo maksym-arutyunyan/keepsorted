@@ -1,8 +1,0 @@
-DEPS = [
-    # Keep sorted.
-    "bbb",
-    "cc",
-    "aaa",
-    "aa",
-    "a",
-]
