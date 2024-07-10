@@ -11,10 +11,7 @@ NC='\033[0m' # No Color
 
 # Build the Rust project
 echo "Compiling the Rust project..."
-cargo build --release
-
-# Check if the compilation was successful
-if [ $? -ne 0 ]; then
+if ! cargo build --release; then
   echo "Compilation failed. Exiting."
   exit 1
 fi
