@@ -1,0 +1,4 @@
+# Expect block with trailing empty line to be sorted.
+# Keep sorted.
+a
+b
