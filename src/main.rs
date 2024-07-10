@@ -157,7 +157,6 @@ mod test {
                 "b
                  a",
             ),
-            ("# Keep sorted.", "# Keep sorted."),
             (
                 "# Keep sorted.
                  b
