@@ -1,7 +1,7 @@
 use clap::{arg, command, Parser};
 use regex::Regex;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Write};
+use std::io::{self, Write};
 use std::path::Path;
 
 #[derive(Parser, Debug)]
@@ -35,13 +35,13 @@ fn main() -> io::Result<()> {
 }
 
 fn process_file(path: &Path) -> io::Result<()> {
-    let file = File::open(path)?;
-    let reader = BufReader::new(file);
-
-    let mut lines = Vec::new();
-    for line in reader.lines() {
-        lines.push(line?);
+    let mut content = std::fs::read_to_string(path)?;
+    let ends_with_newline = content.ends_with('\n');
+    if !ends_with_newline {
+        // Add trailing '\n' so all the lines have it.
+        content.push_str("\n");
     }
+    let lines: Vec<&str> = content.split_inclusive('\n').collect();
 
     let re = Regex::new(r" Keep sorted").unwrap();
     let mut output_lines = Vec::new();
@@ -70,8 +70,14 @@ fn process_file(path: &Path) -> io::Result<()> {
     }
 
     let mut file = File::create(path)?;
-    for line in output_lines {
-        writeln!(file, "{}", line)?;
+    let n = output_lines.len();
+    for (i, line) in output_lines.iter().enumerate() {
+        if i+1 == n && !ends_with_newline {
+            // Remove trailing '\n' since there were none in the source.
+            write!(file, "{}", line.trim_end_matches('\n'))?;
+        } else {
+            write!(file, "{}", line)?;
+        }
     }
 
     Ok(())
