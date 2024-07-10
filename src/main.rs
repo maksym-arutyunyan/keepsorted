@@ -1,7 +1,7 @@
 use clap::{arg, command, Parser};
 use regex::Regex;
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::{self, BufWriter, Write};
 use std::path::Path;
 
 #[derive(Parser, Debug)]
@@ -23,39 +23,45 @@ fn main() -> io::Result<()> {
         .or(args.positional_path)
         .expect("Path must be provided");
 
-    if Path::new(&path).is_dir() {
-        let project_name = env!("CARGO_PKG_NAME");
-        eprintln!("{}: read {}: is a directory", project_name, path);
+    let path = Path::new(&path);
+
+    if path.is_dir() {
+        eprintln!(
+            "{}: read {}: is a directory",
+            env!("CARGO_PKG_NAME"),
+            path.display()
+        );
         std::process::exit(1);
-    } else {
-        process_file(Path::new(&path))?;
     }
 
-    Ok(())
+    process_file(path)
 }
 
 fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
+
     if !ends_with_newline {
         // Add trailing '\n' so all the lines have it.
-        content.push_str("\n");
+        content.push('\n');
     }
+
     let lines: Vec<&str> = content.split_inclusive('\n').collect();
 
-    let re = Regex::new(r" Keep sorted").unwrap();
+    let re =
+        Regex::new(r" Keep sorted").map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
-    let mut is_sorting_block = false;
     let mut block = Vec::new();
+    let mut is_sorting_block = false;
 
     for line in lines {
-        if re.is_match(&line) {
+        if re.is_match(line) {
             is_sorting_block = true;
             output_lines.push(line);
         } else if is_sorting_block && line.trim().is_empty() {
             is_sorting_block = false;
-            block.sort();
-            output_lines.append(&mut block);
+            block.sort_unstable();
+            output_lines.extend(block.drain(..));
             output_lines.push(line);
         } else if is_sorting_block {
             block.push(line);
@@ -65,20 +71,23 @@ fn process_file(path: &Path) -> io::Result<()> {
     }
 
     if is_sorting_block {
-        block.sort();
-        output_lines.append(&mut block);
+        block.sort_unstable();
+        output_lines.extend(block.drain(..));
     }
 
-    let mut file = File::create(path)?;
+    let output_file = File::create(path)?;
+    let mut writer = BufWriter::new(output_file);
+
     let n = output_lines.len();
     for (i, line) in output_lines.iter().enumerate() {
-        if i+1 == n && !ends_with_newline {
+        if i + 1 == n && !ends_with_newline {
             // Remove trailing '\n' since there were none in the source.
-            write!(file, "{}", line.trim_end_matches('\n'))?;
+            write!(writer, "{}", line.trim_end_matches('\n'))?;
         } else {
-            write!(file, "{}", line)?;
+            write!(writer, "{}", line)?;
         }
     }
 
+    writer.flush()?;
     Ok(())
 }
