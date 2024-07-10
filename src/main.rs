@@ -1,4 +1,4 @@
-use clap::{Parser, arg, command};
+use clap::{arg, command, Parser};
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
@@ -18,7 +18,10 @@ fn main() -> io::Result<()> {
     let args = Args::parse();
 
     // Get the path from either the option or the positional argument
-    let path = args.path.or(args.positional_path).expect("Path must be provided");
+    let path = args
+        .path
+        .or(args.positional_path)
+        .expect("Path must be provided");
 
     if Path::new(&path).is_dir() {
         let project_name = env!("CARGO_PKG_NAME");
