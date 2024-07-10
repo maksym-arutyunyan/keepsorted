@@ -1,5 +1,4 @@
 use clap::{Parser, arg, command};
-use walkdir::WalkDir;
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, Write};
@@ -22,12 +21,9 @@ fn main() -> io::Result<()> {
     let path = args.path.or(args.positional_path).expect("Path must be provided");
 
     if Path::new(&path).is_dir() {
-        for entry in WalkDir::new(path) {
-            let entry = entry?;
-            if entry.file_type().is_file() {
-                process_file(entry.path())?;
-            }
-        }
+        let project_name = env!("CARGO_PKG_NAME");
+        eprintln!("{}: read {}: is a directory", project_name, path);
+        std::process::exit(1);
     } else {
         process_file(Path::new(&path))?;
     }

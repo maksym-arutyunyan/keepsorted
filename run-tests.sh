@@ -21,7 +21,7 @@ fi
 
 # Run tests
 echo ""
-echo "Running tests"
+echo "Running tests..."
 for src_file in "$TEST_DIR"/*_src*; do
     # Extract the base name and extension
     base_name=$(basename "$src_file" "_src${src_file##*_src}")
