@@ -4,6 +4,11 @@
 BINARY_PATH="./target/release/keepsorted"
 TEST_DIR="./tests"
 
+# Define color codes
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
 # Build the Rust project
 echo "Compiling the Rust project..."
 cargo build --release
@@ -15,7 +20,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Run tests
-echo "Running tests..."
+echo ""
+echo "Running tests"
 for src_file in "$TEST_DIR"/*_src*; do
     # Extract the base name and extension
     base_name=$(basename "$src_file" "_src${src_file##*_src}")
@@ -37,9 +43,9 @@ for src_file in "$TEST_DIR"/*_src*; do
 
     # Compare the output with the expected file
     if diff -q "$TEMP_FILE" "$expected_file" > /dev/null; then
-        echo "$base_name: PASSED"
+        echo -e "test $base_name ... ${GREEN}ok${NC}"
     else
-        echo "$base_name: FAILED"
+        echo -e "test $base_name ... ${RED}FAILED${NC}"
         echo "Differences:"
         diff "$TEMP_FILE" "$expected_file"
     fi
