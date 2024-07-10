@@ -57,12 +57,10 @@ fn process_file(path: &Path) -> io::Result<()> {
             block.sort();
             output_lines.append(&mut block);
             output_lines.push(line);
+        } else if is_sorting_block {
+            block.push(line);
         } else {
-            if is_sorting_block {
-                block.push(line);
-            } else {
-                output_lines.push(line);
-            }
+            output_lines.push(line);
         }
     }
 
