@@ -1,0 +1,22 @@
+# Block #1.
+bbb
+cc
+a
+aa
+aaa
+
+# Block #2.
+# Keep sorted.
+bbb
+cc
+aaa
+aa
+a
+
+# Block #3.
+bbb
+cc
+a
+aa
+aaa
+

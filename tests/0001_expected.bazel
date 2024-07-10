@@ -1,0 +1,8 @@
+DEPS = [
+    # Keep sorted.
+    "a",
+    "aa",
+    "aaa",
+    "bbb",
+    "cc",
+]
