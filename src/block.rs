@@ -59,19 +59,41 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
 }
 
 fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
-    sorting_key(a).cmp(&sorting_key(b))
+    let trimmed_a = a.trim();
+    let trimmed_b = b.trim();
+
+    let mut iter_a = trimmed_a.chars();
+    let mut iter_b = trimmed_b.chars();
+
+    loop {
+        match (iter_a.next(), iter_b.next()) {
+            (Some(char_a), Some(char_b)) => {
+                let order_a = priority_order(char_a);
+                let order_b = priority_order(char_b);
+
+                match order_a.cmp(&order_b) {
+                    std::cmp::Ordering::Equal => continue,
+                    result => return result,
+                }
+            }
+            (Some(_), None) => return std::cmp::Ordering::Greater,
+            (None, Some(_)) => return std::cmp::Ordering::Less,
+            (None, None) => return std::cmp::Ordering::Equal,
+        }
+    }
 }
 
-fn sorting_key(line: &str) -> (u8, &str) {
-    let trimmed = line.trim();
-    if trimmed.starts_with(r#"":"#) {
-        (0, trimmed)
-    } else if trimmed.starts_with(r#""//"#) {
-        (1, trimmed)
-    } else if trimmed.starts_with(r#""@"#) {
-        (2, trimmed)
+fn priority_order(c: char) -> (u8, char) {
+    if c.is_alphanumeric() {
+        (0, c)
     } else {
-        (3, trimmed)
+        match c {
+            '"' => (1, 'a'),
+            ':' => (2, 'a'),
+            '/' => (3,'a'),
+            '@' => (4,'a'),
+            other => (5, other), // All other characters
+        }
     }
 }
 
@@ -90,22 +112,46 @@ mod tests {
     #[test]
     fn bazel_order() {
         let mut input = vec![
-            r#"":bbb""#,
-            r#"":aaa""#,
-            r#""//dir/subdir:bbb""#,
-            r#""//dir/subdir:aaa""#,
-            r#""@crate_index//:bbb""#,
-            r#""@crate_index//:aaa""#,
+            r#"":bbb","#,
+            r#"":aaa","#,
+            r#""nested","#,
+            r#""//dir/subdir/folder:xxx","#,
+            r#""//dir/subdir/folder",  # Some in-line comment."#,
+            r#""//dir/subdir:bbb","#,
+            r#""//dir/subdir:aaa","#,
+            r#""@crate_index//:bbb","#,
+            r#""@crate_index//:aaa","#,
         ];
         let expected = vec![
-            r#"":aaa""#,
-            r#"":bbb""#,
-            r#""//dir/subdir:aaa""#,
-            r#""//dir/subdir:bbb""#,
-            r#""@crate_index//:aaa""#,
-            r#""@crate_index//:bbb""#,
+            r#""nested","#,
+            r#"":aaa","#,
+            r#"":bbb","#,
+            r#""//dir/subdir:aaa","#,
+            r#""//dir/subdir:bbb","#,
+            r#""//dir/subdir/folder",  # Some in-line comment."#,
+            r#""//dir/subdir/folder:xxx","#,
+            r#""@crate_index//:aaa","#,
+            r#""@crate_index//:bbb","#,
         ];
         sort(&mut input, SortStrategy::Bazel);
+        assert_eq!(input, expected);
+    }
+
+    #[test]
+    fn with_inline_comment_bazel() {
+        let mut input = vec![
+            "y",
+            "x  # Some in-line comment.",
+            "b",
+            "a",
+        ];
+        let expected = vec![
+            "a",
+            "b",
+            "x  # Some in-line comment.",
+            "y",
+        ];
+        sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
 

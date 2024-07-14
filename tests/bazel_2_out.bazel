@@ -11,6 +11,8 @@ rust_library(
         # about the dependency below.
         "//dir/subdir:aaa",
         "//dir/subdir:bbb",
+        "//dir/subdir/folder",  # Some in-line comment.
+        "//dir/subdir/folder:xxx",
         "@crate_index//:aaa",
         "@crate_index//:bbb",
         # Some multi-line

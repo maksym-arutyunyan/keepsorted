@@ -7,6 +7,8 @@ rust_library(
         # Keep sorted.
         ":bbb",
         ":aaa",
+        "//dir/subdir/folder:xxx",
+        "//dir/subdir/folder",  # Some in-line comment.
         "//dir/subdir:bbb",
         # Some multi-line comment 
         # about the dependency below.
