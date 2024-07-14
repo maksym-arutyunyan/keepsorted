@@ -25,10 +25,6 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
 
     for &line in block.iter() {
         if line.trim().starts_with('#') {
-            if current_group.comments.is_empty() && !current_group.code.is_empty() {
-                groups.push(current_group);
-                current_group = LineGroup::new();
-            }
             current_group.comments.push(line);
         } else {
             current_group.code = line;
@@ -36,7 +32,6 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
             current_group = LineGroup::new();
         }
     }
-
     let trailing_comments = current_group.comments;
 
     match strategy {
@@ -53,21 +48,19 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
 }
 
 fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
-    let key_a = sorting_key(a);
-    let key_b = sorting_key(b);
-    key_a.cmp(&key_b)
+    sorting_key(a).cmp(&sorting_key(b))
 }
 
 fn sorting_key(line: &str) -> (u8, &str) {
-    let line = line.trim();
-    if line.starts_with(r#"":"#) {
-        (0, line)
-    } else if line.starts_with(r#""//"#) {
-        (1, line)
-    } else if line.starts_with(r#""@"#) {
-        (2, line)
+    let trimmed = line.trim();
+    if trimmed.starts_with(r#"":"#) {
+        (0, trimmed)
+    } else if trimmed.starts_with(r#""//"#) {
+        (1, trimmed)
+    } else if trimmed.starts_with(r#""@"#) {
+        (2, trimmed)
     } else {
-        (3, line)
+        (3, trimmed)
     }
 }
 
