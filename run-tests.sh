@@ -42,7 +42,7 @@ for src_file in "$TEST_DIR"/*_in*; do
     fi
 
     # Create a temporary file and copy the source file to it
-    TEMP_FILE=$(mktemp)
+    TEMP_FILE=$(mktemp --suffix=".$extension")
     cp "$src_file" "$TEMP_FILE"
 
     # Run the binary on the temporary file

@@ -37,6 +37,13 @@ fn main() -> io::Result<()> {
     process_file(path)
 }
 
+fn is_bazel_related(path: &Path) -> bool {
+    match path.extension().and_then(|s| s.to_str()) {
+        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
+        None => false,
+    }
+}
+
 fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
@@ -46,7 +53,12 @@ fn process_file(path: &Path) -> io::Result<()> {
     }
     let lines: Vec<&str> = content.split_inclusive('\n').collect();
 
-    let output_lines = process_lines(lines)?;
+    // Check the file extension
+    let output_lines = if is_bazel_related(path) {
+        process_lines_bazel(lines)?
+    } else {
+        process_lines(lines)?
+    };
 
     let n = output_lines.len();
     let output_file = File::create(path)?;
