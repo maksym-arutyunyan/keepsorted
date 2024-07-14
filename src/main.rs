@@ -270,6 +270,33 @@ mod test {
     }
 
     #[test]
+    #[ignore]
+    fn bazel_block_with_comment() {
+        let input = r#"
+            block = [
+                # Keep sorted.
+                "d",
+                # Some comment about the line below.
+                "c",
+                "b",
+                "a",
+            ]
+        "#;
+        let expected = r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                # Some comment about the line below.
+                "c",
+                "d",
+            ]
+        "#;
+        let result = process_text_bazel(input).unwrap();
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
+    }
+
+    #[test]
     fn bazel_blocks() {
         let input = r#"
             block_1 = [
