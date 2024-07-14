@@ -1,0 +1,18 @@
+rust_library(
+    name = "some_library",
+    srcs = [
+        "src/lib.rs",
+    ],
+    deps = [
+        # Keep sorted.
+        ":bbb",
+        ":aaa",
+        "//dir/subdir:bbb",
+        # Some multi-line comment 
+        # about the dependency below.
+        "//dir/subdir:aaa",
+        "@crate_index//:bbb",
+        "@crate_index//:aaa",
+    ],
+)
+
