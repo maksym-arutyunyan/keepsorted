@@ -5,32 +5,32 @@ rust_library(
     ],
     proc_macro_deps = [
         # Keep sorted.
-        ":bbb",
         ":aaa",
-        "//dir/subdir:bbb",
+        ":bbb",
         "//dir/subdir:aaa",
-        "@crate_index//:bbb",
+        "//dir/subdir:bbb",
         "@crate_index//:aaa",
+        "@crate_index//:bbb",
     ] + select({
         "@platforms//os:osx": [
             # Keep sorted.
-            ":bbb",
             ":aaa",
-            "//dir/subdir:bbb",
+            ":bbb",
             "//dir/subdir:aaa",
-            "@crate_index//:bbb",
+            "//dir/subdir:bbb",
             "@crate_index//:aaa",
+            "@crate_index//:bbb",
         ],
         "//conditions:default": [
         ],
     }),
     deps = [
         # Keep sorted.
-        ":bbb",
         ":aaa",
-        "//dir/subdir:bbb",
+        ":bbb",
         "//dir/subdir:aaa",
-        "@crate_index//:bbb",
+        "//dir/subdir:bbb",
         "@crate_index//:aaa",
+        "@crate_index//:bbb",
     ],
 )
