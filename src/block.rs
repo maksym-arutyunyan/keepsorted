@@ -19,12 +19,17 @@ impl<'a> LineGroup<'a> {
     }
 }
 
+fn is_single_line_comment(line: &str) -> bool {
+    let trimmed = line.trim();
+    ["#", "//"].iter().any(|&token| trimmed.starts_with(token))
+}
+
 pub fn sort(block: &mut [&str], strategy: SortStrategy) {
     let mut groups = Vec::new();
     let mut current_group = LineGroup::new();
 
     for &line in block.iter() {
-        if line.trim().starts_with('#') {
+        if is_single_line_comment(line) {
             current_group.comments.push(line);
         } else {
             current_group.code = line;
@@ -157,7 +162,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn with_several_single_line_comments_rust() {
         let mut input = vec![
             "y",
@@ -166,6 +170,8 @@ mod tests {
             "x",
             "b", 
             "a",
+            "// Some multi-line comment",
+            "// trailing comment.",
         ];
         let expected = vec![
             "a",
@@ -174,6 +180,8 @@ mod tests {
             "// for the line below.",
             "x",
             "y",
+            "// Some multi-line comment",
+            "// trailing comment.",
         ];
         sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
