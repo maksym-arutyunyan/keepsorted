@@ -66,7 +66,7 @@ fn process_file(path: &Path) -> io::Result<()> {
 
 fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let re =
-        Regex::new(r"^\s*# Keep sorted.\s*$").map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+        Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$").map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
