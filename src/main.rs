@@ -95,11 +95,30 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     Ok(output_lines)
 }
 
+fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
+    let key_a = sorting_key(a);
+    let key_b = sorting_key(b);
+    key_a.cmp(&key_b)
+}
+
+fn sorting_key(line: &str) -> (u8, &str) {
+    let line = line.trim();
+    if line.starts_with(r#"":"#) {
+        (0, line)
+    } else if line.starts_with(r#""//"#) {
+        (1, line)
+    } else if line.starts_with(r#""@"#) {
+        (2, line)
+    } else {
+        (3, line)
+    }
+}
+
 fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
-    let mut block = Vec::new();
+    let mut block = Vec::<&str>::new();
     let mut is_scope = false;
     let mut is_sorting_block = false;
 
@@ -117,7 +136,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
                 output_lines.push(line);
             } else if is_sorting_block && is_sorting_block_end(line) {
                 is_sorting_block = false;
-                block.sort_unstable();
+                block.sort_by(|&a, &b| custom_comparator(a, b));
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -131,7 +150,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        block.sort_unstable();
+        block.sort_by(|&a, &b| custom_comparator(a, b));
         output_lines.append(&mut block);
     }
 
@@ -321,7 +340,6 @@ mod test {
     }
 
     #[test]
-    #[ignore]
     fn bazel_order() {
         let input = r#"
             block = [
