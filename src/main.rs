@@ -4,6 +4,8 @@ use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
 
+mod block;
+
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
@@ -89,7 +91,7 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
             output_lines.push(line);
         } else if is_sorting_block && line.trim().is_empty() {
             is_sorting_block = false;
-            block.sort_unstable();
+            block::sort(&mut block);
             output_lines.append(&mut block);
             output_lines.push(line);
         } else if is_sorting_block {
@@ -100,30 +102,11 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        block.sort_unstable();
+        block::sort(&mut block);
         output_lines.append(&mut block);
     }
 
     Ok(output_lines)
-}
-
-fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
-    let key_a = sorting_key(a);
-    let key_b = sorting_key(b);
-    key_a.cmp(&key_b)
-}
-
-fn sorting_key(line: &str) -> (u8, &str) {
-    let line = line.trim();
-    if line.starts_with(r#"":"#) {
-        (0, line)
-    } else if line.starts_with(r#""//"#) {
-        (1, line)
-    } else if line.starts_with(r#""@"#) {
-        (2, line)
-    } else {
-        (3, line)
-    }
 }
 
 fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
@@ -148,7 +131,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
                 output_lines.push(line);
             } else if is_sorting_block && is_sorting_block_end(line) {
                 is_sorting_block = false;
-                block.sort_by(|&a, &b| custom_comparator(a, b));
+                block::sort_bazel(&mut block);
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -162,7 +145,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        block.sort_by(|&a, &b| custom_comparator(a, b));
+        block::sort_bazel(&mut block);
         output_lines.append(&mut block);
     }
 
@@ -170,7 +153,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
 }
 
 #[cfg(test)]
-mod test {
+mod main {
     use super::*;
 
     // Helper function to hide text-lines conversion.
@@ -188,37 +171,34 @@ mod test {
 
     #[test]
     fn empty() {
-        let (input, expected) = ("", "");
+        let input = "";
+        let expected = "";
         let result = process_text(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
     fn single_letter() {
-        let (input, expected) = (
-            "
-                a
-            ",
-            "
-                a
-            ",
-        );
+        let input = "
+            a
+        ";
+        let expected = "
+            a
+        ";
         let result = process_text(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
     fn no_comment() {
-        let (input, expected) = (
-            "
-                b
-                a
-            ",
-            "
-                b
-                a
-            ",
-        );
+        let input = "
+            b
+            a
+        ";
+        let expected = "
+            b
+            a
+        ";
         let result = process_text(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
