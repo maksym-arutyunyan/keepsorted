@@ -1,10 +1,14 @@
 
-pub fn sort(block: &mut [&str]) {
-    block.sort_unstable();
+pub enum SortStrategy {
+    Default = 0,
+    Bazel = 1,
 }
 
-pub fn sort_bazel(block: &mut [&str]) {
-    block.sort_by(|&a, &b| custom_comparator(a, b));
+pub fn sort(block: &mut [&str], strategy: SortStrategy) {
+    match strategy {
+        SortStrategy::Bazel => block.sort_by(|&a, &b| custom_comparator(a, b)),
+        _ => block.sort_unstable(),
+    }
 }
 
 fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
@@ -34,7 +38,7 @@ mod tests {
     fn simple() {
         let mut input = vec!["b", "a"];
         let expected = vec!["a", "b"];
-        sort(&mut input);
+        sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
 
@@ -56,7 +60,7 @@ mod tests {
             r#""@crate_index//:aaa""#,
             r#""@crate_index//:bbb""#,
         ];
-        sort_bazel(&mut input);
+        sort(&mut input, SortStrategy::Bazel);
         assert_eq!(input, expected);
     }
 
@@ -79,7 +83,7 @@ mod tests {
             "x",
             "y",
         ];
-        sort(&mut input);
+        sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
 
@@ -102,7 +106,7 @@ mod tests {
             "x",
             "y",
         ];
-        sort(&mut input);
+        sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
 
@@ -125,7 +129,7 @@ mod tests {
             "x",
             "y",
         ];
-        sort(&mut input);
+        sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
 }

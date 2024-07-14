@@ -3,6 +3,7 @@ use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
+use crate::block::{SortStrategy, sort};
 
 mod block;
 
@@ -91,7 +92,7 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
             output_lines.push(line);
         } else if is_sorting_block && line.trim().is_empty() {
             is_sorting_block = false;
-            block::sort(&mut block);
+            block::sort(&mut block, SortStrategy::Default);
             output_lines.append(&mut block);
             output_lines.push(line);
         } else if is_sorting_block {
@@ -102,7 +103,7 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        block::sort(&mut block);
+        block::sort(&mut block, SortStrategy::Default);
         output_lines.append(&mut block);
     }
 
@@ -131,7 +132,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
                 output_lines.push(line);
             } else if is_sorting_block && is_sorting_block_end(line) {
                 is_sorting_block = false;
-                block::sort_bazel(&mut block);
+                sort(&mut block, SortStrategy::Bazel);
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -145,7 +146,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        block::sort_bazel(&mut block);
+        sort(&mut block, SortStrategy::Bazel);
         output_lines.append(&mut block);
     }
 
