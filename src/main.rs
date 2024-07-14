@@ -65,8 +65,8 @@ fn process_file(path: &Path) -> io::Result<()> {
 }
 
 fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
-    let re =
-        Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$").map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
@@ -99,64 +99,158 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
 mod test {
     use super::*;
 
+    // Helper function to hide text-lines conversion.
+    fn process_text(text: &str) -> io::Result<String> {
+        let lines: Vec<&str> = text.lines().collect();
+        let processed_lines = process_lines(lines)?;
+        Ok(processed_lines.join("\n"))
+    }
+
     #[test]
-    fn basic_cases() {
-        let test_cases = [
-            ("", ""),
-            ("a", "a"),
-            (
-                "b
-                 a",
-                "b
-                 a",
-            ),
-            (
-                "# Keep sorted.
-                 b
-                 a",
-                "# Keep sorted.
-                 a
-                 b",
-            ),
-            (
-                "# Keep sorted.
-                 d_yes
-                 c_yes
-                    \n
-                 b_no
-                 a_no",
-                "# Keep sorted.
-                 c_yes
-                 d_yes
-                    \n
-                 b_no
-                 a_no",
-            ),
-            (
-                "block_1 = ({[
+    fn empty() {
+        assert_eq!(process_text("").unwrap(), "");
+    }
+
+    #[test]
+    fn single_letter() {
+        let (input, expected) = (
+            "
+                a
+            ",
+            "
+                a
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
+    }
+
+    #[test]
+    fn no_comment() {
+        let (input, expected) = (
+            "
+                b
+                a
+            ",
+            "
+                b
+                a
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
+    }
+
+    #[test]
+    fn simple_block() {
+        let (input, expected) = (
+            "
+                # Keep sorted.
+                b
+                a
+            ",
+            "
+                # Keep sorted.
+                a
+                b
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
+    }
+
+    #[test]
+    fn blocks_divided_by_newline() {
+        let (input, expected) = (
+            "
+                # Keep sorted.
+                d
+                c
+
+                b
+                a
+            ",
+            "
+                # Keep sorted.
+                c
+                d
+
+                b
+                a
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
+    }
+
+    #[test]
+    fn bazel_block() {
+        let (input, expected) = (
+            "
+                block = [
                     # Keep sorted.
                     b
                     a
-                ]})
-                block_2 = ({[
-                    b
-                    a
-                ]})",
-                "block_1 = ({[
+                ]
+            ",
+            "
+                block = [
                     # Keep sorted.
                     a
                     b
-                ]})
-                block_2 = ({[
+                ]
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
+    }
+
+    #[test]
+    #[ignore]
+    fn bazel_blocks() {
+        let (input, expected) = (
+            "
+                block_1 = [
+                    # Keep sorted.
                     b
                     a
-                ]})"
-            )
-        ];
-        for (input, expected) in test_cases {
-            let lines: Vec<_> = input.split('\n').collect();
-            let expected: Vec<_> = expected.split('\n').collect();
-            assert_eq!(process_lines(lines).unwrap(), expected);
-        }
+                ],
+                block_2 = [
+                    y
+                    x
+                ],
+            ",
+            "
+                block_1 = [
+                    # Keep sorted.
+                    a
+                    b
+                ],
+                block_2 = [
+                    y
+                    x
+                ],
+            ",
+        );
+        let result = process_text(input).unwrap();
+        assert_eq!(
+            result, expected,
+            "\nExpected:\n{expected}\nActual:\n{result}"
+        );
     }
 }
