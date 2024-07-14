@@ -108,7 +108,9 @@ mod test {
 
     #[test]
     fn empty() {
-        assert_eq!(process_text("").unwrap(), "");
+        let (input, expected) = ("", "");
+        let result = process_text(input).unwrap();
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
@@ -122,10 +124,7 @@ mod test {
             ",
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
-        );
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
@@ -141,10 +140,7 @@ mod test {
             ",
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
-        );
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
@@ -162,10 +158,7 @@ mod test {
             ",
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
-        );
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
@@ -189,68 +182,135 @@ mod test {
             ",
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
-        );
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
     fn bazel_block() {
         let (input, expected) = (
-            "
+            r#"
                 block = [
                     # Keep sorted.
-                    b
-                    a
+                    "b",
+                    "a",
                 ]
-            ",
-            "
+            "#,
+            r#"
                 block = [
                     # Keep sorted.
-                    a
-                    b
+                    "a",
+                    "b",
                 ]
-            ",
+            "#,
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
-        );
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
     #[ignore]
     fn bazel_blocks() {
         let (input, expected) = (
-            "
+            r#"
                 block_1 = [
                     # Keep sorted.
-                    b
-                    a
+                    "b",
+                    "a",
                 ],
                 block_2 = [
-                    y
-                    x
+                    "y",
+                    "x",
                 ],
-            ",
-            "
+            "#,
+            r#"
                 block_1 = [
                     # Keep sorted.
-                    a
-                    b
+                    "a",
+                    "b",
                 ],
                 block_2 = [
-                    y
-                    x
+                    "y",
+                    "x",
                 ],
-            ",
+            "#,
         );
         let result = process_text(input).unwrap();
-        assert_eq!(
-            result, expected,
-            "\nExpected:\n{expected}\nActual:\n{result}"
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
+    }
+
+    #[test]
+    #[ignore]
+    fn bazel_blocks_select() {
+        let (input, expected) = (
+            r#"
+                deps = [
+                    # Keep sorted.
+                    "b",
+                    "a",
+                ] + select({
+                    "@platforms//os:osx": [
+                        # Keep sorted.
+                        "y",
+                        "x",
+                    ],
+                    "//conditions:default": [
+                        # Keep sorted.
+                        "m",
+                        "k",
+                    ],
+                })
+            "#,
+            r#"
+                deps = [
+                    # Keep sorted.
+                    "a",
+                    "b",
+                ] + select({
+                    "@platforms//os:osx": [
+                        # Keep sorted.
+                        "x",
+                        "y",
+                    ],
+                    "//conditions:default": [
+                        # Keep sorted.
+                        "k",
+                        "m",
+                    ],
+                })
+            "#,
         );
+        let result = process_text(input).unwrap();
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
+    }
+
+    #[test]
+    #[ignore]
+    fn bazel_order() {
+        let (input, expected) = (
+            r#"
+                block = [
+                    # Keep sorted.
+                    ":b",
+                    ":a",
+                    "//path/b",
+                    "//path/a",
+                    "@crate_index//:b",
+                    "@crate_index//:a",
+                ]
+            "#,
+            r#"
+                block = [
+                    # Keep sorted.
+                    ":a",
+                    ":b",
+                    "//path/a",
+                    "//path/b",
+                    "@crate_index//:a",
+                    "@crate_index//:b",
+                ]
+            "#,
+        );
+        let result = process_text(input).unwrap();
+        assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 }
