@@ -1,6 +1,0 @@
-# Expect block without trailing empty line at EOF to be sorted.
-BLOCK = [
-    # Keep sorted.
-    "a",
-    "b",
-]
