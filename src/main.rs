@@ -135,11 +135,11 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let mut is_sorting_block = false;
 
     fn is_sorting_block_end(line: &str) -> bool {
-        line.contains("]") || line.trim().is_empty()
+        line.contains(']') || line.trim().is_empty()
     }
 
     for line in lines {
-        if line.contains("[") {
+        if line.contains('[') {
             is_scope = true;
             output_lines.push(line);
         } else if is_scope {
