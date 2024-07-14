@@ -95,6 +95,49 @@ fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     Ok(output_lines)
 }
 
+fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
+    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+    let mut output_lines = Vec::new();
+    let mut block = Vec::new();
+    let mut is_scope = false;
+    let mut is_sorting_block = false;
+
+    fn is_sorting_block_end(line: &str) -> bool {
+        line.contains("]") || line.trim().is_empty()
+    }
+
+    for line in lines {
+        if line.contains("[") {
+            is_scope = true;
+            output_lines.push(line);
+        } else if is_scope {
+            if re.is_match(line) {
+                is_sorting_block = true;
+                output_lines.push(line);
+            } else if is_sorting_block && is_sorting_block_end(line) {
+                is_sorting_block = false;
+                block.sort_unstable();
+                output_lines.append(&mut block);
+                output_lines.push(line);
+            } else if is_sorting_block {
+                block.push(line);
+            } else {
+                output_lines.push(line);
+            }
+        } else {
+            output_lines.push(line);
+        }
+    }
+
+    if is_sorting_block {
+        block.sort_unstable();
+        output_lines.append(&mut block);
+    }
+
+    Ok(output_lines)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -103,6 +146,12 @@ mod test {
     fn process_text(text: &str) -> io::Result<String> {
         let lines: Vec<&str> = text.lines().collect();
         let processed_lines = process_lines(lines)?;
+        Ok(processed_lines.join("\n"))
+    }
+
+    fn process_text_bazel(text: &str) -> io::Result<String> {
+        let lines: Vec<&str> = text.lines().collect();
+        let processed_lines = process_lines_bazel(lines)?;
         Ok(processed_lines.join("\n"))
     }
 
@@ -197,12 +246,11 @@ mod test {
                 "b",
             ]
         "#;
-        let result = process_text(input).unwrap();
+        let result = process_text_bazel(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
-    #[ignore]
     fn bazel_blocks() {
         let input = r#"
             block_1 = [
@@ -226,12 +274,11 @@ mod test {
                 "x",
             ],
         "#;
-        let result = process_text(input).unwrap();
+        let result = process_text_bazel(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
     #[test]
-    #[ignore]
     fn bazel_blocks_select() {
         let input = r#"
             deps = [
@@ -269,7 +316,7 @@ mod test {
                 ],
             })
         "#;
-        let result = process_text(input).unwrap();
+        let result = process_text_bazel(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 
@@ -298,7 +345,7 @@ mod test {
                 "@crate_index//:b",
             ]
         "#;
-        let result = process_text(input).unwrap();
+        let result = process_text_bazel(input).unwrap();
         assert!(result == expected, "Expected: {expected}\nActual: {result}");
     }
 }
