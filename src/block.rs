@@ -27,7 +27,7 @@ fn sorting_key(line: &str) -> (u8, &str) {
 }
 
 #[cfg(test)]
-mod block {
+mod tests {
     use super::*;
 
     #[test]
@@ -35,12 +35,34 @@ mod block {
         let mut input = vec!["b", "a"];
         let expected = vec!["a", "b"];
         sort(&mut input);
-        assert!(input == expected, "Expected: {expected:?}\nActual: {input:?}");
+        assert_eq!(input, expected);
+    }
+
+    #[test]
+    fn bazel_order() {
+        let mut input = vec![
+            r#"":bbb""#,
+            r#"":aaa""#,
+            r#""//dir/subdir:bbb""#,
+            r#""//dir/subdir:aaa""#,
+            r#""@crate_index//:bbb""#,
+            r#""@crate_index//:aaa""#,
+        ];
+        let expected = vec![
+            r#"":aaa""#,
+            r#"":bbb""#,
+            r#""//dir/subdir:aaa""#,
+            r#""//dir/subdir:bbb""#,
+            r#""@crate_index//:aaa""#,
+            r#""@crate_index//:bbb""#,
+        ];
+        sort_bazel(&mut input);
+        assert_eq!(input, expected);
     }
 
     #[test]
     #[ignore]
-    fn with_multi_line_comment() {
+    fn with_multi_line_comment_bazel() {
         let mut input = vec![
             "y",
             "# Some multi-line comment",
@@ -54,6 +76,52 @@ mod block {
             "b", 
             "# Some multi-line comment",
             "# for the line below.",
+            "x",
+            "y",
+        ];
+        sort(&mut input);
+        assert_eq!(input, expected);
+    }
+
+    #[test]
+    #[ignore]
+    fn with_several_single_line_comments_rust() {
+        let mut input = vec![
+            "y",
+            "// Some multi-line comment",
+            "// for the line below.",
+            "x",
+            "b", 
+            "a",
+        ];
+        let expected = vec![
+            "a",
+            "b", 
+            "// Some multi-line comment",
+            "// for the line below.",
+            "x",
+            "y",
+        ];
+        sort(&mut input);
+        assert_eq!(input, expected);
+    }
+
+    #[test]
+    #[ignore]
+    fn with_multi_line_comment_rust() {
+        let mut input = vec![
+            "y",
+            "/* Some multi-line comment",
+            "   for the line below.  */",
+            "x",
+            "b", 
+            "a",
+        ];
+        let expected = vec![
+            "a",
+            "b", 
+            "/* Some multi-line comment",
+            "   for the line below.  */",
             "x",
             "y",
         ];

@@ -153,7 +153,7 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
 }
 
 #[cfg(test)]
-mod main {
+mod main_tests {
     use super::*;
 
     // Helper function to hide text-lines conversion.
