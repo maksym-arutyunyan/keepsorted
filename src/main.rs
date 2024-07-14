@@ -100,54 +100,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn empty_input() {
-        let empty = Vec::<&str>::new();
-        assert_eq!(process_lines(empty.clone()).unwrap(), empty);
-    }
-
-    #[test]
-    fn single_input() {
-        assert_eq!(process_lines(vec!["a"]).unwrap(), vec!["a"]);
-    }
-
-    #[test]
-    fn simple_input_no_trailing_newline() {
-        assert_eq!(
-            process_lines(vec!["# Keep sorted.", "b", "a"]).unwrap(),
-            vec!["# Keep sorted.", "a", "b"]
-        );
-    }
-
-    #[test]
-    fn simple_input_with_trailing_newline() {
-        assert_eq!(
-            process_lines(vec!["# Keep sorted.", "b", "a", ""]).unwrap(),
-            vec!["# Keep sorted.", "a", "b", ""]
-        );
-    }
-
-    #[test]
-    fn simple_cases() {
-        let test_cases = [
-            (vec![], vec![]),
-            (vec!["a"], vec!["a"]),
-            (vec!["# Keep sorted."], vec!["# Keep sorted."]),
-            (
-                vec!["# Keep sorted.", "b", "a"],
-                vec!["# Keep sorted.", "a", "b"],
-            ),
-            (
-                vec!["# Keep sorted.", "b", "a", ""],
-                vec!["# Keep sorted.", "a", "b", ""],
-            ),
-        ];
-        for (input, expected) in test_cases {
-            assert_eq!(process_lines(input).unwrap(), expected);
-        }
-    }
-
-    #[test]
-    fn another_way() {
+    fn basic_cases() {
         let test_cases = [
             ("", ""),
             ("a", "a"),
@@ -179,6 +132,26 @@ mod test {
                  b_no
                  a_no",
             ),
+            (
+                "block_1 = ({[
+                    # Keep sorted.
+                    b
+                    a
+                ]})
+                block_2 = ({[
+                    b
+                    a
+                ]})",
+                "block_1 = ({[
+                    # Keep sorted.
+                    a
+                    b
+                ]})
+                block_2 = ({[
+                    b
+                    a
+                ]})"
+            )
         ];
         for (input, expected) in test_cases {
             let lines: Vec<_> = input.split('\n').collect();
