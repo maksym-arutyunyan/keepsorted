@@ -1,9 +1,9 @@
+use crate::block::{sort, SortStrategy};
 use clap::{arg, command, Parser};
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
-use crate::block::{SortStrategy, sort};
 
 mod block;
 
@@ -263,7 +263,6 @@ mod main_tests {
     }
 
     #[test]
-    //#[ignore]
     fn bazel_block_with_comment() {
         let input = r#"
             block = [
