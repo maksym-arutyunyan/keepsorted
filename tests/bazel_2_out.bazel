@@ -13,6 +13,8 @@ rust_library(
         "//dir/subdir:bbb",
         "@crate_index//:aaa",
         "@crate_index//:bbb",
+        # Some multi-line
+        # trailing comment.
     ],
 )
 

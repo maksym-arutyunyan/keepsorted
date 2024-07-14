@@ -263,7 +263,7 @@ mod main_tests {
     }
 
     #[test]
-    #[ignore]
+    //#[ignore]
     fn bazel_block_with_comment() {
         let input = r#"
             block = [
@@ -273,6 +273,7 @@ mod main_tests {
                 "c",
                 "b",
                 "a",
+                # Trailing comment.
             ]
         "#;
         let expected = r#"
@@ -283,6 +284,7 @@ mod main_tests {
                 # Some comment about the line below.
                 "c",
                 "d",
+                # Trailing comment.
             ]
         "#;
         let result = process_text_bazel(input).unwrap();
