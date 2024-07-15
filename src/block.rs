@@ -90,8 +90,8 @@ fn priority_order(c: char) -> (u8, char) {
         match c {
             '"' => (1, 'a'),
             ':' => (2, 'a'),
-            '/' => (3,'a'),
-            '@' => (4,'a'),
+            '/' => (3, 'a'),
+            '@' => (4, 'a'),
             other => (5, other), // All other characters
         }
     }
@@ -139,18 +139,8 @@ mod tests {
 
     #[test]
     fn with_inline_comment_bazel() {
-        let mut input = vec![
-            "y",
-            "x  # Some in-line comment.",
-            "b",
-            "a",
-        ];
-        let expected = vec![
-            "a",
-            "b",
-            "x  # Some in-line comment.",
-            "y",
-        ];
+        let mut input = vec!["y", "x  # Some in-line comment.", "b", "a"];
+        let expected = vec!["a", "b", "x  # Some in-line comment.", "y"];
         sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
     }
