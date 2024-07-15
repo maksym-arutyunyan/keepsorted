@@ -119,6 +119,7 @@ mod tests {
             r#""//dir/subdir/folder",  # Some in-line comment."#,
             r#""//dir/subdir:bbb","#,
             r#""//dir/subdir:aaa","#,
+            r#""@crate_index//project","#,
             r#""@crate_index//:bbb","#,
             r#""@crate_index//:aaa","#,
         ];
@@ -132,6 +133,7 @@ mod tests {
             r#""//dir/subdir/folder:xxx","#,
             r#""@crate_index//:aaa","#,
             r#""@crate_index//:bbb","#,
+            r#""@crate_index//project","#,
         ];
         sort(&mut input, SortStrategy::Bazel);
         assert_eq!(input, expected);
