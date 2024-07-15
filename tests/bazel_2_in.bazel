@@ -10,9 +10,10 @@ rust_library(
         "//dir/subdir/folder:xxx",
         "//dir/subdir/folder",  # Some in-line comment.
         "//dir/subdir:bbb",
-        # Some multi-line comment 
+        # Some multi-line comment
         # about the dependency below.
         "//dir/subdir:aaa",
+        "@crate_index//project",
         "@crate_index//:bbb",
         "@crate_index//:aaa",
         # Some multi-line

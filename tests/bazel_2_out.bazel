@@ -7,7 +7,7 @@ rust_library(
         # Keep sorted.
         ":aaa",
         ":bbb",
-        # Some multi-line comment 
+        # Some multi-line comment
         # about the dependency below.
         "//dir/subdir:aaa",
         "//dir/subdir:bbb",
@@ -15,8 +15,8 @@ rust_library(
         "//dir/subdir/folder:xxx",
         "@crate_index//:aaa",
         "@crate_index//:bbb",
+        "@crate_index//project",
         # Some multi-line
         # trailing comment.
     ],
 )
-
