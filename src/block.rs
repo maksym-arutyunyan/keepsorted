@@ -120,8 +120,14 @@ mod tests {
             r#""//dir/subdir:bbb","#,
             r#""//dir/subdir:aaa","#,
             r#""@crate_index//project","#,
+            r#""@crate_index//:base64-bytestring","#,
+            r#""@crate_index//:base32","#,
+            r#""@crate_index//:base","#,
             r#""@crate_index//:bbb","#,
             r#""@crate_index//:aaa","#,
+            r#"requirement("gitpython"),"#,
+            r#"requirement("python-gitlab"),"#,
+            r#"requirement("pyyaml"),"#,
         ];
         let expected = vec![
             r#""nested","#,
@@ -132,8 +138,14 @@ mod tests {
             r#""//dir/subdir/folder",  # Some in-line comment."#,
             r#""//dir/subdir/folder:xxx","#,
             r#""@crate_index//:aaa","#,
+            r#""@crate_index//:base","#,
+            r#""@crate_index//:base32","#,
+            r#""@crate_index//:base64-bytestring","#,
             r#""@crate_index//:bbb","#,
             r#""@crate_index//project","#,
+            r#"requirement("gitpython"),"#,
+            r#"requirement("python-gitlab"),"#,
+            r#"requirement("pyyaml"),"#,
         ];
         sort(&mut input, SortStrategy::Bazel);
         assert_eq!(input, expected);
