@@ -8,6 +8,7 @@ rust_library(
         "nested",
         ":bbb",
         ":aaa",
+        "//dir/subdir/folder:yyy",  # TODO[yyy]
         "//dir/subdir/folder:xxx",
         "//dir/subdir/folder",  # Some in-line comment.
         "//dir/subdir:bbb",

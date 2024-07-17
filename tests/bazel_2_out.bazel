@@ -14,6 +14,7 @@ rust_library(
         "//dir/subdir:bbb",
         "//dir/subdir/folder",  # Some in-line comment.
         "//dir/subdir/folder:xxx",
+        "//dir/subdir/folder:yyy",  # TODO[yyy]
         "@crate_index//:aaa",
         "@crate_index//:base",
         "@crate_index//:base32",
