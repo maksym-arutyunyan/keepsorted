@@ -1,13 +1,76 @@
+use std::cmp::Ordering;
+
 #[derive(Debug)]
 pub enum SortStrategy {
     Bazel,
     Default,
 }
 
+// From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
+//
+// A stringSortKey records information about a single string literal to be
+// sorted. The strings are first grouped into four phases: most strings,
+// strings beginning with ":", strings beginning with "//", and strings
+// beginning with "@". The next significant part of the comparison is the list
+// of elements in the value, where elements are split at `.' and `:'. Finally
+// we compare by value and break ties by original index.
+#[derive(Debug, PartialEq, Eq)]
+struct SortKey<'a> {
+    phase: i16,
+    split: Vec<&'a str>,
+}
+
+impl<'a> SortKey<'a> {
+    fn new(line: &'a str) -> Self {
+        // Trim the input line
+        let trimmed = line.trim();
+        
+        // Find and remove the portion of the line starting from the '#' character
+        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+        
+        // Determine the phase based on the beginning of the line
+        let phase = if line_without_comment.starts_with("\":") {
+            1
+        } else if line_without_comment.starts_with("\"//") {
+            2
+        } else if line_without_comment.starts_with("\"@") {
+            3
+        } else if line_without_comment.starts_with("\"") {
+            0
+        } else {
+            4
+        };
+
+        // Split the line into components using '.' and ':' as delimiters
+        let split: Vec<&str> = line_without_comment.split(|c| c == '.' || c == ':' || c == '"').collect();
+
+        // Create and return the SortKey instance
+        Self {
+            phase,
+            split,
+        }
+    }
+}
+
+impl<'a> Ord for SortKey<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.phase
+            .cmp(&other.phase)
+            .then_with(|| self.split.cmp(&other.split))
+    }
+}
+
+impl<'a> PartialOrd for SortKey<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 struct LineGroup<'a> {
     comments: Vec<&'a str>,
     code: &'a str,
+    sort_key: SortKey<'a>,
 }
 
 impl<'a> LineGroup<'a> {
@@ -15,7 +78,13 @@ impl<'a> LineGroup<'a> {
         Self {
             comments: Vec::new(),
             code: "",
+            sort_key: SortKey::new(""),
         }
+    }
+
+    fn set_code(&mut self, line: &'a str) {
+        self.code = line;
+        self.sort_key = SortKey::new(line);
     }
 }
 
@@ -32,7 +101,7 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
         if is_single_line_comment(line) {
             current_group.comments.push(line);
         } else {
-            current_group.code = line;
+            current_group.set_code(line);
             groups.push(current_group);
             current_group = LineGroup::new();
         }
@@ -40,7 +109,7 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
     let trailing_comments = current_group.comments;
 
     match strategy {
-        SortStrategy::Bazel => groups.sort_by(|a, b| custom_comparator(a.code, b.code)),
+        SortStrategy::Bazel => groups.sort_by(|a, b| a.sort_key.cmp(&b.sort_key)),
         _ => groups.sort_by(|a, b| a.code.cmp(b.code)),
     }
 
@@ -58,45 +127,6 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
     block.copy_from_slice(&sorted_block);
 }
 
-fn custom_comparator(a: &str, b: &str) -> std::cmp::Ordering {
-    let trimmed_a = a.trim();
-    let trimmed_b = b.trim();
-
-    let mut iter_a = trimmed_a.chars();
-    let mut iter_b = trimmed_b.chars();
-
-    loop {
-        match (iter_a.next(), iter_b.next()) {
-            (Some(char_a), Some(char_b)) => {
-                let order_a = priority_order(char_a);
-                let order_b = priority_order(char_b);
-
-                match order_a.cmp(&order_b) {
-                    std::cmp::Ordering::Equal => continue,
-                    result => return result,
-                }
-            }
-            (Some(_), None) => return std::cmp::Ordering::Greater,
-            (None, Some(_)) => return std::cmp::Ordering::Less,
-            (None, None) => return std::cmp::Ordering::Equal,
-        }
-    }
-}
-
-fn priority_order(c: char) -> (u8, char) {
-    if c.is_alphanumeric() {
-        (0, c)
-    } else {
-        match c {
-            '"' => (1, 'a'),
-            ':' => (2, 'a'),
-            '/' => (3, 'a'),
-            '@' => (4, 'a'),
-            other => (5, other), // All other characters
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -107,6 +137,33 @@ mod tests {
         let expected = vec!["a", "b"];
         sort(&mut input, SortStrategy::Default);
         assert_eq!(input, expected);
+    }
+
+    #[test]
+    fn sort_key() {
+        let ordered_items = [
+            r#""nested","#,
+            r#"":aaa","#,
+            r#"":bbb","#,
+            r#""//dir/subdir:aaa","#,
+            r#""//dir/subdir:bbb","#,
+            r#""//dir/subdir/folder",  # Some in-line comment."#,
+            r#""//dir/subdir/folder:xxx","#,
+            r#""@crate_index//:aaa","#,
+            r#""@crate_index//:base","#,
+            r#""@crate_index//:base32","#,
+            r#""@crate_index//:base64-bytestring","#,
+            r#""@crate_index//:bbb","#,
+            r#""@crate_index//project","#,
+            r#"requirement("gitpython"),"#,
+            r#"requirement("python-gitlab"),"#,
+            r#"requirement("pyyaml"),"#,
+        ];
+        for window in ordered_items.windows(2) {
+            let left = SortKey::new(window[0]);
+            let right = SortKey::new(window[1]);
+            assert!(left <= right, "Sort order incorrect: {:?} > {:?}", left, right);
+        }
     }
 
     #[test]

@@ -5,6 +5,7 @@ rust_library(
     ],
     deps = [
         # Keep sorted.
+        "nested",
         ":bbb",
         ":aaa",
         "//dir/subdir/folder:xxx",
@@ -26,4 +27,3 @@ rust_library(
         # trailing comment.
     ],
 )
-

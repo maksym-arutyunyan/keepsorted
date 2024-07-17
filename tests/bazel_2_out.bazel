@@ -5,6 +5,7 @@ rust_library(
     ],
     deps = [
         # Keep sorted.
+        "nested",
         ":aaa",
         ":bbb",
         # Some multi-line comment
