@@ -132,7 +132,9 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
             if re.is_match(line) {
                 is_sorting_block = true;
                 output_lines.push(line);
-            } else if is_sorting_block && (line_without_comment.contains(']') || line.trim().is_empty()) {
+            } else if is_sorting_block
+                && (line_without_comment.contains(']') || line.trim().is_empty())
+            {
                 is_sorting_block = false;
                 sort(&mut block, SortStrategy::Bazel);
                 output_lines.append(&mut block);
