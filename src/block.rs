@@ -24,10 +24,10 @@ impl<'a> SortKey<'a> {
     fn new(line: &'a str) -> Self {
         // Trim the input line
         let trimmed = line.trim();
-        
+
         // Find and remove the portion of the line starting from the '#' character
         let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
-        
+
         // Determine the phase based on the beginning of the line
         let phase = if line_without_comment.starts_with("\":") {
             1
@@ -35,20 +35,19 @@ impl<'a> SortKey<'a> {
             2
         } else if line_without_comment.starts_with("\"@") {
             3
-        } else if line_without_comment.starts_with("\"") {
+        } else if line_without_comment.starts_with('"') {
             0
         } else {
             4
         };
 
         // Split the line into components using '.' and ':' as delimiters
-        let split: Vec<&str> = line_without_comment.split(|c| c == '.' || c == ':' || c == '"').collect();
+        let split: Vec<&str> = line_without_comment
+            .split(|c| c == '.' || c == ':' || c == '"')
+            .collect();
 
         // Create and return the SortKey instance
-        Self {
-            phase,
-            split,
-        }
+        Self { phase, split }
     }
 }
 
@@ -162,7 +161,12 @@ mod tests {
         for window in ordered_items.windows(2) {
             let left = SortKey::new(window[0]);
             let right = SortKey::new(window[1]);
-            assert!(left <= right, "Sort order incorrect: {:?} > {:?}", left, right);
+            assert!(
+                left <= right,
+                "Sort order incorrect: {:?} > {:?}",
+                left,
+                right
+            );
         }
     }
 
