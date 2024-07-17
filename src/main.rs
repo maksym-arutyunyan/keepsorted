@@ -118,19 +118,23 @@ fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let mut is_scope = false;
     let mut is_sorting_block = false;
 
-    fn is_sorting_block_end(line: &str) -> bool {
-        line.contains(']') || line.trim().is_empty()
-    }
-
     for line in lines {
-        if line.contains('[') {
+        // Trim the input line
+        let trimmed = line.trim();
+
+        // Find and remove the portion of the line starting from the '#' character
+        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+
+        if line_without_comment.contains('[') {
             is_scope = true;
             output_lines.push(line);
         } else if is_scope {
             if re.is_match(line) {
                 is_sorting_block = true;
                 output_lines.push(line);
-            } else if is_sorting_block && is_sorting_block_end(line) {
+            } else if is_sorting_block
+                && (line_without_comment.contains(']') || line.trim().is_empty())
+            {
                 is_sorting_block = false;
                 sort(&mut block, SortStrategy::Bazel);
                 output_lines.append(&mut block);
@@ -270,7 +274,7 @@ mod main_tests {
                 "d",
                 # Some comment about the line below.
                 "c",
-                "b",
+                "b",  # TODO[bbb]
                 "a",
                 # Trailing comment.
             ]
@@ -279,7 +283,7 @@ mod main_tests {
             block = [
                 # Keep sorted.
                 "a",
-                "b",
+                "b",  # TODO[bbb]
                 # Some comment about the line below.
                 "c",
                 "d",
