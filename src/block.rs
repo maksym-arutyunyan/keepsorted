@@ -1,9 +1,32 @@
 use std::cmp::Ordering;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SortStrategy {
     Default,
     Bazel,
+}
+
+// A SortKey enum to handle different sorting strategies.
+#[derive(Debug, PartialEq, Eq)]
+enum SortKey<'a> {
+    Default(&'a str),
+    Bazel(BazelSortKey<'a>),
+}
+
+impl<'a> Ord for SortKey<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (SortKey::Default(a), SortKey::Default(b)) => a.cmp(b),
+            (SortKey::Bazel(a), SortKey::Bazel(b)) => a.cmp(b),
+            _ => Ordering::Equal, // This should not happen if used correctly
+        }
+    }
+}
+
+impl<'a> PartialOrd for SortKey<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
@@ -59,21 +82,42 @@ impl<'a> PartialOrd for BazelSortKey<'a> {
 struct LineGroup<'a> {
     comments: Vec<&'a str>,
     code: &'a str,
-    bazel_sort_key: BazelSortKey<'a>,
+    strategy: SortStrategy,
+    sort_key: SortKey<'a>,
 }
 
 impl<'a> LineGroup<'a> {
-    fn new() -> Self {
+    fn new(strategy: SortStrategy) -> Self {
+        let sort_key = match strategy {
+            SortStrategy::Default => SortKey::Default(""),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new("")),
+        };
         Self {
-            comments: Vec::new(),
-            code: "",
-            bazel_sort_key: BazelSortKey::new(""),
+            comments: Default::default(),
+            code: Default::default(),
+            strategy,
+            sort_key,
         }
     }
 
     fn set_code(&mut self, line: &'a str) {
         self.code = line;
-        self.bazel_sort_key = BazelSortKey::new(line);
+        self.sort_key = match self.strategy {
+            SortStrategy::Default => SortKey::Default(line),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
+        };
+    }
+}
+
+impl<'a> Ord for LineGroup<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.sort_key.cmp(&other.sort_key)
+    }
+}
+
+impl<'a> PartialOrd for LineGroup<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -84,7 +128,7 @@ fn is_single_line_comment(line: &str) -> bool {
 
 pub fn sort(block: &mut [&str], strategy: SortStrategy) {
     let mut groups = Vec::with_capacity(block.len());
-    let mut current_group = LineGroup::new();
+    let mut current_group = LineGroup::new(strategy.clone());
 
     for &line in block.iter() {
         if is_single_line_comment(line) {
@@ -92,15 +136,12 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
         } else {
             current_group.set_code(line);
             groups.push(current_group);
-            current_group = LineGroup::new();
+            current_group = LineGroup::new(strategy.clone());
         }
     }
     let trailing_comments = current_group.comments;
 
-    match strategy {
-        SortStrategy::Default => groups.sort_by(|a, b| a.code.cmp(b.code)),
-        SortStrategy::Bazel => groups.sort_by(|a, b| a.bazel_sort_key.cmp(&b.bazel_sort_key)),
-    }
+    groups.sort();
 
     let mut sorted_block = Vec::with_capacity(block.len());
     for group in groups {
