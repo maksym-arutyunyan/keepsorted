@@ -14,10 +14,11 @@ macro_rules! test_inner {
         let input = $input;
         let expected = $expected;
         let result = process_bazel(input).unwrap();
-        assert_eq!(
-            result, expected,
+        assert!(
+            result == expected,
             "Expected: {}\nActual: {}",
-            expected, result
+            expected,
+            result
         );
     }};
 }
@@ -37,6 +38,138 @@ fn bazel_single_block() {
                 # Keep sorted.
                 "a",
                 "b",
+            ]
+        "#
+    );
+}
+
+#[test]
+fn bazel_inline_comment() {
+    test_inner!(
+        r#"
+            block = [
+                # Keep sorted.
+                "y",
+                "x",  # Some in-line comment.
+                "b",
+                "a",
+            ]
+        "#,
+        r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                "x",  # Some in-line comment.
+                "y",
+            ]
+        "#
+    );
+}
+
+#[test]
+fn bazel_inline_comment_with_braces() {
+    test_inner!(
+        r#"
+            block = [
+                # Keep sorted.
+                "y",
+                "x",  # TODO[xxx].
+                "b",
+                "a",
+            ]
+        "#,
+        r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                "x",  # TODO[xxx].
+                "y",
+            ]
+        "#
+    );
+}
+
+#[test]
+fn bazel_multi_line_comment() {
+    test_inner!(
+        r#"
+            block = [
+                # Keep sorted.
+                "y",
+                # Some multi-line comment,
+                # for the line below.,
+                "x",
+                "b",
+                "a",
+            ]
+        "#,
+        r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                # Some multi-line comment,
+                # for the line below.,
+                "x",
+                "y",
+            ]
+        "#
+    );
+}
+
+#[test]
+fn bazel_multi_line_trailing_comment() {
+    test_inner!(
+        r#"
+            block = [
+                # Keep sorted.
+                "b",
+                "a",
+                # Some multi-line comment
+                # trailing comment.
+            ]
+        "#,
+        r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                # Some multi-line comment
+                # trailing comment.
+            ]
+        "#
+    );
+}
+
+#[test]
+fn bazel_several_multi_line_comments() {
+    test_inner!(
+        r#"
+            block = [
+                # Keep sorted.
+                "y",
+                # Some multi-line comment
+                # for the line below.
+                "x",
+                "b",
+                "a",
+                # Some multi-line comment
+                # trailing comment.
+            ]
+        "#,
+        r#"
+            block = [
+                # Keep sorted.
+                "a",
+                "b",
+                # Some multi-line comment
+                # for the line below.
+                "x",
+                "y",
+                # Some multi-line comment
+                # trailing comment.
             ]
         "#
     );
@@ -146,23 +279,45 @@ fn bazel_order() {
         r#"
             block = [
                 # Keep sorted.
-                ":b",
-                ":a",
-                "//path/b",
-                "//path/a",
-                "@crate_index//:b",
-                "@crate_index//:a",
+                ":bbb",
+                ":aaa",
+                "nested",
+                "//dir/subdir/folder:yyy",  # TODO[yyy]
+                "//dir/subdir/folder:xxx",
+                "//dir/subdir/folder",  # Some in-line comment.
+                "//dir/subdir:bbb",
+                "//dir/subdir:aaa",
+                "@crate_index//project",
+                "@crate_index//:base64-bytestring",
+                "@crate_index//:base32",
+                "@crate_index//:base",
+                "@crate_index//:bbb",
+                "@crate_index//:aaa",
+                requirement("gitpython"),
+                requirement("python-gitlab"),
+                requirement("pyyaml"),
             ]
         "#,
         r#"
             block = [
                 # Keep sorted.
-                ":a",
-                ":b",
-                "//path/a",
-                "//path/b",
-                "@crate_index//:a",
-                "@crate_index//:b",
+                "nested",
+                ":aaa",
+                ":bbb",
+                "//dir/subdir:aaa",
+                "//dir/subdir:bbb",
+                "//dir/subdir/folder",  # Some in-line comment.
+                "//dir/subdir/folder:xxx",
+                "//dir/subdir/folder:yyy",  # TODO[yyy]
+                "@crate_index//:aaa",
+                "@crate_index//:base",
+                "@crate_index//:base32",
+                "@crate_index//:base64-bytestring",
+                "@crate_index//:bbb",
+                "@crate_index//project",
+                requirement("gitpython"),
+                requirement("python-gitlab"),
+                requirement("pyyaml"),
             ]
         "#
     );

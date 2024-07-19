@@ -14,10 +14,11 @@ macro_rules! test_inner {
         let input = $input;
         let expected = $expected;
         let result = process_default(input).unwrap();
-        assert_eq!(
-            result, expected,
+        assert!(
+            result == expected,
             "Expected: {}\nActual: {}",
-            expected, result
+            expected,
+            result
         );
     }};
 }
@@ -30,63 +31,88 @@ fn default_empty() {
 #[test]
 fn default_single_item() {
     test_inner!(
-        "
+        r#"
             a
-        ",
-        "
+        "#,
+        r#"
             a
-        "
+        "#
     );
 }
 
 #[test]
 fn default_no_sorting_comment() {
     test_inner!(
-        "
+        r#"
             b
             a
-        ",
-        "
+        "#,
+        r#"
             b
             a
-        "
+        "#
     );
 }
 
 #[test]
 fn default_simple_block() {
     test_inner!(
-        "
+        r#"
             # Keep sorted.
             b
             a
-        ",
-        "
+        "#,
+        r#"
             # Keep sorted.
             a
             b
-        "
+        "#
     );
 }
 
 #[test]
 fn default_blocks_divided_by_newline() {
     test_inner!(
-        "
+        r#"
             # Keep sorted.
             d
             c
 
             b
             a
-        ",
-        "
+        "#,
+        r#"
             # Keep sorted.
             c
             d
 
             b
             a
-        "
+        "#
+    );
+}
+
+#[test]
+#[ignore]
+fn with_multi_line_comment_rust() {
+    test_inner!(
+        r#"
+            // Keep sorted.
+            y,
+            /* Some multi-line comment,
+               for the line below.  */,
+            x,
+            b,
+            a,
+        "#,
+        r#"
+            // Keep sorted.
+            a,
+            b,
+            /* Some multi-line comment,
+               for the line below.  */,
+            x,
+            y,
+        "#
     );
 }
