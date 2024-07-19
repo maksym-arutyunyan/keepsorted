@@ -6,6 +6,9 @@ use std::path::Path;
 
 mod block;
 
+#[cfg(test)]
+mod tests;
+
 fn is_bazel_related(path: &Path) -> bool {
     match path.extension().and_then(|s| s.to_str()) {
         Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
