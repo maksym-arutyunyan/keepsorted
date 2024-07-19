@@ -1,10 +1,10 @@
-use keepsorted::process_lines_bazel;
+use keepsorted::{process_lines, SortStrategy};
 use std::io::{self};
 
 // Helper function to hide text-lines conversion.
 fn process_bazel(text: &str) -> io::Result<String> {
     let lines: Vec<&str> = text.lines().collect();
-    let processed_lines = process_lines_bazel(lines)?;
+    let processed_lines = process_lines(SortStrategy::Bazel, lines)?;
     Ok(processed_lines.join("\n"))
 }
 

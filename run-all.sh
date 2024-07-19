@@ -5,6 +5,10 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Run cargo build and capture its exit status
+cargo build --release --all-targets
+build_status=$?
+
 # Run cargo test and capture its exit status
 cargo test
 test_status=$?
@@ -23,10 +27,13 @@ e2e_status=$?
 
 # Check the status of each command and print the final status
 echo ""
-if [ $test_status -eq 0 ] && [ $clippy_status -eq 0 ] && [ $fmt_status -eq 0 ] && [ $e2e_status -eq 0 ]; then
+if [ $build_status -eq 0 ] && [ $test_status -eq 0 ] && [ $clippy_status -eq 0 ] && [ $fmt_status -eq 0 ] && [ $e2e_status -eq 0 ]; then
     echo -e "All checks passed ${GREEN}ok${NC}."
 else
     echo -e "Some checks ${RED}FAILED${NC}:"
+    if [ $build_status -ne 0 ]; then
+        echo -e " - cargo build ${RED}FAILED${NC}"
+    fi
     if [ $test_status -ne 0 ]; then
         echo -e " - cargo test ${RED}FAILED${NC}"
     fi

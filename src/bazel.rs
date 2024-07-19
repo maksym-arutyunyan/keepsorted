@@ -1,4 +1,7 @@
+use crate::block::{sort, SortStrategy};
+use regex::Regex;
 use std::cmp::Ordering;
+use std::io::{self};
 use std::path::Path;
 
 pub(crate) fn is_bazel(path: &Path) -> bool {
@@ -6,6 +9,53 @@ pub(crate) fn is_bazel(path: &Path) -> bool {
         Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
         None => false,
     }
+}
+
+pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
+    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+    let mut output_lines = Vec::new();
+    let mut block = Vec::<&str>::new();
+    let mut is_scope = false;
+    let mut is_sorting_block = false;
+
+    for line in lines {
+        // Trim the input line
+        let trimmed = line.trim();
+
+        // Find and remove the portion of the line starting from the '#' character
+        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+
+        if line_without_comment.contains('[') {
+            is_scope = true;
+            output_lines.push(line);
+        } else if is_scope {
+            if re.is_match(line) {
+                is_sorting_block = true;
+                output_lines.push(line);
+            } else if is_sorting_block
+                && (line_without_comment.contains(']') || line.trim().is_empty())
+            {
+                is_sorting_block = false;
+                sort(&mut block, SortStrategy::Bazel);
+                output_lines.append(&mut block);
+                output_lines.push(line);
+            } else if is_sorting_block {
+                block.push(line);
+            } else {
+                output_lines.push(line);
+            }
+        } else {
+            output_lines.push(line);
+        }
+    }
+
+    if is_sorting_block {
+        sort(&mut block, SortStrategy::Bazel);
+        output_lines.append(&mut block);
+    }
+
+    Ok(output_lines)
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go

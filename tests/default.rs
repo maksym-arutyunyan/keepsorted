@@ -1,10 +1,10 @@
-use keepsorted::process_lines;
+use keepsorted::{process_lines, SortStrategy};
 use std::io::{self};
 
 // Helper function to hide text-lines conversion.
 fn process_default(text: &str) -> io::Result<String> {
     let lines: Vec<&str> = text.lines().collect();
-    let processed_lines = process_lines(lines)?;
+    let processed_lines = process_lines(SortStrategy::Default, lines)?;
     Ok(processed_lines.join("\n"))
 }
 
