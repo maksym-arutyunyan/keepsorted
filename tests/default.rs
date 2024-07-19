@@ -93,7 +93,7 @@ fn default_blocks_divided_by_newline() {
 }
 
 #[test]
-#[ignore]
+#[ignore]  // TODO: move to the appropriate place.
 fn with_multi_line_comment_rust() {
     test_inner!(
         r#"
