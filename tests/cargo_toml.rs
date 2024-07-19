@@ -130,3 +130,28 @@ y = "4"
         "#
     );
 }
+
+#[test]
+fn cargo_toml_nested_list() {
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+b = { workspace = true, default-features = false, features = [
+    "z",
+    "y",
+    "x",
+] }
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = { workspace = true, default-features = false, features = [
+    "z",
+    "y",
+    "x",
+] }
+        "#
+    );
+}
