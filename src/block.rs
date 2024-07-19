@@ -6,6 +6,14 @@ pub enum SortStrategy {
     Default,
 }
 
+// From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
+//
+// A stringSortKey records information about a single string literal to be
+// sorted. The strings are first grouped into four phases: most strings,
+// strings beginning with ":", strings beginning with "//", and strings
+// beginning with "@". The next significant part of the comparison is the list
+// of elements in the value, where elements are split at `.' and `:'. Finally
+// we compare by value and break ties by original index.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SortKey<'a> {
     phase: i16,
