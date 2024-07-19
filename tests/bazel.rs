@@ -1,31 +1,12 @@
-use keepsorted::{process_lines, SortStrategy};
-use std::io::{self};
+#[macro_use]
+mod common;
 
-// Helper function to hide text-lines conversion.
-fn process_input(text: &str) -> io::Result<String> {
-    let lines: Vec<&str> = text.lines().collect();
-    let processed_lines = process_lines(SortStrategy::Bazel, lines)?;
-    Ok(processed_lines.join("\n"))
-}
-
-// Macro for defining the core test logic.
-macro_rules! test_inner {
-    ($input:expr, $expected:expr) => {{
-        let input = $input;
-        let expected = $expected;
-        let result = process_input(input).unwrap();
-        assert!(
-            result == expected,
-            "Expected: {}\nActual: {}",
-            expected,
-            result
-        );
-    }};
-}
+use keepsorted::SortStrategy;
 
 #[test]
 fn bazel_single_block() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -46,6 +27,7 @@ fn bazel_single_block() {
 #[test]
 fn bazel_inline_comment() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -70,6 +52,7 @@ fn bazel_inline_comment() {
 #[test]
 fn bazel_inline_comment_with_braces() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -94,6 +77,7 @@ fn bazel_inline_comment_with_braces() {
 #[test]
 fn bazel_multi_line_comment() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -122,6 +106,7 @@ fn bazel_multi_line_comment() {
 #[test]
 fn bazel_multi_line_trailing_comment() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -146,6 +131,7 @@ fn bazel_multi_line_trailing_comment() {
 #[test]
 fn bazel_several_multi_line_comments() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -178,6 +164,7 @@ fn bazel_several_multi_line_comments() {
 #[test]
 fn bazel_single_block_with_comment() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.
@@ -206,6 +193,7 @@ fn bazel_single_block_with_comment() {
 #[test]
 fn bazel_blocks() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block_1 = [
                 # Keep sorted.
@@ -234,6 +222,7 @@ fn bazel_blocks() {
 #[test]
 fn bazel_blocks_with_select() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             deps = [
                 # Keep sorted.
@@ -276,6 +265,7 @@ fn bazel_blocks_with_select() {
 #[test]
 fn bazel_order() {
     test_inner!(
+        SortStrategy::Bazel,
         r#"
             block = [
                 # Keep sorted.

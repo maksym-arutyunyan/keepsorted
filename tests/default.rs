@@ -1,36 +1,17 @@
-use keepsorted::{process_lines, SortStrategy};
-use std::io::{self};
+#[macro_use]
+mod common;
 
-// Helper function to hide text-lines conversion.
-fn process_input(text: &str) -> io::Result<String> {
-    let lines: Vec<&str> = text.lines().collect();
-    let processed_lines = process_lines(SortStrategy::Default, lines)?;
-    Ok(processed_lines.join("\n"))
-}
-
-// Macro for defining the core test logic.
-macro_rules! test_inner {
-    ($input:expr, $expected:expr) => {{
-        let input = $input;
-        let expected = $expected;
-        let result = process_input(input).unwrap();
-        assert!(
-            result == expected,
-            "Expected: {}\nActual: {}",
-            expected,
-            result
-        );
-    }};
-}
+use keepsorted::SortStrategy;
 
 #[test]
 fn default_empty() {
-    test_inner!("", "");
+    test_inner!(SortStrategy::Default, "", "");
 }
 
 #[test]
 fn default_single_item() {
     test_inner!(
+        SortStrategy::Default,
         r#"
             a
         "#,
@@ -43,6 +24,7 @@ fn default_single_item() {
 #[test]
 fn default_no_sorting_comment() {
     test_inner!(
+        SortStrategy::Default,
         r#"
             b
             a
@@ -57,6 +39,7 @@ fn default_no_sorting_comment() {
 #[test]
 fn default_simple_block() {
     test_inner!(
+        SortStrategy::Default,
         r#"
             # Keep sorted.
             b
@@ -73,6 +56,7 @@ fn default_simple_block() {
 #[test]
 fn default_blocks_divided_by_newline() {
     test_inner!(
+        SortStrategy::Default,
         r#"
             # Keep sorted.
             d
@@ -97,6 +81,7 @@ fn default_blocks_divided_by_newline() {
 #[ignore]
 fn with_multi_line_comment_rust() {
     test_inner!(
+        SortStrategy::Default,
         r#"
             // Keep sorted.
             y,
