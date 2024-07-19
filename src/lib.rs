@@ -1,20 +1,14 @@
-use crate::block::{sort, SortStrategy};
-use regex::Regex;
+use crate::bazel::{is_bazel, process_lines_bazel};
+use crate::default::process_lines_default;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
 
+pub use crate::block::SortStrategy;
+
+mod bazel;
 mod block;
-
-#[cfg(test)]
-mod tests;
-
-fn is_bazel(path: &Path) -> bool {
-    match path.extension().and_then(|s| s.to_str()) {
-        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
-        None => false,
-    }
-}
+mod default;
 
 pub fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;
@@ -27,9 +21,9 @@ pub fn process_file(path: &Path) -> io::Result<()> {
 
     // Check the file extension
     let output_lines = if is_bazel(path) {
-        process_lines_bazel(lines)?
+        process_lines(SortStrategy::Bazel, lines)?
     } else {
-        process_lines(lines)?
+        process_lines(SortStrategy::Default, lines)?
     };
 
     let n = output_lines.len();
@@ -48,80 +42,9 @@ pub fn process_file(path: &Path) -> io::Result<()> {
     Ok(())
 }
 
-pub fn process_lines(lines: Vec<&str>) -> io::Result<Vec<&str>> {
-    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
-    let mut output_lines = Vec::new();
-    let mut block = Vec::new();
-    let mut is_sorting_block = false;
-
-    for line in lines {
-        if re.is_match(line) {
-            is_sorting_block = true;
-            output_lines.push(line);
-        } else if is_sorting_block && line.trim().is_empty() {
-            is_sorting_block = false;
-            block::sort(&mut block, SortStrategy::Default);
-            output_lines.append(&mut block);
-            output_lines.push(line);
-        } else if is_sorting_block {
-            block.push(line);
-        } else {
-            output_lines.push(line);
-        }
+pub fn process_lines(strategy: SortStrategy, lines: Vec<&str>) -> io::Result<Vec<&str>> {
+    match strategy {
+        SortStrategy::Default => process_lines_default(lines),
+        SortStrategy::Bazel => process_lines_bazel(lines),
     }
-
-    if is_sorting_block {
-        block::sort(&mut block, SortStrategy::Default);
-        output_lines.append(&mut block);
-    }
-
-    Ok(output_lines)
-}
-
-pub fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
-    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
-    let mut output_lines = Vec::new();
-    let mut block = Vec::<&str>::new();
-    let mut is_scope = false;
-    let mut is_sorting_block = false;
-
-    for line in lines {
-        // Trim the input line
-        let trimmed = line.trim();
-
-        // Find and remove the portion of the line starting from the '#' character
-        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
-
-        if line_without_comment.contains('[') {
-            is_scope = true;
-            output_lines.push(line);
-        } else if is_scope {
-            if re.is_match(line) {
-                is_sorting_block = true;
-                output_lines.push(line);
-            } else if is_sorting_block
-                && (line_without_comment.contains(']') || line.trim().is_empty())
-            {
-                is_sorting_block = false;
-                sort(&mut block, SortStrategy::Bazel);
-                output_lines.append(&mut block);
-                output_lines.push(line);
-            } else if is_sorting_block {
-                block.push(line);
-            } else {
-                output_lines.push(line);
-            }
-        } else {
-            output_lines.push(line);
-        }
-    }
-
-    if is_sorting_block {
-        sort(&mut block, SortStrategy::Bazel);
-        output_lines.append(&mut block);
-    }
-
-    Ok(output_lines)
 }
