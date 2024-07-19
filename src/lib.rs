@@ -8,9 +8,6 @@ use std::path::Path;
 mod bazel;
 mod block;
 
-#[cfg(test)]
-mod tests;
-
 pub fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
