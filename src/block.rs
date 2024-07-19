@@ -6,14 +6,6 @@ pub enum SortStrategy {
     Default,
 }
 
-// From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
-//
-// A stringSortKey records information about a single string literal to be
-// sorted. The strings are first grouped into four phases: most strings,
-// strings beginning with ":", strings beginning with "//", and strings
-// beginning with "@". The next significant part of the comparison is the list
-// of elements in the value, where elements are split at `.' and `:'. Finally
-// we compare by value and break ties by original index.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SortKey<'a> {
     phase: i16,
@@ -22,31 +14,21 @@ pub struct SortKey<'a> {
 
 impl<'a> SortKey<'a> {
     pub fn new(line: &'a str) -> Self {
-        // Trim the input line
         let trimmed = line.trim();
-
-        // Find and remove the portion of the line starting from the '#' character
         let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
 
-        // Determine the phase based on the beginning of the line
-        let phase = if line_without_comment.starts_with("\":") {
-            1
-        } else if line_without_comment.starts_with("\"//") {
-            2
-        } else if line_without_comment.starts_with("\"@") {
-            3
-        } else if line_without_comment.starts_with('"') {
-            0
-        } else {
-            4
+        let phase = match line_without_comment {
+            l if l.starts_with("\":") => 1,
+            l if l.starts_with("\"//") => 2,
+            l if l.starts_with("\"@") => 3,
+            l if l.starts_with('"') => 0,
+            _ => 4,
         };
 
-        // Split the line into components using '.' and ':' as delimiters
         let split: Vec<&str> = line_without_comment
             .split(|c| c == '.' || c == ':' || c == '"')
             .collect();
 
-        // Create and return the SortKey instance
         Self { phase, split }
     }
 }
@@ -89,11 +71,11 @@ impl<'a> LineGroup<'a> {
 
 fn is_single_line_comment(line: &str) -> bool {
     let trimmed = line.trim();
-    ["#", "//"].iter().any(|&token| trimmed.starts_with(token))
+    trimmed.starts_with('#') || trimmed.starts_with("//")
 }
 
 pub fn sort(block: &mut [&str], strategy: SortStrategy) {
-    let mut groups = Vec::new();
+    let mut groups = Vec::with_capacity(block.len());
     let mut current_group = LineGroup::new();
 
     for &line in block.iter() {
@@ -109,19 +91,15 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
 
     match strategy {
         SortStrategy::Bazel => groups.sort_by(|a, b| a.sort_key.cmp(&b.sort_key)),
-        _ => groups.sort_by(|a, b| a.code.cmp(b.code)),
+        SortStrategy::Default => groups.sort_by(|a, b| a.code.cmp(b.code)),
     }
 
-    let sorted_block: Vec<&str> = groups
-        .into_iter()
-        .flat_map(|group| {
-            group
-                .comments
-                .into_iter()
-                .chain(std::iter::once(group.code))
-        })
-        .chain(trailing_comments)
-        .collect();
+    let mut sorted_block = Vec::with_capacity(block.len());
+    for group in groups {
+        sorted_block.extend(group.comments);
+        sorted_block.push(group.code);
+    }
+    sorted_block.extend(trailing_comments);
 
     block.copy_from_slice(&sorted_block);
 }
