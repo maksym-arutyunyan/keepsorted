@@ -1,17 +1,17 @@
 #[macro_use]
 mod common;
 
-use keepsorted::SortStrategy;
+use keepsorted::SortStrategy::Default;
 
 #[test]
 fn default_empty() {
-    test_inner!(SortStrategy::Default, "", "");
+    test_inner!(Default, "", "");
 }
 
 #[test]
 fn default_single_item() {
     test_inner!(
-        SortStrategy::Default,
+        Default,
         r#"
             a
         "#,
@@ -24,7 +24,7 @@ fn default_single_item() {
 #[test]
 fn default_no_sorting_comment() {
     test_inner!(
-        SortStrategy::Default,
+        Default,
         r#"
             b
             a
@@ -39,7 +39,7 @@ fn default_no_sorting_comment() {
 #[test]
 fn default_simple_block() {
     test_inner!(
-        SortStrategy::Default,
+        Default,
         r#"
             # Keep sorted.
             b
@@ -56,7 +56,7 @@ fn default_simple_block() {
 #[test]
 fn default_blocks_divided_by_newline() {
     test_inner!(
-        SortStrategy::Default,
+        Default,
         r#"
             # Keep sorted.
             d
@@ -81,7 +81,7 @@ fn default_blocks_divided_by_newline() {
 #[ignore]
 fn with_multi_line_comment_rust() {
     test_inner!(
-        SortStrategy::Default,
+        Default,
         r#"
             // Keep sorted.
             y,
