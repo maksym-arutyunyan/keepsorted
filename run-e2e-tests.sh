@@ -2,7 +2,7 @@
 
 # Define the path to the binary and test directory
 BINARY_PATH="./target/release/keepsorted"
-TEST_DIR="./tests"
+TEST_DIR="./e2e-tests"
 
 # Define color codes
 GREEN='\033[0;32m'
