@@ -92,8 +92,9 @@ fn default_blocks_divided_by_newline() {
     );
 }
 
+// TODO: move to the appropriate place.
 #[test]
-#[ignore]  // TODO: move to the appropriate place.
+#[ignore]
 fn with_multi_line_comment_rust() {
     test_inner!(
         r#"

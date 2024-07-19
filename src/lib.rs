@@ -1,20 +1,15 @@
+use crate::bazel::is_bazel;
 use crate::block::{sort, SortStrategy};
 use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
 
+mod bazel;
 mod block;
 
 #[cfg(test)]
 mod tests;
-
-fn is_bazel(path: &Path) -> bool {
-    match path.extension().and_then(|s| s.to_str()) {
-        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
-        None => false,
-    }
-}
 
 pub fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;

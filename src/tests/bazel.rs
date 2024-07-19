@@ -1,4 +1,4 @@
-use crate::block;
+use crate::bazel::BazelSortKey;
 
 #[test]
 fn sort_key() {
@@ -22,8 +22,8 @@ fn sort_key() {
         r#"requirement("pyyaml"),"#,
     ];
     for window in ordered_items.windows(2) {
-        let left = block::BazelSortKey::new(window[0]);
-        let right = block::BazelSortKey::new(window[1]);
+        let left = BazelSortKey::new(window[0]);
+        let right = BazelSortKey::new(window[1]);
         assert!(
             left <= right,
             "Sort order incorrect: {:?} > {:?}",
