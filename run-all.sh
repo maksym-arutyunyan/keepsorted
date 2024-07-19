@@ -11,11 +11,11 @@ cargo test
 test_status=$?
 
 # Run clippy and capture its exit status
-./run-clippy.sh
+cargo clippy --all-targets -- -D warnings
 clippy_status=$?
 
 # Run fmt and capture its exit status
-./run-fmt.sh
+cargo fmt --all -- --check
 fmt_status=$?
 
 # Run e2e tests and capture its exit status
