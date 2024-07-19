@@ -2,8 +2,8 @@ use std::cmp::Ordering;
 
 #[derive(Debug)]
 pub enum SortStrategy {
-    Bazel,
     Default,
+    Bazel,
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
@@ -15,12 +15,12 @@ pub enum SortStrategy {
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
 #[derive(Debug, PartialEq, Eq)]
-pub struct SortKey<'a> {
+pub struct BazelSortKey<'a> {
     phase: i16,
     split: Vec<&'a str>,
 }
 
-impl<'a> SortKey<'a> {
+impl<'a> BazelSortKey<'a> {
     pub fn new(line: &'a str) -> Self {
         let trimmed = line.trim();
         let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
@@ -41,7 +41,7 @@ impl<'a> SortKey<'a> {
     }
 }
 
-impl<'a> Ord for SortKey<'a> {
+impl<'a> Ord for BazelSortKey<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.phase
             .cmp(&other.phase)
@@ -49,7 +49,7 @@ impl<'a> Ord for SortKey<'a> {
     }
 }
 
-impl<'a> PartialOrd for SortKey<'a> {
+impl<'a> PartialOrd for BazelSortKey<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -59,7 +59,7 @@ impl<'a> PartialOrd for SortKey<'a> {
 struct LineGroup<'a> {
     comments: Vec<&'a str>,
     code: &'a str,
-    sort_key: SortKey<'a>,
+    bazel_sort_key: BazelSortKey<'a>,
 }
 
 impl<'a> LineGroup<'a> {
@@ -67,13 +67,13 @@ impl<'a> LineGroup<'a> {
         Self {
             comments: Vec::new(),
             code: "",
-            sort_key: SortKey::new(""),
+            bazel_sort_key: BazelSortKey::new(""),
         }
     }
 
     fn set_code(&mut self, line: &'a str) {
         self.code = line;
-        self.sort_key = SortKey::new(line);
+        self.bazel_sort_key = BazelSortKey::new(line);
     }
 }
 
@@ -98,8 +98,8 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
     let trailing_comments = current_group.comments;
 
     match strategy {
-        SortStrategy::Bazel => groups.sort_by(|a, b| a.sort_key.cmp(&b.sort_key)),
         SortStrategy::Default => groups.sort_by(|a, b| a.code.cmp(b.code)),
+        SortStrategy::Bazel => groups.sort_by(|a, b| a.bazel_sort_key.cmp(&b.bazel_sort_key)),
     }
 
     let mut sorted_block = Vec::with_capacity(block.len());
