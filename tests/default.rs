@@ -2,7 +2,7 @@ use keepsorted::{process_lines, SortStrategy};
 use std::io::{self};
 
 // Helper function to hide text-lines conversion.
-fn process_default(text: &str) -> io::Result<String> {
+fn process_input(text: &str) -> io::Result<String> {
     let lines: Vec<&str> = text.lines().collect();
     let processed_lines = process_lines(SortStrategy::Default, lines)?;
     Ok(processed_lines.join("\n"))
@@ -13,7 +13,7 @@ macro_rules! test_inner {
     ($input:expr, $expected:expr) => {{
         let input = $input;
         let expected = $expected;
-        let result = process_default(input).unwrap();
+        let result = process_input(input).unwrap();
         assert!(
             result == expected,
             "Expected: {}\nActual: {}",
