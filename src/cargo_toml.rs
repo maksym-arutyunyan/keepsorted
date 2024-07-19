@@ -2,10 +2,10 @@ use crate::block::{sort, SortStrategy};
 use regex::Regex;
 use std::io::{self};
 
-const STRATEGY: SortStrategy = SortStrategy::Default;
+const STRATEGY: SortStrategy = SortStrategy::CargoToml;
 
-pub(crate) fn process_lines_default(lines: Vec<&str>) -> io::Result<Vec<&str>> {
-    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
+pub(crate) fn process_lines_cargo_toml(lines: Vec<&str>) -> io::Result<Vec<&str>> {
+    let re = Regex::new(r"^\[dependencies\]$")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
     let mut block = Vec::new();

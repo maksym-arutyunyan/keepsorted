@@ -13,10 +13,10 @@ fn default_single_item() {
     test_inner!(
         Default,
         r#"
-            a
+a
         "#,
         r#"
-            a
+a
         "#
     );
 }
@@ -26,12 +26,12 @@ fn default_no_sorting_comment() {
     test_inner!(
         Default,
         r#"
-            b
-            a
+b
+a
         "#,
         r#"
-            b
-            a
+b
+a
         "#
     );
 }
@@ -41,14 +41,14 @@ fn default_simple_block() {
     test_inner!(
         Default,
         r#"
-            # Keep sorted.
-            b
-            a
+# Keep sorted.
+b
+a
         "#,
         r#"
-            # Keep sorted.
-            a
-            b
+# Keep sorted.
+a
+b
         "#
     );
 }
@@ -58,20 +58,20 @@ fn default_blocks_divided_by_newline() {
     test_inner!(
         Default,
         r#"
-            # Keep sorted.
-            d
-            c
+# Keep sorted.
+d
+c
 
-            b
-            a
+b
+a
         "#,
         r#"
-            # Keep sorted.
-            c
-            d
+# Keep sorted.
+c
+d
 
-            b
-            a
+b
+a
         "#
     );
 }
@@ -83,22 +83,22 @@ fn with_multi_line_comment_rust() {
     test_inner!(
         Default,
         r#"
-            // Keep sorted.
-            y,
-            /* Some multi-line comment,
-               for the line below.  */,
-            x,
-            b,
-            a,
+// Keep sorted.
+y,
+/* Some multi-line comment,
+    for the line below.  */,
+x,
+b,
+a,
         "#,
         r#"
-            // Keep sorted.
-            a,
-            b,
-            /* Some multi-line comment,
-               for the line below.  */,
-            x,
-            y,
+// Keep sorted.
+a,
+b,
+/* Some multi-line comment,
+    for the line below.  */,
+x,
+y,
         "#
     );
 }

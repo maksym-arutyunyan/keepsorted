@@ -4,6 +4,8 @@ use std::cmp::Ordering;
 use std::io::{self};
 use std::path::Path;
 
+const STRATEGY: SortStrategy = SortStrategy::Bazel;
+
 pub(crate) fn is_bazel(path: &Path) -> bool {
     match path.extension().and_then(|s| s.to_str()) {
         Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
@@ -37,7 +39,7 @@ pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
                 && (line_without_comment.contains(']') || line.trim().is_empty())
             {
                 is_sorting_block = false;
-                sort(&mut block, SortStrategy::Bazel);
+                sort(&mut block, STRATEGY);
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -51,7 +53,7 @@ pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        sort(&mut block, SortStrategy::Bazel);
+        sort(&mut block, STRATEGY);
         output_lines.append(&mut block);
     }
 

@@ -5,6 +5,7 @@ use std::cmp::Ordering;
 pub enum SortStrategy {
     Default,
     Bazel,
+    CargoToml,
 }
 
 // A SortKey enum to handle different sorting strategies.
@@ -43,6 +44,7 @@ impl<'a> LineGroup<'a> {
         let sort_key = match strategy {
             SortStrategy::Default => SortKey::Default(""),
             SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new("")),
+            SortStrategy::CargoToml => SortKey::Default(""),
         };
         Self {
             comments: Default::default(),
@@ -57,6 +59,7 @@ impl<'a> LineGroup<'a> {
         self.sort_key = match self.strategy {
             SortStrategy::Default => SortKey::Default(line),
             SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
+            SortStrategy::CargoToml => SortKey::Default(line),
         };
     }
 }

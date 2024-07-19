@@ -1,4 +1,5 @@
 use crate::bazel::{is_bazel, process_lines_bazel};
+use crate::cargo_toml::process_lines_cargo_toml;
 use crate::default::process_lines_default;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
@@ -8,6 +9,7 @@ pub use crate::block::SortStrategy;
 
 mod bazel;
 mod block;
+mod cargo_toml;
 mod default;
 
 pub fn process_file(path: &Path) -> io::Result<()> {
@@ -46,5 +48,6 @@ pub fn process_lines(strategy: SortStrategy, lines: Vec<&str>) -> io::Result<Vec
     match strategy {
         SortStrategy::Default => process_lines_default(lines),
         SortStrategy::Bazel => process_lines_bazel(lines),
+        SortStrategy::CargoToml => process_lines_cargo_toml(lines),
     }
 }
