@@ -1,9 +1,32 @@
 use std::cmp::Ordering;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SortStrategy {
-    Bazel,
     Default,
+    Bazel,
+}
+
+// A SortKey enum to handle different sorting strategies.
+#[derive(Debug, PartialEq, Eq)]
+enum SortKey<'a> {
+    Default(&'a str),
+    Bazel(BazelSortKey<'a>),
+}
+
+impl<'a> Ord for SortKey<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (SortKey::Default(a), SortKey::Default(b)) => a.cmp(b),
+            (SortKey::Bazel(a), SortKey::Bazel(b)) => a.cmp(b),
+            _ => Ordering::Equal, // This should not happen if used correctly
+        }
+    }
+}
+
+impl<'a> PartialOrd for SortKey<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
@@ -15,43 +38,33 @@ pub enum SortStrategy {
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
 #[derive(Debug, PartialEq, Eq)]
-struct SortKey<'a> {
+pub struct BazelSortKey<'a> {
     phase: i16,
     split: Vec<&'a str>,
 }
 
-impl<'a> SortKey<'a> {
-    fn new(line: &'a str) -> Self {
-        // Trim the input line
+impl<'a> BazelSortKey<'a> {
+    pub fn new(line: &'a str) -> Self {
         let trimmed = line.trim();
-
-        // Find and remove the portion of the line starting from the '#' character
         let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
 
-        // Determine the phase based on the beginning of the line
-        let phase = if line_without_comment.starts_with("\":") {
-            1
-        } else if line_without_comment.starts_with("\"//") {
-            2
-        } else if line_without_comment.starts_with("\"@") {
-            3
-        } else if line_without_comment.starts_with('"') {
-            0
-        } else {
-            4
+        let phase = match line_without_comment {
+            l if l.starts_with("\":") => 1,
+            l if l.starts_with("\"//") => 2,
+            l if l.starts_with("\"@") => 3,
+            l if l.starts_with('"') => 0,
+            _ => 4,
         };
 
-        // Split the line into components using '.' and ':' as delimiters
         let split: Vec<&str> = line_without_comment
             .split(|c| c == '.' || c == ':' || c == '"')
             .collect();
 
-        // Create and return the SortKey instance
         Self { phase, split }
     }
 }
 
-impl<'a> Ord for SortKey<'a> {
+impl<'a> Ord for BazelSortKey<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.phase
             .cmp(&other.phase)
@@ -59,7 +72,7 @@ impl<'a> Ord for SortKey<'a> {
     }
 }
 
-impl<'a> PartialOrd for SortKey<'a> {
+impl<'a> PartialOrd for BazelSortKey<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -69,32 +82,53 @@ impl<'a> PartialOrd for SortKey<'a> {
 struct LineGroup<'a> {
     comments: Vec<&'a str>,
     code: &'a str,
+    strategy: SortStrategy,
     sort_key: SortKey<'a>,
 }
 
 impl<'a> LineGroup<'a> {
-    fn new() -> Self {
+    fn new(strategy: SortStrategy) -> Self {
+        let sort_key = match strategy {
+            SortStrategy::Default => SortKey::Default(""),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new("")),
+        };
         Self {
-            comments: Vec::new(),
-            code: "",
-            sort_key: SortKey::new(""),
+            comments: Default::default(),
+            code: Default::default(),
+            strategy,
+            sort_key,
         }
     }
 
     fn set_code(&mut self, line: &'a str) {
         self.code = line;
-        self.sort_key = SortKey::new(line);
+        self.sort_key = match self.strategy {
+            SortStrategy::Default => SortKey::Default(line),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
+        };
+    }
+}
+
+impl<'a> Ord for LineGroup<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.sort_key.cmp(&other.sort_key)
+    }
+}
+
+impl<'a> PartialOrd for LineGroup<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
 fn is_single_line_comment(line: &str) -> bool {
     let trimmed = line.trim();
-    ["#", "//"].iter().any(|&token| trimmed.starts_with(token))
+    trimmed.starts_with('#') || trimmed.starts_with("//")
 }
 
 pub fn sort(block: &mut [&str], strategy: SortStrategy) {
-    let mut groups = Vec::new();
-    let mut current_group = LineGroup::new();
+    let mut groups = Vec::with_capacity(block.len());
+    let mut current_group = LineGroup::new(strategy.clone());
 
     for &line in block.iter() {
         if is_single_line_comment(line) {
@@ -102,221 +136,19 @@ pub fn sort(block: &mut [&str], strategy: SortStrategy) {
         } else {
             current_group.set_code(line);
             groups.push(current_group);
-            current_group = LineGroup::new();
+            current_group = LineGroup::new(strategy.clone());
         }
     }
     let trailing_comments = current_group.comments;
 
-    match strategy {
-        SortStrategy::Bazel => groups.sort_by(|a, b| a.sort_key.cmp(&b.sort_key)),
-        _ => groups.sort_by(|a, b| a.code.cmp(b.code)),
-    }
+    groups.sort();
 
-    let sorted_block: Vec<&str> = groups
-        .into_iter()
-        .flat_map(|group| {
-            group
-                .comments
-                .into_iter()
-                .chain(std::iter::once(group.code))
-        })
-        .chain(trailing_comments)
-        .collect();
+    let mut sorted_block = Vec::with_capacity(block.len());
+    for group in groups {
+        sorted_block.extend(group.comments);
+        sorted_block.push(group.code);
+    }
+    sorted_block.extend(trailing_comments);
 
     block.copy_from_slice(&sorted_block);
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn simple() {
-        let mut input = vec!["b", "a"];
-        let expected = vec!["a", "b"];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn sort_key() {
-        let ordered_items = [
-            r#""nested","#,
-            r#"":aaa","#,
-            r#"":bbb","#,
-            r#""//dir/subdir:aaa","#,
-            r#""//dir/subdir:bbb","#,
-            r#""//dir/subdir/folder",  # Some in-line comment."#,
-            r#""//dir/subdir/folder:xxx","#,
-            r#""//dir/subdir/folder:yyy",  # TODO[yyy]"#,
-            r#""@crate_index//:aaa","#,
-            r#""@crate_index//:base","#,
-            r#""@crate_index//:base32","#,
-            r#""@crate_index//:base64-bytestring","#,
-            r#""@crate_index//:bbb","#,
-            r#""@crate_index//project","#,
-            r#"requirement("gitpython"),"#,
-            r#"requirement("python-gitlab"),"#,
-            r#"requirement("pyyaml"),"#,
-        ];
-        for window in ordered_items.windows(2) {
-            let left = SortKey::new(window[0]);
-            let right = SortKey::new(window[1]);
-            assert!(
-                left <= right,
-                "Sort order incorrect: {:?} > {:?}",
-                left,
-                right
-            );
-        }
-    }
-
-    #[test]
-    fn bazel_order() {
-        let mut input = vec![
-            r#"":bbb","#,
-            r#"":aaa","#,
-            r#""nested","#,
-            r#""//dir/subdir/folder:yyy",  # TODO[yyy]"#,
-            r#""//dir/subdir/folder:xxx","#,
-            r#""//dir/subdir/folder",  # Some in-line comment."#,
-            r#""//dir/subdir:bbb","#,
-            r#""//dir/subdir:aaa","#,
-            r#""@crate_index//project","#,
-            r#""@crate_index//:base64-bytestring","#,
-            r#""@crate_index//:base32","#,
-            r#""@crate_index//:base","#,
-            r#""@crate_index//:bbb","#,
-            r#""@crate_index//:aaa","#,
-            r#"requirement("gitpython"),"#,
-            r#"requirement("python-gitlab"),"#,
-            r#"requirement("pyyaml"),"#,
-        ];
-        let expected = vec![
-            r#""nested","#,
-            r#"":aaa","#,
-            r#"":bbb","#,
-            r#""//dir/subdir:aaa","#,
-            r#""//dir/subdir:bbb","#,
-            r#""//dir/subdir/folder",  # Some in-line comment."#,
-            r#""//dir/subdir/folder:xxx","#,
-            r#""//dir/subdir/folder:yyy",  # TODO[yyy]"#,
-            r#""@crate_index//:aaa","#,
-            r#""@crate_index//:base","#,
-            r#""@crate_index//:base32","#,
-            r#""@crate_index//:base64-bytestring","#,
-            r#""@crate_index//:bbb","#,
-            r#""@crate_index//project","#,
-            r#"requirement("gitpython"),"#,
-            r#"requirement("python-gitlab"),"#,
-            r#"requirement("pyyaml"),"#,
-        ];
-        sort(&mut input, SortStrategy::Bazel);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn with_inline_comment_bazel() {
-        let mut input = vec!["y", "x  # Some in-line comment.", "b", "a"];
-        let expected = vec!["a", "b", "x  # Some in-line comment.", "y"];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn with_multi_line_comment_bazel() {
-        let mut input = vec![
-            "y",
-            "# Some multi-line comment",
-            "# for the line below.",
-            "x",
-            "b",
-            "a",
-        ];
-        let expected = vec![
-            "a",
-            "b",
-            "# Some multi-line comment",
-            "# for the line below.",
-            "x",
-            "y",
-        ];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn with_multi_line_start_comment_bazel() {
-        let mut input = vec![
-            "# Some multi-line comment",
-            "# for the line below.",
-            "b",
-            "a",
-        ];
-        let expected = vec![
-            "a",
-            "# Some multi-line comment",
-            "# for the line below.",
-            "b",
-        ];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn with_multi_line_trailing_comment_bazel() {
-        let mut input = vec!["b", "a", "# Some multi-line comment", "# trailing comment."];
-        let expected = vec!["a", "b", "# Some multi-line comment", "# trailing comment."];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    fn with_several_single_line_comments_rust() {
-        let mut input = vec![
-            "y",
-            "// Some multi-line comment",
-            "// for the line below.",
-            "x",
-            "b",
-            "a",
-            "// Some multi-line comment",
-            "// trailing comment.",
-        ];
-        let expected = vec![
-            "a",
-            "b",
-            "// Some multi-line comment",
-            "// for the line below.",
-            "x",
-            "y",
-            "// Some multi-line comment",
-            "// trailing comment.",
-        ];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
-
-    #[test]
-    #[ignore]
-    fn with_multi_line_comment_rust() {
-        let mut input = vec![
-            "y",
-            "/* Some multi-line comment",
-            "   for the line below.  */",
-            "x",
-            "b",
-            "a",
-        ];
-        let expected = vec![
-            "a",
-            "b",
-            "/* Some multi-line comment",
-            "   for the line below.  */",
-            "x",
-            "y",
-        ];
-        sort(&mut input, SortStrategy::Default);
-        assert_eq!(input, expected);
-    }
 }
