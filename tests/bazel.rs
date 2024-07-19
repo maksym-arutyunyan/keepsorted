@@ -23,7 +23,7 @@ macro_rules! test_inner {
 }
 
 #[test]
-fn bazel_block() {
+fn bazel_single_block() {
     test_inner!(
         r#"
             block = [
@@ -43,7 +43,7 @@ fn bazel_block() {
 }
 
 #[test]
-fn bazel_block_with_comment() {
+fn bazel_single_block_with_comment() {
     test_inner!(
         r#"
             block = [
@@ -99,7 +99,7 @@ fn bazel_blocks() {
 }
 
 #[test]
-fn bazel_blocks_select() {
+fn bazel_blocks_with_select() {
     test_inner!(
         r#"
             deps = [

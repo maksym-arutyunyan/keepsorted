@@ -23,12 +23,12 @@ macro_rules! test_inner {
 }
 
 #[test]
-fn empty() {
+fn default_empty() {
     test_inner!("", "");
 }
 
 #[test]
-fn single_letter() {
+fn default_single_item() {
     test_inner!(
         "
             a
@@ -40,7 +40,7 @@ fn single_letter() {
 }
 
 #[test]
-fn no_comment() {
+fn default_no_sorting_comment() {
     test_inner!(
         "
             b
@@ -54,7 +54,7 @@ fn no_comment() {
 }
 
 #[test]
-fn simple_block() {
+fn default_simple_block() {
     test_inner!(
         "
             # Keep sorted.
@@ -70,7 +70,7 @@ fn simple_block() {
 }
 
 #[test]
-fn blocks_divided_by_newline() {
+fn default_blocks_divided_by_newline() {
     test_inner!(
         "
             # Keep sorted.
