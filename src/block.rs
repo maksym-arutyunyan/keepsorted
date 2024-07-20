@@ -32,14 +32,14 @@ impl<'a> PartialOrd for SortKey<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct LineGroup<'a> {
+struct ItemGroup<'a> {
     comments: Vec<&'a str>,
     code: &'a str,
     strategy: SortStrategy,
     sort_key: SortKey<'a>,
 }
 
-impl<'a> LineGroup<'a> {
+impl<'a> ItemGroup<'a> {
     fn new(strategy: SortStrategy) -> Self {
         let sort_key = match strategy {
             SortStrategy::Default => SortKey::Default(""),
@@ -64,13 +64,13 @@ impl<'a> LineGroup<'a> {
     }
 }
 
-impl<'a> Ord for LineGroup<'a> {
+impl<'a> Ord for ItemGroup<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.sort_key.cmp(&other.sort_key)
     }
 }
 
-impl<'a> PartialOrd for LineGroup<'a> {
+impl<'a> PartialOrd for ItemGroup<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -83,7 +83,7 @@ fn is_single_line_comment(line: &str) -> bool {
 
 pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
     let mut groups = Vec::with_capacity(block.len());
-    let mut current_group = LineGroup::new(strategy.clone());
+    let mut current_group = ItemGroup::new(strategy.clone());
 
     for &line in block.iter() {
         if is_single_line_comment(line) {
@@ -91,7 +91,7 @@ pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
         } else {
             current_group.set_code(line);
             groups.push(current_group);
-            current_group = LineGroup::new(strategy.clone());
+            current_group = ItemGroup::new(strategy.clone());
         }
     }
     let trailing_comments = current_group.comments;
