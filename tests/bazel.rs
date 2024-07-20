@@ -82,8 +82,8 @@ fn bazel_multi_line_comment() {
 block = [
     # Keep sorted.
     "y",
-    # Some multi-line comment,
-    # for the line below.,
+    # Some multi-line comment
+    # for the line below.
     "x",
     "b",
     "a",
@@ -94,8 +94,8 @@ block = [
     # Keep sorted.
     "a",
     "b",
-    # Some multi-line comment,
-    # for the line below.,
+    # Some multi-line comment
+    # for the line below.
     "x",
     "y",
 ]

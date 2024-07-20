@@ -67,8 +67,10 @@ fn with_multi_line_comment_rust() {
         r#"
 // Keep sorted.
 y,
-/* Some multi-line comment,
-    for the line below.  */,
+/* 
+ * Some multi-line comment
+ * for the line below.
+ */
 x,
 b,
 a,
@@ -77,8 +79,10 @@ a,
 // Keep sorted.
 a,
 b,
-/* Some multi-line comment,
-    for the line below.  */,
+/* 
+ * Some multi-line comment
+ * for the line below.
+ */
 x,
 y,
         "#
