@@ -33,7 +33,7 @@ impl<'a> PartialOrd for SortKey<'a> {
 
 #[derive(Debug, PartialEq, Eq)]
 struct ItemGroup<'a> {
-    comments: Vec<&'a str>,
+    comment: Vec<&'a str>,
     code: &'a str,
     strategy: SortStrategy,
     sort_key: SortKey<'a>,
@@ -47,7 +47,7 @@ impl<'a> ItemGroup<'a> {
             SortStrategy::CargoToml => SortKey::Default(""),
         };
         Self {
-            comments: Default::default(),
+            comment: Default::default(),
             code: Default::default(),
             strategy,
             sort_key,
@@ -87,23 +87,23 @@ pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
 
     for &line in block.iter() {
         if is_single_line_comment(line) {
-            current_group.comments.push(line);
+            current_group.comment.push(line);
         } else {
             current_group.set_code(line);
             groups.push(current_group);
             current_group = ItemGroup::new(strategy.clone());
         }
     }
-    let trailing_comments = current_group.comments;
+    let trailing_comment = current_group.comment;
 
     groups.sort();
 
     let mut sorted_block = Vec::with_capacity(block.len());
     for group in groups {
-        sorted_block.extend(group.comments);
+        sorted_block.extend(group.comment);
         sorted_block.push(group.code);
     }
-    sorted_block.extend(trailing_comments);
+    sorted_block.extend(trailing_comment);
 
     block.copy_from_slice(&sorted_block);
 }
