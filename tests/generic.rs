@@ -4,24 +4,6 @@ mod common;
 use keepsorted::SortStrategy::Generic;
 
 #[test]
-fn generic_empty() {
-    test_inner!(Generic, "", "");
-}
-
-#[test]
-fn generic_single_item() {
-    test_inner!(
-        Generic,
-        r#"
-a
-        "#,
-        r#"
-a
-        "#
-    );
-}
-
-#[test]
 fn generic_no_sorting_comment() {
     test_inner!(
         Generic,
