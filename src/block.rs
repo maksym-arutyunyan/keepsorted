@@ -34,7 +34,7 @@ impl<'a> PartialOrd for SortKey<'a> {
 #[derive(Debug, PartialEq, Eq)]
 struct ItemGroup<'a> {
     comment: Vec<&'a str>,
-    code: &'a str,
+    item: &'a str,
     strategy: SortStrategy,
     sort_key: SortKey<'a>,
 }
@@ -48,14 +48,14 @@ impl<'a> ItemGroup<'a> {
         };
         Self {
             comment: Default::default(),
-            code: Default::default(),
+            item: Default::default(),
             strategy,
             sort_key,
         }
     }
 
-    fn set_code(&mut self, line: &'a str) {
-        self.code = line;
+    fn set_item(&mut self, line: &'a str) {
+        self.item = line;
         self.sort_key = match self.strategy {
             SortStrategy::Default => SortKey::Default(line),
             SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
@@ -89,7 +89,7 @@ pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
         if is_single_line_comment(line) {
             current_group.comment.push(line);
         } else {
-            current_group.set_code(line);
+            current_group.set_item(line);
             groups.push(current_group);
             current_group = ItemGroup::new(strategy.clone());
         }
@@ -101,7 +101,7 @@ pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
     let mut sorted_block = Vec::with_capacity(block.len());
     for group in groups {
         sorted_block.extend(group.comment);
-        sorted_block.push(group.code);
+        sorted_block.push(group.item);
     }
     sorted_block.extend(trailing_comment);
 
