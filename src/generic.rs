@@ -2,9 +2,9 @@ use crate::block::{sort, SortStrategy};
 use regex::Regex;
 use std::io::{self};
 
-const STRATEGY: SortStrategy = SortStrategy::Default;
+const STRATEGY: SortStrategy = SortStrategy::Generic;
 
-pub(crate) fn process_lines_default(lines: Vec<&str>) -> io::Result<Vec<&str>> {
+pub(crate) fn process_lines_generic(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
