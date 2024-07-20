@@ -4,12 +4,12 @@ mod common;
 use keepsorted::SortStrategy::Generic;
 
 #[test]
-fn default_empty() {
+fn generic_empty() {
     test_inner!(Generic, "", "");
 }
 
 #[test]
-fn default_single_item() {
+fn generic_single_item() {
     test_inner!(
         Generic,
         r#"
@@ -22,7 +22,7 @@ a
 }
 
 #[test]
-fn default_no_sorting_comment() {
+fn generic_no_sorting_comment() {
     test_inner!(
         Generic,
         r#"
@@ -37,7 +37,7 @@ a
 }
 
 #[test]
-fn default_simple_block() {
+fn generic_simple_block() {
     test_inner!(
         Generic,
         r#"
@@ -54,7 +54,7 @@ b
 }
 
 #[test]
-fn default_blocks_divided_by_newline() {
+fn generic_blocks_divided_by_newline() {
     test_inner!(
         Generic,
         r#"
