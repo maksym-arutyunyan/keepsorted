@@ -60,9 +60,7 @@ impl<'a> Item<'a> {
     }
 
     fn calculate_sort_key(&mut self) {
-        todo!("fix this");
-        let joined = self.item.join("\n");
-        let text = joined.as_str();
+        let text = self.item.first().unwrap();
         self.sort_key = match self.strategy {
             SortStrategy::Generic => SortKey::Generic(text),
             SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(text)),

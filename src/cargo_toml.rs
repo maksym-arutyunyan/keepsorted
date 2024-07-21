@@ -4,6 +4,7 @@ use std::path::Path;
 
 const STRATEGY: SortStrategy = SortStrategy::CargoToml;
 
+#[allow(dead_code)]
 pub(crate) fn is_cargo_toml(path: &Path) -> bool {
     // Check if the path is a file and its file name is "Cargo.toml"
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
