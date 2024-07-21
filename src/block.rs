@@ -56,10 +56,17 @@ impl<'a> Item<'a> {
 
     fn add_item(&mut self, line: &'a str) {
         self.item.push(line);
+        self.calculate_sort_key();
+    }
+
+    fn calculate_sort_key(&mut self) {
+        todo!("fix this");
+        let joined = self.item.join("\n");
+        let text = joined.as_str();
         self.sort_key = match self.strategy {
-            SortStrategy::Generic => SortKey::Generic(line),
-            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
-            SortStrategy::CargoToml => SortKey::Generic(line),
+            SortStrategy::Generic => SortKey::Generic(text),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(text)),
+            SortStrategy::CargoToml => SortKey::Generic(text),
         };
     }
 }
