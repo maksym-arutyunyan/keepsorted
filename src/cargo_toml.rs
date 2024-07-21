@@ -9,6 +9,10 @@ pub(crate) fn is_cargo_toml(path: &Path) -> bool {
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
 }
 
+fn is_block_start(line: &str) -> bool {
+    line.starts_with("[dependencies]") || line.starts_with("[dev-dependencies]")
+}
+
 pub(crate) fn process_lines_cargo_toml(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     let mut output_lines = Vec::new();
     let mut block = Vec::new();
@@ -18,7 +22,7 @@ pub(crate) fn process_lines_cargo_toml(lines: Vec<&str>) -> io::Result<Vec<&str>
         let trimmed = line.trim();
         let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
 
-        if line.starts_with("[dependencies]") || line.starts_with("[dev-dependencies]") {
+        if is_block_start(line) {
             is_sorting_block = true;
             output_lines.push(line);
         } else if is_sorting_block
