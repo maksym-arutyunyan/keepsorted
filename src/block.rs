@@ -3,21 +3,22 @@ use std::cmp::Ordering;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SortStrategy {
-    Default,
+    Generic,
     Bazel,
+    CargoToml,
 }
 
 // A SortKey enum to handle different sorting strategies.
 #[derive(Debug, PartialEq, Eq)]
 enum SortKey<'a> {
-    Default(&'a str),
+    Generic(&'a str),
     Bazel(BazelSortKey<'a>),
 }
 
 impl<'a> Ord for SortKey<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (SortKey::Default(a), SortKey::Default(b)) => a.cmp(b),
+            (SortKey::Generic(a), SortKey::Generic(b)) => a.cmp(b),
             (SortKey::Bazel(a), SortKey::Bazel(b)) => a.cmp(b),
             _ => Ordering::Equal, // This should not happen if used correctly
         }
@@ -31,43 +32,50 @@ impl<'a> PartialOrd for SortKey<'a> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-struct LineGroup<'a> {
-    comments: Vec<&'a str>,
-    code: &'a str,
+struct Item<'a> {
+    comment: Vec<&'a str>,
+    item: Vec<&'a str>,
     strategy: SortStrategy,
     sort_key: SortKey<'a>,
 }
 
-impl<'a> LineGroup<'a> {
+impl<'a> Item<'a> {
     fn new(strategy: SortStrategy) -> Self {
         let sort_key = match strategy {
-            SortStrategy::Default => SortKey::Default(""),
+            SortStrategy::Generic => SortKey::Generic(""),
             SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new("")),
+            SortStrategy::CargoToml => SortKey::Generic(""),
         };
         Self {
-            comments: Default::default(),
-            code: Default::default(),
+            comment: Default::default(),
+            item: Default::default(),
             strategy,
             sort_key,
         }
     }
 
-    fn set_code(&mut self, line: &'a str) {
-        self.code = line;
+    fn add_item(&mut self, line: &'a str) {
+        self.item.push(line);
+        self.calculate_sort_key();
+    }
+
+    fn calculate_sort_key(&mut self) {
+        let text = self.item.first().unwrap();
         self.sort_key = match self.strategy {
-            SortStrategy::Default => SortKey::Default(line),
-            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(line)),
+            SortStrategy::Generic => SortKey::Generic(text),
+            SortStrategy::Bazel => SortKey::Bazel(BazelSortKey::new(text)),
+            SortStrategy::CargoToml => SortKey::Generic(text),
         };
     }
 }
 
-impl<'a> Ord for LineGroup<'a> {
+impl<'a> Ord for Item<'a> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.sort_key.cmp(&other.sort_key)
     }
 }
 
-impl<'a> PartialOrd for LineGroup<'a> {
+impl<'a> PartialOrd for Item<'a> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
@@ -79,28 +87,28 @@ fn is_single_line_comment(line: &str) -> bool {
 }
 
 pub(crate) fn sort(block: &mut [&str], strategy: SortStrategy) {
-    let mut groups = Vec::with_capacity(block.len());
-    let mut current_group = LineGroup::new(strategy.clone());
+    let mut items = Vec::with_capacity(block.len());
+    let mut current_item = Item::new(strategy.clone());
 
     for &line in block.iter() {
         if is_single_line_comment(line) {
-            current_group.comments.push(line);
+            current_item.comment.push(line);
         } else {
-            current_group.set_code(line);
-            groups.push(current_group);
-            current_group = LineGroup::new(strategy.clone());
+            current_item.add_item(line);
+            items.push(current_item);
+            current_item = Item::new(strategy.clone());
         }
     }
-    let trailing_comments = current_group.comments;
+    let trailing_comment = current_item.comment;
 
-    groups.sort();
+    items.sort();
 
     let mut sorted_block = Vec::with_capacity(block.len());
-    for group in groups {
-        sorted_block.extend(group.comments);
-        sorted_block.push(group.code);
+    for group in items {
+        sorted_block.extend(group.comment);
+        sorted_block.extend(group.item);
     }
-    sorted_block.extend(trailing_comments);
+    sorted_block.extend(trailing_comment);
 
     block.copy_from_slice(&sorted_block);
 }

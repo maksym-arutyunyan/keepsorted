@@ -1,5 +1,6 @@
 use crate::bazel::{is_bazel, process_lines_bazel};
-use crate::default::process_lines_default;
+use crate::cargo_toml::process_lines_cargo_toml;
+use crate::generic::process_lines_generic;
 use std::fs::File;
 use std::io::{self, BufWriter, Write};
 use std::path::Path;
@@ -8,7 +9,8 @@ pub use crate::block::SortStrategy;
 
 mod bazel;
 mod block;
-mod default;
+mod cargo_toml;
+mod generic;
 
 pub fn process_file(path: &Path) -> io::Result<()> {
     let mut content = std::fs::read_to_string(path)?;
@@ -19,11 +21,12 @@ pub fn process_file(path: &Path) -> io::Result<()> {
     }
     let lines: Vec<&str> = content.split_inclusive('\n').collect();
 
-    // Check the file extension
+    // Check the file extension.
+    // TODO: enable Cargo.toml support.
     let output_lines = if is_bazel(path) {
         process_lines(SortStrategy::Bazel, lines)?
     } else {
-        process_lines(SortStrategy::Default, lines)?
+        process_lines(SortStrategy::Generic, lines)?
     };
 
     let n = output_lines.len();
@@ -44,7 +47,8 @@ pub fn process_file(path: &Path) -> io::Result<()> {
 
 pub fn process_lines(strategy: SortStrategy, lines: Vec<&str>) -> io::Result<Vec<&str>> {
     match strategy {
-        SortStrategy::Default => process_lines_default(lines),
+        SortStrategy::Generic => process_lines_generic(lines),
         SortStrategy::Bazel => process_lines_bazel(lines),
+        SortStrategy::CargoToml => process_lines_cargo_toml(lines),
     }
 }
