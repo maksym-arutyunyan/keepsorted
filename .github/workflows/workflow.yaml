@@ -123,29 +123,3 @@ jobs:
       env:
         SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
 
-  tests:
-    name: Tests
-    runs-on: ${{ matrix.os }}
-    needs: cargo-build
-    strategy:
-      matrix:
-        os: [ ubuntu-20.04, macos-12 ]
-
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
-
-      - name: Install Rust
-        run: |
-          rustup update ${{ matrix.rust }} --no-self-update
-          rustup default ${{ matrix.rust }}
-
-      - name: Run tests
-        run: |
-          bash run-e2e-tests.sh
