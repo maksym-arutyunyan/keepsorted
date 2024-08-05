@@ -55,11 +55,14 @@ fn classify(path: &Path) -> Strategy {
     }
 }
 
-fn is_bazel(_path: &Path) -> bool {
-    false
+fn is_bazel(path: &Path) -> bool {
+    match path.extension().and_then(|s| s.to_str()) {
+        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
+        None => false,
+    }
 }
 
-fn is_cargo_toml(_path: &Path) -> bool {
-    false
+fn is_cargo_toml(path: &Path) -> bool {
+    // Check if the path is a file and its file name is "Cargo.toml"
+    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
 }
-
