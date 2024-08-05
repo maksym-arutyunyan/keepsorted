@@ -8,7 +8,7 @@ pub fn process_file(path: &Path) -> io::Result<()> {
     let mut content = fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
     if !ends_with_newline {
-        // Add trailing '\n' so all the lines have it.
+        // Ensure content ends with a newline to support line reordering.
         content.push('\n');
     }
 
@@ -21,7 +21,7 @@ pub fn process_file(path: &Path) -> io::Result<()> {
             writer,
             "{}",
             if i + 1 == lines.len() && !ends_with_newline {
-                // Remove trailing '\n' since there were none in the source.
+                // Remove the newline if it wasn’t in the original.
                 line.trim_end_matches('\n')
             } else {
                 line
