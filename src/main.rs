@@ -1,5 +1,5 @@
 use clap::{arg, command, Parser};
-//use keepsorted::process_file;
+use keepsorted::process_file;
 use std::io::{self};
 use std::path::Path;
 
@@ -33,14 +33,13 @@ fn main() -> io::Result<()> {
         std::process::exit(1);
     }
 
-    // process_file(path).map_err(|e| {
-    //     eprintln!(
-    //         "{}: failed to process file {}: {}",
-    //         env!("CARGO_PKG_NAME"),
-    //         path.display(),
-    //         e
-    //     );
-    //     e
-    // })
-    Ok(())
+    process_file(path).map_err(|e| {
+        eprintln!(
+            "{}: failed to process file {}: {}",
+            env!("CARGO_PKG_NAME"),
+            path.display(),
+            e
+        );
+        e
+    })
 }
