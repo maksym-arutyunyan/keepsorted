@@ -46,12 +46,10 @@ pub fn process_lines<'a>(strategy: Strategy, lines: Vec<&'a str>) -> io::Result<
 }
 
 fn classify(path: &Path) -> Strategy {
-    if is_bazel(path) {
-        Strategy::Bazel
-    } else if is_cargo_toml(path) {
-        Strategy::CargoToml
-    } else {
-        Strategy::Generic
+    match path {
+        _ if is_bazel(path) => Strategy::Bazel,
+        _ if is_cargo_toml(path) => Strategy::CargoToml,
+        _ => Strategy::Generic,
     }
 }
 
