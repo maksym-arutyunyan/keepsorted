@@ -11,7 +11,7 @@ pub fn process_file(path: &Path) -> io::Result<()> {
         content.push('\n');
     }
 
-    let mut lines: Vec<String> = content.split_inclusive('\n').map(String::from).collect();
+    let mut lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
     process_lines(classify(path), &mut lines)?;
 
     let mut writer = BufWriter::new(File::create(path)?);
