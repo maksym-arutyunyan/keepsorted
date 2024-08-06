@@ -1,5 +1,5 @@
 use std::io;
 
-pub(crate) fn process<'a>(_lines: &mut [String]) -> io::Result<()> {
-    Ok(())
+pub(crate) fn process<'a>(_lines: Vec<String>) -> io::Result<Vec<String>> {
+    Ok(vec![])
 }

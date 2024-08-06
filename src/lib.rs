@@ -12,15 +12,15 @@ pub fn process_file(path: &Path) -> io::Result<()> {
         content.push('\n');
     }
 
-    let mut lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
-    process_lines(classify(path), &mut lines)?;
+    let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
+    let output_lines = process_lines(classify(path), lines)?;
 
     let mut writer = BufWriter::new(File::create(path)?);
-    for (i, line) in lines.iter().enumerate() {
+    for (i, line) in output_lines.iter().enumerate() {
         write!(
             writer,
             "{}",
-            if i + 1 == lines.len() && !ends_with_newline {
+            if i + 1 == output_lines.len() && !ends_with_newline {
                 // Remove the newline if it wasn’t in the original.
                 line.trim_end_matches('\n')
             } else {
@@ -38,7 +38,7 @@ pub enum Strategy {
     CargoToml,
 }
 
-pub fn process_lines(strategy: Strategy, lines: &mut [String]) -> io::Result<()> {
+pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
     match strategy {
         Strategy::Generic => crate::strategies::generic::process(lines),
         Strategy::Bazel => crate::strategies::bazel::process(lines),
