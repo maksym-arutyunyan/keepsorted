@@ -55,55 +55,55 @@ fn run_test(input_file_path: &str, expected_file_path: &str) {
 #[test]
 fn test_e2e_bazel_1() {
     run_test(
-        "./tests/e2e-tests/bazel_1_in.bazel",
-        "./tests/e2e-tests/bazel_1_out.bazel",
+        "./tests/e2e-tests/bazel/1_in.bazel",
+        "./tests/e2e-tests/bazel/1_out.bazel",
     );
 }
 
 #[test]
 fn test_e2e_bazel_2() {
     run_test(
-        "./tests/e2e-tests/bazel_2_in.bazel",
-        "./tests/e2e-tests/bazel_2_out.bazel",
+        "./tests/e2e-tests/bazel/2_in.bazel",
+        "./tests/e2e-tests/bazel/2_out.bazel",
     );
 }
 
 #[test]
 fn test_e2e_plain_text_1() {
     run_test(
-        "./tests/e2e-tests/plain_text_1_in.txt",
-        "./tests/e2e-tests/plain_text_1_out.txt",
+        "./tests/e2e-tests/plain_text/1_in.txt",
+        "./tests/e2e-tests/plain_text/1_out.txt",
     );
 }
 
 #[test]
 fn test_e2e_plain_text_2() {
     run_test(
-        "./tests/e2e-tests/plain_text_2_in.txt",
-        "./tests/e2e-tests/plain_text_2_out.txt",
+        "./tests/e2e-tests/plain_text/2_in.txt",
+        "./tests/e2e-tests/plain_text/2_out.txt",
     );
 }
 
 #[test]
 fn test_e2e_plain_text_3() {
     run_test(
-        "./tests/e2e-tests/plain_text_3_in.txt",
-        "./tests/e2e-tests/plain_text_3_out.txt",
+        "./tests/e2e-tests/plain_text/3_in.txt",
+        "./tests/e2e-tests/plain_text/3_out.txt",
     );
 }
 
 #[test]
 fn test_e2e_cargo_toml_1() {
     run_test(
-        "./tests/e2e-tests/cargo_toml_1/Cargo.toml",
-        "./tests/e2e-tests/cargo_toml_1/Cargo_out.toml",
+        "./tests/e2e-tests/cargo_toml/1/Cargo.toml",
+        "./tests/e2e-tests/cargo_toml/1/Cargo_out.toml",
     );
 }
 
 #[test]
 fn test_e2e_cargo_toml_2() {
     run_test(
-        "./tests/e2e-tests/cargo_toml_2/Cargo.toml",
-        "./tests/e2e-tests/cargo_toml_2/Cargo_out.toml",
+        "./tests/e2e-tests/cargo_toml/2/Cargo.toml",
+        "./tests/e2e-tests/cargo_toml/2/Cargo_out.toml",
     );
 }
