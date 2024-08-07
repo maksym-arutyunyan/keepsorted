@@ -37,41 +37,41 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
-    let mut current_item = Item::default();
+    let mut item = Item::default();
     for line in block {
         if is_single_line_comment(&line) {
-            current_item.comment.push(line);
+            item.comment.push(line);
         } else {
-            current_item.item = line;
-            items.push(current_item);
-            current_item = Item::default();
+            item.code = line;
+            items.push(item);
+            item = Item::default();
         }
     }
 
-    let trailing_comment = current_item.comment;
+    let trailing_comment = item.comment;
 
     items.sort();
 
-    let mut sorted_block = Vec::with_capacity(n);
-    for group in items {
-        sorted_block.extend(group.comment);
-        sorted_block.push(group.item);
+    let mut result = Vec::with_capacity(n);
+    for item in items {
+        result.extend(item.comment);
+        result.push(item.code);
     }
-    sorted_block.extend(trailing_comment);
+    result.extend(trailing_comment);
 
-    sorted_block
+    result
 }
 
 /// A struct to hold an item and its associated comments.
 #[derive(Debug, Default, Eq, PartialEq)]
 struct Item {
     comment: Vec<String>,
-    item: String,
+    code: String,
 }
 
 impl Ord for Item {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.item.cmp(&other.item)
+        self.code.cmp(&other.code)
     }
 }
 
