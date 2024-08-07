@@ -1,0 +1,7 @@
+[dependencies]
+b = { workspace = true, default-features = false, features = [
+    "z",
+    "y",
+    "x",
+] } # some comment.
+a = "1"

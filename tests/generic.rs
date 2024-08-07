@@ -1,7 +1,7 @@
 #[macro_use]
 mod common;
 
-use keepsorted::SortStrategy::Generic;
+use keepsorted::Strategy::Generic;
 
 #[test]
 fn generic_simple_block() {

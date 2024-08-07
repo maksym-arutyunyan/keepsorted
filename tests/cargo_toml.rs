@@ -1,7 +1,7 @@
 #[macro_use]
 mod common;
 
-use keepsorted::SortStrategy::CargoToml;
+use keepsorted::Strategy::CargoToml;
 
 #[test]
 fn cargo_toml_simple() {
@@ -132,7 +132,6 @@ y = "4"
 }
 
 #[test]
-#[ignore]
 fn cargo_toml_nested_list() {
     test_inner!(
         CargoToml,
@@ -142,7 +141,7 @@ b = { workspace = true, default-features = false, features = [
     "z",
     "y",
     "x",
-] }
+] } # some comment.
 a = "1"
         "#,
         r#"
@@ -152,7 +151,7 @@ b = { workspace = true, default-features = false, features = [
     "z",
     "y",
     "x",
-] }
+] } # some comment.
         "#
     );
 }

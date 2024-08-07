@@ -1,23 +1,12 @@
-use crate::block::{sort, SortStrategy};
 use regex::Regex;
 use std::cmp::Ordering;
-use std::io::{self};
-use std::path::Path;
+use std::io;
 
-const STRATEGY: SortStrategy = SortStrategy::Bazel;
-
-pub(crate) fn is_bazel(path: &Path) -> bool {
-    match path.extension().and_then(|s| s.to_str()) {
-        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
-        None => false,
-    }
-}
-
-pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
+pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines = Vec::new();
-    let mut block = Vec::<&str>::new();
+    let mut block = Vec::new();
     let mut is_scope = false;
     let mut is_sorting_block = false;
 
@@ -32,14 +21,14 @@ pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
             is_scope = true;
             output_lines.push(line);
         } else if is_scope {
-            if re.is_match(line) {
+            if re.is_match(&line) {
                 is_sorting_block = true;
                 output_lines.push(line);
             } else if is_sorting_block
                 && (line_without_comment.contains(']') || line.trim().is_empty())
             {
                 is_sorting_block = false;
-                sort(&mut block, STRATEGY);
+                block = sort(block);
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -53,11 +42,52 @@ pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
     }
 
     if is_sorting_block {
-        sort(&mut block, STRATEGY);
+        block = sort(block);
         output_lines.append(&mut block);
     }
 
     Ok(output_lines)
+}
+
+#[derive(Default)]
+struct Item {
+    comment: Vec<String>,
+    code: String,
+    sort_key: BazelSortKey,
+}
+
+/// Sorts a block of lines, keeping associated comments with their items.
+fn sort(block: Vec<String>) -> Vec<String> {
+    let n = block.len();
+    let mut items = Vec::with_capacity(n);
+    let mut current_item = Item::default();
+    for line in block {
+        if is_single_line_comment(&line) {
+            current_item.comment.push(line);
+        } else {
+            items.push(Item {
+                comment: std::mem::take(&mut current_item.comment),
+                code: line.clone(),
+                sort_key: BazelSortKey::new(&line),
+            });
+        }
+    }
+    let trailing_comments = current_item.comment;
+
+    items.sort_by(|a, b| a.sort_key.cmp(&b.sort_key));
+
+    let mut result = Vec::with_capacity(n);
+    for item in items {
+        result.extend(item.comment);
+        result.push(item.code);
+    }
+    result.extend(trailing_comments);
+
+    result
+}
+
+fn is_single_line_comment(line: &str) -> bool {
+    line.trim().starts_with('#')
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
@@ -68,16 +98,15 @@ pub(crate) fn process_lines_bazel(lines: Vec<&str>) -> io::Result<Vec<&str>> {
 // beginning with "@". The next significant part of the comparison is the list
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
-#[derive(Debug, PartialEq, Eq)]
-pub struct BazelSortKey<'a> {
+#[derive(Debug, Default, Eq, PartialEq)]
+pub struct BazelSortKey {
     phase: i16,
-    split: Vec<&'a str>,
+    split: Vec<String>,
 }
 
-impl<'a> BazelSortKey<'a> {
-    pub(crate) fn new(line: &'a str) -> Self {
-        let trimmed = line.trim();
-        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+impl BazelSortKey {
+    pub(crate) fn new(line: &str) -> Self {
+        let line_without_comment = line.trim().split('#').next().unwrap_or("").trim();
 
         let phase = match line_without_comment {
             l if l.starts_with("\":") => 1,
@@ -87,15 +116,16 @@ impl<'a> BazelSortKey<'a> {
             _ => 4,
         };
 
-        let split: Vec<&str> = line_without_comment
+        let split = line_without_comment
             .split(|c| c == '.' || c == ':' || c == '"')
+            .map(ToString::to_string)
             .collect();
 
         Self { phase, split }
     }
 }
 
-impl<'a> Ord for BazelSortKey<'a> {
+impl Ord for BazelSortKey {
     fn cmp(&self, other: &Self) -> Ordering {
         self.phase
             .cmp(&other.phase)
@@ -103,7 +133,7 @@ impl<'a> Ord for BazelSortKey<'a> {
     }
 }
 
-impl<'a> PartialOrd for BazelSortKey<'a> {
+impl PartialOrd for BazelSortKey {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }

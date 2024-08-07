@@ -1,7 +1,7 @@
 #[macro_use]
 mod common;
 
-use keepsorted::SortStrategy::Bazel;
+use keepsorted::Strategy::Bazel;
 
 #[test]
 fn bazel_single_block() {
