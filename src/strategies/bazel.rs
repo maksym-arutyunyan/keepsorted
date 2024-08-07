@@ -99,7 +99,7 @@ fn is_single_line_comment(line: &str) -> bool {
 // beginning with "@". The next significant part of the comparison is the list
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Debug, Default, Eq, PartialEq)]
 pub struct BazelSortKey {
     phase: i16,
     split: Vec<String>,
@@ -107,10 +107,9 @@ pub struct BazelSortKey {
 
 impl BazelSortKey {
     pub(crate) fn new(line: &str) -> Self {
-        let trimmed = line.trim();
-        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim().to_string();
+        let line_without_comment = line.trim().split('#').next().unwrap_or("").trim();
 
-        let phase = match &line_without_comment {
+        let phase = match line_without_comment {
             l if l.starts_with("\":") => 1,
             l if l.starts_with("\"//") => 2,
             l if l.starts_with("\"@") => 3,
@@ -118,9 +117,9 @@ impl BazelSortKey {
             _ => 4,
         };
 
-        let split: Vec<_> = line_without_comment
+        let split = line_without_comment
             .split(|c| c == '.' || c == ':' || c == '"')
-            .map(|c| c.to_string())
+            .map(ToString::to_string)
             .collect();
 
         Self { phase, split }
