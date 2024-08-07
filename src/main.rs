@@ -39,7 +39,6 @@ fn main() -> io::Result<()> {
     // Check for experimental features
     let features = args.features.unwrap_or_default();
     let cargo_toml_enabled = features.contains(&"cargo_toml".to_string());
-    println!("ABC cargo_toml_enabled: {cargo_toml_enabled}");
 
     process_file(path, cargo_toml_enabled).map_err(|e| {
         eprintln!(
