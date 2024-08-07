@@ -87,8 +87,7 @@ fn sort(block: Vec<String>) -> Vec<String> {
 }
 
 fn is_single_line_comment(line: &str) -> bool {
-    let trimmed = line.trim();
-    trimmed.starts_with('#') || trimmed.starts_with("//")
+    line.trim().starts_with('#')
 }
 
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go

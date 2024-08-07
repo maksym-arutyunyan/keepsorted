@@ -74,6 +74,5 @@ fn sort(block: Vec<String>) -> Vec<String> {
 }
 
 fn is_single_line_comment(line: &str) -> bool {
-    let trimmed = line.trim();
-    trimmed.starts_with('#') || trimmed.starts_with("//")
+    line.trim().starts_with('#')
 }
