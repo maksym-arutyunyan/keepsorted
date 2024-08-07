@@ -55,18 +55,13 @@ fn sort(block: Vec<String>) -> Vec<String> {
             current_item.comment.push(line);
             is_multiline_code = false;
         } else {
+            current_item.code.push(line.clone());
             if line.contains('{') {
                 is_multiline_code = true;
             }
-            if !is_multiline_code {
-                current_item.code.push(line);
+            if !is_multiline_code || is_code_section_completed(&line) {
                 items.push(std::mem::take(&mut current_item));
-            } else {
-                current_item.code.push(line.clone());
-                if is_code_section_completed(&line) {
-                    items.push(std::mem::take(&mut current_item));
-                    is_multiline_code = false;
-                }
+                is_multiline_code = false;
             }
         }
     }
