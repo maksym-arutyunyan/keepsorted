@@ -1,5 +1,4 @@
 use regex::Regex;
-use std::cmp::Ordering;
 use std::io;
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -37,51 +36,35 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
-    let mut item = Item::default();
+    let mut current_item = Item::default();
     for line in block {
         if is_single_line_comment(&line) {
-            item.comment.push(line);
+            current_item.comment.push(line);
         } else {
-            item.code = line;
-            items.push(item);
-            item = Item::default();
+            current_item.code = line;
+            items.push(std::mem::take(&mut current_item));
         }
     }
+    let trailing_comments = std::mem::take(&mut current_item.comment);
 
-    let trailing_comment = item.comment;
-
-    items.sort();
+    items.sort_by(|a, b| a.code.cmp(&b.code));
 
     let mut result = Vec::with_capacity(n);
     for item in items {
         result.extend(item.comment);
         result.push(item.code);
     }
-    result.extend(trailing_comment);
+    result.extend(trailing_comments);
 
     result
 }
 
-/// A struct to hold an item and its associated comments.
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Default)]
 struct Item {
     comment: Vec<String>,
     code: String,
 }
 
-impl Ord for Item {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.code.cmp(&other.code)
-    }
-}
-
-impl PartialOrd for Item {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-/// Checks if a line is a single-line comment.
 fn is_single_line_comment(line: &str) -> bool {
     let trimmed = line.trim();
     trimmed.starts_with('#') || trimmed.starts_with("//")
