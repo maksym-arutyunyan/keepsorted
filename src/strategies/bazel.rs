@@ -49,6 +49,13 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     Ok(output_lines)
 }
 
+#[derive(Default)]
+struct Item {
+    comment: Vec<String>,
+    code: String,
+    sort_key: BazelSortKey,
+}
+
 /// Sorts a block of lines, keeping associated comments with their items.
 fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
@@ -58,12 +65,14 @@ fn sort(block: Vec<String>) -> Vec<String> {
         if is_single_line_comment(&line) {
             current_item.comment.push(line);
         } else {
-            current_item.sort_key = BazelSortKey::new(&line);
-            current_item.code = line;
-            items.push(std::mem::take(&mut current_item));
+            items.push(Item {
+                comment: std::mem::take(&mut current_item.comment),
+                code: line.clone(),
+                sort_key: BazelSortKey::new(&line),
+            });
         }
     }
-    let trailing_comments = std::mem::take(&mut current_item.comment);
+    let trailing_comments = current_item.comment;
 
     items.sort_by(|a, b| a.sort_key.cmp(&b.sort_key));
 
@@ -75,13 +84,6 @@ fn sort(block: Vec<String>) -> Vec<String> {
     result.extend(trailing_comments);
 
     result
-}
-
-#[derive(Default)]
-struct Item {
-    comment: Vec<String>,
-    code: String,
-    sort_key: BazelSortKey,
 }
 
 fn is_single_line_comment(line: &str) -> bool {
