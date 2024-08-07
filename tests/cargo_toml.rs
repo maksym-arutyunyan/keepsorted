@@ -141,7 +141,7 @@ b = { workspace = true, default-features = false, features = [
     "z",
     "y",
     "x",
-] }
+] }  # some comment.
 a = "1"
         "#,
         r#"
@@ -151,7 +151,7 @@ b = { workspace = true, default-features = false, features = [
     "z",
     "y",
     "x",
-] }
+] }  # some comment.
         "#
     );
 }

@@ -84,5 +84,10 @@ fn is_single_line_comment(line: &str) -> bool {
 }
 
 fn is_code_section_completed(line: &str) -> bool {
-    line.trim().ends_with('}')
+    // Split the line at the '#' character, take the first part, trim it, and check if it ends with '}'
+    line.trim()
+        .split_once('#')
+        .map_or(line, |(code, _)| code)
+        .trim()
+        .ends_with('}')
 }
