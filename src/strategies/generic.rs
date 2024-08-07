@@ -33,11 +33,12 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     Ok(output_lines)
 }
 
+/// Sorts a block of lines, keeping associated comments with their items.
 fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();
-    for line in block.into_iter() {
+    for line in block {
         if is_single_line_comment(&line) {
             current_item.comment.push(line);
         } else {
@@ -46,6 +47,7 @@ fn sort(block: Vec<String>) -> Vec<String> {
             current_item = Item::default();
         }
     }
+
     let trailing_comment = current_item.comment;
 
     items.sort();
@@ -60,7 +62,8 @@ fn sort(block: Vec<String>) -> Vec<String> {
     sorted_block
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
+/// A struct to hold an item and its associated comments.
+#[derive(Debug, Default, Eq, PartialEq)]
 struct Item {
     comment: Vec<String>,
     item: String,
@@ -78,7 +81,8 @@ impl PartialOrd for Item {
     }
 }
 
-fn is_single_line_comment(line: &String) -> bool {
+/// Checks if a line is a single-line comment.
+fn is_single_line_comment(line: &str) -> bool {
     let trimmed = line.trim();
     trimmed.starts_with('#') || trimmed.starts_with("//")
 }
