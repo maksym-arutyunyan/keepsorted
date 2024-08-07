@@ -1,7 +1,6 @@
 use regex::Regex;
+use std::cmp::Ordering;
 use std::io;
-
-const STRATEGY: crate::Strategy = crate::Strategy::Generic;
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
@@ -16,7 +15,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
             output_lines.push(line);
         } else if is_sorting_block && line.trim().is_empty() {
             is_sorting_block = false;
-            //sort(&mut block, STRATEGY);
+            block = sort(block);
             output_lines.append(&mut block);
             output_lines.push(line);
         } else if is_sorting_block {
@@ -27,9 +26,59 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     }
 
     if is_sorting_block {
-        //sort(&mut block, STRATEGY);
+        block = sort(block);
         output_lines.append(&mut block);
     }
 
     Ok(output_lines)
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
+struct Item {
+    comment: Vec<String>,
+    item: String,
+}
+
+impl Ord for Item {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.item.cmp(&other.item)
+    }
+}
+
+impl PartialOrd for Item {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+fn sort(block: Vec<String>) -> Vec<String> {
+    let n = block.len();
+    let mut items = Vec::with_capacity(n);
+    let mut current_item = Item::default();
+    for line in block.into_iter() {
+        if is_single_line_comment(&line) {
+            current_item.comment.push(line);
+        } else {
+            current_item.item = line;
+            items.push(current_item);
+            current_item = Item::default();
+        }
+    }
+    let trailing_comment = current_item.comment;
+
+    items.sort();
+
+    let mut sorted_block = Vec::with_capacity(n);
+    for group in items {
+        sorted_block.extend(group.comment);
+        sorted_block.push(group.item);
+    }
+    sorted_block.extend(trailing_comment);
+
+    sorted_block
+}
+
+fn is_single_line_comment(line: &String) -> bool {
+    let trimmed = line.trim();
+    trimmed.starts_with('#') || trimmed.starts_with("//")
 }
