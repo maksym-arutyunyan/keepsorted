@@ -33,24 +33,6 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     Ok(output_lines)
 }
 
-#[derive(Default, Debug, PartialEq, Eq)]
-struct Item {
-    comment: Vec<String>,
-    item: String,
-}
-
-impl Ord for Item {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.item.cmp(&other.item)
-    }
-}
-
-impl PartialOrd for Item {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
 fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
@@ -76,6 +58,24 @@ fn sort(block: Vec<String>) -> Vec<String> {
     sorted_block.extend(trailing_comment);
 
     sorted_block
+}
+
+#[derive(Default, Debug, PartialEq, Eq)]
+struct Item {
+    comment: Vec<String>,
+    item: String,
+}
+
+impl Ord for Item {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.item.cmp(&other.item)
+    }
+}
+
+impl PartialOrd for Item {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 fn is_single_line_comment(line: &String) -> bool {
