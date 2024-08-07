@@ -41,7 +41,7 @@ fn is_block_start(line: &str) -> bool {
 #[derive(Default)]
 struct Item {
     comment: Vec<String>,
-    code: String,
+    code: Vec<String>,
 }
 
 /// Sorts a block of lines, keeping associated comments with their items.
@@ -49,14 +49,25 @@ fn sort(block: Vec<String>) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();
+    let mut is_multiline_code = false;
     for line in block {
         if is_single_line_comment(&line) {
             current_item.comment.push(line);
+            is_multiline_code = false;
         } else {
-            items.push(Item {
-                comment: std::mem::take(&mut current_item.comment),
-                code: line,
-            });
+            if line.contains('{') {
+                is_multiline_code = true;
+            }
+            if !is_multiline_code {
+                current_item.code.push(line);
+                items.push(std::mem::take(&mut current_item));
+            } else {
+                current_item.code.push(line.clone());
+                if is_code_section_completed(&line) {
+                    items.push(std::mem::take(&mut current_item));
+                    is_multiline_code = false;
+                }
+            }
         }
     }
     let trailing_comments = std::mem::take(&mut current_item.comment);
@@ -66,7 +77,7 @@ fn sort(block: Vec<String>) -> Vec<String> {
     let mut result = Vec::with_capacity(n);
     for item in items {
         result.extend(item.comment);
-        result.push(item.code);
+        result.extend(item.code);
     }
     result.extend(trailing_comments);
 
@@ -75,4 +86,8 @@ fn sort(block: Vec<String>) -> Vec<String> {
 
 fn is_single_line_comment(line: &str) -> bool {
     line.trim().starts_with('#')
+}
+
+fn is_code_section_completed(line: &str) -> bool {
+    line.trim().ends_with('}')
 }

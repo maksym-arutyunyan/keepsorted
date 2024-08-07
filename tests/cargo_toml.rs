@@ -132,7 +132,6 @@ y = "4"
 }
 
 #[test]
-#[ignore]
 fn cargo_toml_nested_list() {
     test_inner!(
         CargoToml,
