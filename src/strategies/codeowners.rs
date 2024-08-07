@@ -6,26 +6,21 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let mut is_sorting_block = false;
 
     for line in lines {
-        if line.trim().is_empty() {
-            if is_sorting_block {
-                // End of the current sorting block
-                block = sort(block);
-                output_lines.append(&mut block);
-                output_lines.push(line.clone()); // Include the empty line as well
-                block.clear(); // Clear the block for next possible sorting block
-                is_sorting_block = false;
-            } else {
+        if !line.trim().is_empty() {
+            if is_single_line_comment(&line) {
+                // Skip opening comment.
                 output_lines.push(line);
-            }
-        } else {
-            if !is_sorting_block {
+            } else {
                 is_sorting_block = true;
-            }
-            if is_sorting_block {
                 block.push(line);
-            } else {
-                output_lines.push(line);
             }
+        } else if is_sorting_block {
+            is_sorting_block = false;
+            block = sort(block);
+            output_lines.append(&mut block);
+            output_lines.push(line);
+        } else {
+            output_lines.push(line);
         }
     }
 

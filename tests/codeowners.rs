@@ -42,3 +42,38 @@ fn codeowners_two_blocks() {
         "#
     );
 }
+
+#[test]
+fn codeowners_1() {
+    test_inner!(
+        CodeOwners,
+        r#"
+
+# [Misc]
+/b
+/a
+
+# [Bazel]
+/b
+/a
+
+# [Rust Lang]
+/b
+/a
+        "#,
+        r#"
+
+# [Misc]
+/a
+/b
+
+# [Bazel]
+/a
+/b
+
+# [Rust Lang]
+/a
+/b
+        "#
+    );
+}
