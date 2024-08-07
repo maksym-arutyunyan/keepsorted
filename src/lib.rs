@@ -4,7 +4,7 @@ use std::path::Path;
 
 pub mod strategies;
 
-pub fn process_file(path: &Path) -> io::Result<()> {
+pub fn process_file(path: &Path, cargo_toml_enabled: bool) -> io::Result<()> {
     let mut content = fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
     if !ends_with_newline {
@@ -13,7 +13,7 @@ pub fn process_file(path: &Path) -> io::Result<()> {
     }
 
     let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
-    let output_lines = process_lines(classify(path), lines)?;
+    let output_lines = process_lines(classify(path, cargo_toml_enabled), lines)?;
 
     let mut writer = BufWriter::new(File::create(path)?);
     for (i, line) in output_lines.iter().enumerate() {
@@ -46,10 +46,10 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
     }
 }
 
-fn classify(path: &Path) -> Strategy {
+fn classify(path: &Path, cargo_toml_enabled: bool) -> Strategy {
     match path {
         _ if is_bazel(path) => Strategy::Bazel,
-        _ if is_cargo_toml(path) => Strategy::CargoToml,
+        _ if cargo_toml_enabled & is_cargo_toml(path) => Strategy::CargoToml,
         _ => Strategy::Generic,
     }
 }

@@ -11,6 +11,9 @@ struct Args {
 
     #[arg(value_name = "PATH", required_unless_present = "path")]
     positional_path: Option<String>,
+
+    #[arg(short, long, value_name = "FEATURE", use_value_delimiter = true)]
+    features: Option<Vec<String>>,
 }
 
 fn main() -> io::Result<()> {
@@ -33,7 +36,12 @@ fn main() -> io::Result<()> {
         std::process::exit(1);
     }
 
-    process_file(path).map_err(|e| {
+    // Check for experimental features
+    let features = args.features.unwrap_or_default();
+    let cargo_toml_enabled = features.contains(&"cargo_toml".to_string());
+    println!("ABC cargo_toml_enabled: {cargo_toml_enabled}");
+
+    process_file(path, cargo_toml_enabled).map_err(|e| {
         eprintln!(
             "{}: failed to process file {}: {}",
             env!("CARGO_PKG_NAME"),

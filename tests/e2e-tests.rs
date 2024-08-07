@@ -3,7 +3,7 @@ use std::path::Path;
 use std::process::Command;
 use tempfile::tempdir;
 
-fn run_test(input_file_path: &str, expected_file_path: &str) {
+fn run_test(input_file_path: &str, expected_file_path: &str, features: &str) {
     // Read the input and expected output files
     let input_content = fs::read_to_string(input_file_path).expect("Failed to read input file");
     let expected_content =
@@ -24,11 +24,15 @@ fn run_test(input_file_path: &str, expected_file_path: &str) {
     } else {
         "./target/release/keepsorted"
     };
+    // Create the command and conditionally add the --features argument if the string is not empty
+    let mut command = Command::new(keepsorted_binary);
+    command.arg(temp_input_file_path.to_str().unwrap());
+    if !features.is_empty() {
+        command.arg("--features").arg(features);
+    }
+
     // Run the keepsorted binary on the temporary file
-    let output = Command::new(keepsorted_binary)
-        .arg(temp_input_file_path.to_str().unwrap())
-        .output()
-        .expect("Failed to execute keepsorted");
+    let output = command.output().expect("Failed to execute keepsorted");
 
     // Check if the command was successful
     assert!(output.status.success(), "keepsorted command failed");
@@ -57,6 +61,7 @@ fn test_e2e_bazel_1() {
     run_test(
         "./tests/e2e-tests/bazel/1_in.bazel",
         "./tests/e2e-tests/bazel/1_out.bazel",
+        "",
     );
 }
 
@@ -65,6 +70,7 @@ fn test_e2e_bazel_2() {
     run_test(
         "./tests/e2e-tests/bazel/2_in.bazel",
         "./tests/e2e-tests/bazel/2_out.bazel",
+        "",
     );
 }
 
@@ -73,6 +79,7 @@ fn test_e2e_generic_1() {
     run_test(
         "./tests/e2e-tests/generic/1_in.txt",
         "./tests/e2e-tests/generic/1_out.txt",
+        "",
     );
 }
 
@@ -81,6 +88,7 @@ fn test_e2e_generic_2() {
     run_test(
         "./tests/e2e-tests/generic/2_in.txt",
         "./tests/e2e-tests/generic/2_out.txt",
+        "",
     );
 }
 
@@ -89,6 +97,7 @@ fn test_e2e_generic_3() {
     run_test(
         "./tests/e2e-tests/generic/3_in.txt",
         "./tests/e2e-tests/generic/3_out.txt",
+        "",
     );
 }
 
@@ -97,6 +106,7 @@ fn test_e2e_cargo_toml_1() {
     run_test(
         "./tests/e2e-tests/cargo_toml/1/Cargo.toml",
         "./tests/e2e-tests/cargo_toml/1/Cargo_out.toml",
+        "cargo_toml",
     );
 }
 
@@ -105,5 +115,6 @@ fn test_e2e_cargo_toml_2() {
     run_test(
         "./tests/e2e-tests/cargo_toml/2/Cargo.toml",
         "./tests/e2e-tests/cargo_toml/2/Cargo_out.toml",
+        "cargo_toml",
     );
 }
