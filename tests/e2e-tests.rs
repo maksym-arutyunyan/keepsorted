@@ -69,26 +69,26 @@ fn test_e2e_bazel_2() {
 }
 
 #[test]
-fn test_e2e_plain_text_1() {
+fn test_e2e_generic_1() {
     run_test(
-        "./tests/e2e-tests/plain_text/1_in.txt",
-        "./tests/e2e-tests/plain_text/1_out.txt",
+        "./tests/e2e-tests/generic/1_in.txt",
+        "./tests/e2e-tests/generic/1_out.txt",
     );
 }
 
 #[test]
-fn test_e2e_plain_text_2() {
+fn test_e2e_generic_2() {
     run_test(
-        "./tests/e2e-tests/plain_text/2_in.txt",
-        "./tests/e2e-tests/plain_text/2_out.txt",
+        "./tests/e2e-tests/generic/2_in.txt",
+        "./tests/e2e-tests/generic/2_out.txt",
     );
 }
 
 #[test]
-fn test_e2e_plain_text_3() {
+fn test_e2e_generic_3() {
     run_test(
-        "./tests/e2e-tests/plain_text/3_in.txt",
-        "./tests/e2e-tests/plain_text/3_out.txt",
+        "./tests/e2e-tests/generic/3_in.txt",
+        "./tests/e2e-tests/generic/3_out.txt",
     );
 }
 
