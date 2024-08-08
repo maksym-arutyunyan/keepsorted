@@ -114,7 +114,7 @@ jobs:
           args: --all -- --check
 
   keepsorted:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-20.04
     needs: cargo-build
     strategy:
       matrix:
