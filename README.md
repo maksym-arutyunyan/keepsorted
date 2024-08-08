@@ -1,4 +1,9 @@
-# keepsorted (draft)
+# keepsorted
 
-`keepsorted` is a command-line tool for sorting specified blocks of lines in source code files. 
-It processes lines marked with the comment `# Keep sorted` and sorts the subsequent block of lines.
+`keepsorted` is a simple command-line tool to sort blocks of lines in your code files. 
+
+It looks for the comment `# Keep sorted` and sorts the lines that follow it.
+
+For some files, like `Cargo.toml`, `.gitignore`, and `CODEOWNERS`, it works without needing the `# Keep sorted` comment. It automatically sorts sections like dependencies in `Cargo.toml` and blocks separated by newlines in the other files, keeping comments in place.
+
+For some examples look at `./tests/e2e-tests/`.

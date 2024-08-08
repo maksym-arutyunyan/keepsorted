@@ -2,6 +2,11 @@
 name = "keepsorted"
 version = "0.1.0"
 edition = "2021"
+description = "A tool for sorting blocks of lines in code files"
+authors = ["Maksym Arutyunyan"]
+repository = "https://github.com/maksym-arutyunyan/keepsorted"
+readme = "README.md"
+keywords = ["sorting", "code", "command-line"]
 
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
