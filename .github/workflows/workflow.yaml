@@ -116,9 +116,6 @@ jobs:
   keepsorted:
     runs-on: ubuntu-20.04
     needs: cargo-build
-    strategy:
-      matrix:
-        os: [ ubuntu-20.04, macos-12 ]
 
     steps:
       - uses: actions/checkout@v4
