@@ -113,6 +113,44 @@ jobs:
           command: fmt
           args: --all -- --check
 
+  keepsorted:
+    runs-on: ${{ matrix.os }}
+    needs: cargo-build
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-12 ]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
+      - name: Install Rust
+        run: |
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
+
+      - name: Build Project
+        run: cargo build --release
+
+      - name: Run KeepSorted
+        shell: bash
+        # Run `keepsorted` only on files that are not ignored by `.gitignore`.
+        # Also ignore `./misc/` and `./tests/`.
+        run: |
+          git ls-files -co --exclude-standard \
+              | grep -vE '^tests/|^misc/' \
+              | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {}
+        env:
+          RUST_BACKTRACE: 1
+
   shell-checks:
     name: ShellCheck
     runs-on: ubuntu-20.04
