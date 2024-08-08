@@ -4,7 +4,11 @@ use std::io::{self};
 use std::path::Path;
 
 fn about() -> String {
-    format!("{}\n{}", env!("CARGO_PKG_DESCRIPTION"), env!("CARGO_PKG_REPOSITORY"))
+    format!(
+        "{}\n{}",
+        env!("CARGO_PKG_DESCRIPTION"),
+        env!("CARGO_PKG_REPOSITORY")
+    )
 }
 
 #[derive(Parser, Debug)]
