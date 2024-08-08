@@ -146,7 +146,7 @@ jobs:
         # Also ignore `./misc/` and `./tests/`.
         run: |
           git ls-files -co --exclude-standard \
-              | grep -vE '^tests/|^misc/' \
+              | grep -vE "^tests/|^misc/" \
               | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {}
         env:
           RUST_BACKTRACE: 1
