@@ -6,8 +6,8 @@ use tempfile::tempdir;
 fn run_test(input_file_path: &str, expected_file_path: &str, features: &str) {
     // Read the input and expected output files
     let input_content = fs::read_to_string(input_file_path).expect("Failed to read input file");
-    let expected_content =
-        fs::read_to_string(expected_file_path).expect("Failed to read expected file");
+    let expected_content = fs::read_to_string(expected_file_path)
+        .unwrap_or_else(|_| panic!("Failed to read expected file: {}", expected_file_path));
 
     // Create a temporary directory
     let temp_dir = tempdir().expect("Failed to create temporary directory");
@@ -56,56 +56,40 @@ fn run_test(input_file_path: &str, expected_file_path: &str, features: &str) {
     );
 }
 
+fn dir(path: &str) -> String {
+    format!("./tests/e2e-tests/{path}")
+}
+
 #[test]
 fn test_e2e_bazel_1() {
-    run_test(
-        "./tests/e2e-tests/bazel/1_in.bazel",
-        "./tests/e2e-tests/bazel/1_out.bazel",
-        "",
-    );
+    run_test(&dir("bazel/1_in.bazel"), &dir("bazel/1_out.bazel"), "");
 }
 
 #[test]
 fn test_e2e_bazel_2() {
-    run_test(
-        "./tests/e2e-tests/bazel/2_in.bazel",
-        "./tests/e2e-tests/bazel/2_out.bazel",
-        "",
-    );
+    run_test(&dir("bazel/2_in.bazel"), &dir("bazel/2_out.bazel"), "");
 }
 
 #[test]
 fn test_e2e_generic_1() {
-    run_test(
-        "./tests/e2e-tests/generic/1_in.txt",
-        "./tests/e2e-tests/generic/1_out.txt",
-        "",
-    );
+    run_test(&dir("generic/1_in.txt"), &dir("generic/1_out.txt"), "");
 }
 
 #[test]
 fn test_e2e_generic_2() {
-    run_test(
-        "./tests/e2e-tests/generic/2_in.txt",
-        "./tests/e2e-tests/generic/2_out.txt",
-        "",
-    );
+    run_test(&dir("generic/2_in.txt"), &dir("generic/2_out.txt"), "");
 }
 
 #[test]
 fn test_e2e_generic_3() {
-    run_test(
-        "./tests/e2e-tests/generic/3_in.txt",
-        "./tests/e2e-tests/generic/3_out.txt",
-        "",
-    );
+    run_test(&dir("generic/3_in.txt"), &dir("generic/3_out.txt"), "");
 }
 
 #[test]
 fn test_e2e_cargo_toml_1() {
     run_test(
-        "./tests/e2e-tests/cargo_toml/1/Cargo.toml",
-        "./tests/e2e-tests/cargo_toml/1/Cargo_out.toml",
+        &dir("cargo_toml/1/Cargo.toml"),
+        &dir("cargo_toml/1/Cargo_out.toml"),
         "cargo_toml",
     );
 }
@@ -113,8 +97,26 @@ fn test_e2e_cargo_toml_1() {
 #[test]
 fn test_e2e_cargo_toml_2() {
     run_test(
-        "./tests/e2e-tests/cargo_toml/2/Cargo.toml",
-        "./tests/e2e-tests/cargo_toml/2/Cargo_out.toml",
+        &dir("cargo_toml/2/Cargo.toml"),
+        &dir("cargo_toml/2/Cargo_out.toml"),
         "cargo_toml",
+    );
+}
+
+#[test]
+fn test_e2e_gitignore_1() {
+    run_test(
+        &dir("gitignore/.gitignore"),
+        &dir("gitignore/.gitignore_out"),
+        "gitignore",
+    );
+}
+
+#[test]
+fn test_e2e_codeowners_1() {
+    run_test(
+        &dir("codeowners/.github/CODEOWNERS"),
+        &dir("codeowners/.github/CODEOWNERS_out"),
+        "codeowners",
     );
 }
