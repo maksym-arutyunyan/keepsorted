@@ -38,9 +38,7 @@ fn main() -> io::Result<()> {
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    let cargo_toml_enabled = features.contains(&"cargo_toml".to_string());
-
-    process_file(path, cargo_toml_enabled).map_err(|e| {
+    process_file(path, features).map_err(|e| {
         eprintln!(
             "{}: failed to process file {}: {}",
             env!("CARGO_PKG_NAME"),
