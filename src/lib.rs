@@ -36,7 +36,7 @@ pub enum Strategy {
     Generic,
     Bazel,
     CargoToml,
-    CodeOwners,
+    Gitignore,
 }
 
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -44,21 +44,24 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Generic => crate::strategies::generic::process(lines),
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
-        Strategy::CodeOwners => crate::strategies::codeowners::process(lines),
+        Strategy::Gitignore => crate::strategies::gitignore::process(lines),
     }
 }
 
 fn classify(path: &Path, features: Vec<String>) -> Strategy {
-    match path {
-        _ if is_bazel(path) => Strategy::Bazel,
-        _ if features.contains(&"cargo_toml".to_string()) & is_cargo_toml(path) => {
-            Strategy::CargoToml
-        }
-        _ if features.contains(&"codeowners".to_string()) & is_codeowners(path) => {
-            Strategy::CodeOwners
-        }
-        _ => Strategy::Generic,
+    if is_bazel(path) {
+        return Strategy::Bazel;
     }
+    if features.contains(&"cargo_toml".to_string()) && is_cargo_toml(path) {
+        return Strategy::CargoToml;
+    }
+    if features.contains(&"gitignore".to_string()) && is_gitignore(path) {
+        return Strategy::Gitignore;
+    }
+    if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
+        return Strategy::Gitignore;
+    }
+    Strategy::Generic
 }
 
 fn is_bazel(path: &Path) -> bool {
@@ -69,8 +72,11 @@ fn is_bazel(path: &Path) -> bool {
 }
 
 fn is_cargo_toml(path: &Path) -> bool {
-    // Check if the path is a file and its file name is "Cargo.toml"
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
+}
+
+fn is_gitignore(path: &Path) -> bool {
+    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new(".gitignore"))
 }
 
 fn is_codeowners(path: &Path) -> bool {

@@ -1,12 +1,12 @@
 #[macro_use]
 mod common;
 
-use keepsorted::Strategy::CodeOwners;
+use keepsorted::Strategy::Gitignore;
 
 #[test]
 fn codeowners_simple_block() {
     test_inner!(
-        CodeOwners,
+        Gitignore,
         r#"
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
@@ -25,7 +25,7 @@ fn codeowners_simple_block() {
 #[test]
 fn codeowners_two_blocks() {
     test_inner!(
-        CodeOwners,
+        Gitignore,
         r#"
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
@@ -46,7 +46,7 @@ fn codeowners_two_blocks() {
 #[test]
 fn codeowners_1() {
     test_inner!(
-        CodeOwners,
+        Gitignore,
         r#"
 
 # [Misc]
