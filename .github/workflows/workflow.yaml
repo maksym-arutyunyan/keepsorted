@@ -147,10 +147,13 @@ jobs:
         run: |
           git ls-files -co --exclude-standard \
               | grep -vE "^tests/|^misc/" \
-              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore" {} \
-              | git diff --exit-code
+              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore" {}
         env:
           RUST_BACKTRACE: 1
+
+      - name: Git Diff
+        # Check if keepsorted changed any files.
+        run: git diff --exit-code
 
   shell-checks:
     name: ShellCheck

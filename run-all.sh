@@ -27,12 +27,14 @@ fmt_status=$?
 
 # Run `keepsorted` only on files that are not ignored by `.gitignore`.
 # Also ignore `./misc/` and `./tests/`.
-# Check if keepsorted changed any files.
 git ls-files -co --exclude-standard \
     | grep -vE "^tests/|^misc/" \
-    | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore" {} \
-    | git diff --exit-code
+    | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore" {}
 keepsorted_status=$?
+
+# Check if keepsorted changed any files.
+git diff --exit-code
+git_diff_status=$?
 
 # Check the status of each command and print the final status
 echo ""
@@ -41,7 +43,8 @@ if [ $build_status -eq 0 ] &&\
    [ $test_release_status -eq 0 ] &&\
    [ $clippy_status -eq 0 ] &&\
    [ $fmt_status -eq 0 ] &&\
-   [ $keepsorted_status -eq 0 ]; then
+   [ $keepsorted_status -eq 0 ] &&\
+   [ $git_diff_status -eq 0 ]; then
     echo -e "All checks passed ${GREEN}ok${NC}."
 else
     echo -e "Some checks ${RED}FAILED${NC}:"
@@ -63,6 +66,9 @@ else
     if [ $keepsorted_status -ne 0 ]; then
         echo -e " - keepsorted ${RED}FAILED${NC}"
     fi
+    if [ $git_diff_status -ne 0 ]; then
+        echo -e " - git diff ${RED}FAILED${NC}"
+    fi
 fi
 
 # Exit with a status of 1 if any of the steps failed
@@ -71,6 +77,7 @@ if [ $build_status -ne 0 ] ||\
    [ $test_release_status -ne 0 ] ||\
    [ $clippy_status -ne 0 ] ||\
    [ $fmt_status -ne 0 ] ||\
-   [ $keepsorted_status -ne 0 ]; then
+   [ $keepsorted_status -ne 0 ] ||\
+   [ $git_diff_status -ne 0 ]; then
     exit 1
 fi
