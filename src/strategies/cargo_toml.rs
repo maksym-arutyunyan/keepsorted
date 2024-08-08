@@ -35,7 +35,24 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 }
 
 fn is_block_start(line: &str) -> bool {
-    line.starts_with("[dependencies]") || line.starts_with("[dev-dependencies]")
+    // Check if the line starts and ends with brackets.
+    let trimmed = line.trim();
+    if !trimmed.starts_with('[') || !trimmed.ends_with(']') {
+        return false;
+    }
+    for case in ["dependencies", "dev-dependencies", "build-dependencies"] {
+        let patterns = [
+            format!("[{case}]"),           // E.g. [dependencies]
+            format!(".{case}]"),           // E.g. [xxx.dev-dependencies]
+            format!("[{case}."),           // E.g. [dev-dependencies.xxx]
+            format!("[workspace.{case}."), // E.g. [workspace.dependencies.xxx]
+        ];
+        if patterns.iter().any(|pattern| trimmed.contains(pattern)) {
+            return true;
+        }
+    }
+
+    false
 }
 
 #[derive(Default)]

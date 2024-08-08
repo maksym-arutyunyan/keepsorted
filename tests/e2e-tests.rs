@@ -90,7 +90,7 @@ fn test_e2e_cargo_toml_1() {
     run_test(
         &dir("cargo_toml/1/Cargo.toml"),
         &dir("cargo_toml/1/Cargo_out.toml"),
-        "cargo_toml",
+        "",
     );
 }
 
@@ -99,7 +99,7 @@ fn test_e2e_cargo_toml_2() {
     run_test(
         &dir("cargo_toml/2/Cargo.toml"),
         &dir("cargo_toml/2/Cargo_out.toml"),
-        "cargo_toml",
+        "",
     );
 }
 

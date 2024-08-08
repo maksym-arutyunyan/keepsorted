@@ -52,7 +52,7 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     if is_bazel(path) {
         return Strategy::Bazel;
     }
-    if features.contains(&"cargo_toml".to_string()) && is_cargo_toml(path) {
+    if is_cargo_toml(path) {
         return Strategy::CargoToml;
     }
     if features.contains(&"gitignore".to_string()) && is_gitignore(path) {
