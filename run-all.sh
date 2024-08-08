@@ -27,9 +27,11 @@ fmt_status=$?
 
 # Run `keepsorted` only on files that are not ignored by `.gitignore`.
 # Also ignore `./misc/` and `./tests/`.
+# Check if keepsorted changed any files.
 git ls-files -co --exclude-standard \
     | grep -vE "^tests/|^misc/" \
     | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {}
+    | git diff --exit-code
 keepsorted_status=$?
 
 # Check the status of each command and print the final status

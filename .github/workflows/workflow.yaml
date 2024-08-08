@@ -148,6 +148,7 @@ jobs:
           git ls-files -co --exclude-standard \
               | grep -vE "^tests/|^misc/" \
               | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {}
+              | git diff --exit-code
         env:
           RUST_BACKTRACE: 1
 
