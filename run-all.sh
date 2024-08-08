@@ -30,7 +30,7 @@ fmt_status=$?
 # Check if keepsorted changed any files.
 git ls-files -co --exclude-standard \
     | grep -vE "^tests/|^misc/" \
-    | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {}
+    | xargs -I {} bash -c './target/release/keepsorted "$0" --features gitignore' {} \
     | git diff --exit-code
 keepsorted_status=$?
 
