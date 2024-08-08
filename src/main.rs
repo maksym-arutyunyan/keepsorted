@@ -3,16 +3,44 @@ use keepsorted::process_file;
 use std::io::{self};
 use std::path::Path;
 
+fn about() -> String {
+    format!(
+        "{}\n{}",
+        env!("CARGO_PKG_DESCRIPTION"),
+        env!("CARGO_PKG_REPOSITORY")
+    )
+}
+
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(
+    version,
+    about = about(),
+    long_about = None
+)]
 struct Args {
-    #[arg(short, long, value_name = "PATH", conflicts_with = "positional_path")]
+    #[arg(
+        short = 'p',
+        long,
+        value_name = "PATH",
+        conflicts_with = "positional_path",
+        help = "Path to the file to run on. This option is mutually exclusive with the positional path."
+    )]
     path: Option<String>,
 
-    #[arg(value_name = "PATH", required_unless_present = "path")]
+    #[arg(
+        value_name = "PATH",
+        required_unless_present = "path",
+        help = "Path to the file to run on. This is required if the -p option is not used."
+    )]
     positional_path: Option<String>,
 
-    #[arg(short, long, value_name = "FEATURE", use_value_delimiter = true)]
+    #[arg(
+        short = 'f',
+        long,
+        value_name = "FEATURE",
+        use_value_delimiter = true,
+        help = "Experimental feature flags. Provide a list of features to enable."
+    )]
     features: Option<Vec<String>>,
 }
 
