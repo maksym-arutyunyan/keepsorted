@@ -44,7 +44,8 @@ if [ $build_status -eq 0 ] &&\
    [ $clippy_status -eq 0 ] &&\
    [ $fmt_status -eq 0 ] &&\
    [ $keepsorted_status -eq 0 ] &&\
-   [ $git_diff_status -eq 0 ]; then
+   [ $git_diff_status -eq 0 ] &&\
+   1; then
     echo -e "All checks passed ${GREEN}ok${NC}."
 else
     echo -e "Some checks ${RED}FAILED${NC}:"
@@ -78,6 +79,7 @@ if [ $build_status -ne 0 ] ||\
    [ $clippy_status -ne 0 ] ||\
    [ $fmt_status -ne 0 ] ||\
    [ $keepsorted_status -ne 0 ] ||\
-   [ $git_diff_status -ne 0 ]; then
+   [ $git_diff_status -ne 0 ] ||\
+   0; then
     exit 1
 fi
