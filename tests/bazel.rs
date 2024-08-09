@@ -318,7 +318,6 @@ block_2 = [
     );
 }
 
-
 #[test]
 fn bazel_blocks_with_select() {
     test_inner!(
