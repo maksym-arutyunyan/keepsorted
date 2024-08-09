@@ -10,11 +10,11 @@ The tool can also recognize comments attached to non-comment lines, like this:
 # Before:
 dependencies = [
     # Keep sorted.
-    'aaa',
+    'ddd',
+    'ccc',
     # TODO: remove this dependency.
     'bbb',
-    'ccc',
-    'ddd',
+    'aaa',
 ]
 
 # After:
