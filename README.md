@@ -2,7 +2,8 @@
 
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 
-It works by sorting lines within a block that starts with the activation comment `# Keep sorted` or `// Keep sorted`. In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
+It works by sorting lines within a block that starts with the activation comment `# Keep sorted` or `// Keep sorted`. 
+In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
 
 The tool can also recognize comments attached to non-comment lines, like this:
 
@@ -10,20 +11,23 @@ The tool can also recognize comments attached to non-comment lines, like this:
 # Before:
 dependencies = [
     # Keep sorted.
+    'ddd',
+    'ccc',
+    # TODO: remove this dependency.
+    'bbb',
+    'aaa',
+]
+
+# After:
+dependencies = [
     # Keep sorted.
     'aaa',
     # TODO: remove this dependency.
-    'aaa',
     'bbb',
-    'bbb',
-    # TODO: remove this dependency.
     'ccc',
-    'ccc',
-]
+    'ddd',
 ]
 ```
-# After:
-dependencies = [
 
 You can see more examples in the ./tests/e2e-tests/ directory.
 
