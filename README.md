@@ -29,7 +29,7 @@ dependencies = [
 ]
 ```
 
-You can see more examples in the ./tests/e2e-tests/ directory.
+You can see more examples in the `./tests/e2e-tests/` directory.
 
 ## Keywords
 
@@ -93,6 +93,8 @@ $ keepsorted <path> --features gitignore,codeowners
 ```
 
 In `.gitignore` and `CODEOWNERS` files, the tool sorts blocks separated by empty lines while keeping comments in place, except for the opening block comment.
+
+**(!) IMPORTANT**: the order of patterns can be important because it gets executed from top to bottom from more generic to more specific rules, therefore use this feature with extra care.
 
 ```.gitignore
 # Various build artifacts
