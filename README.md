@@ -10,20 +10,23 @@ The tool can also recognize comments attached to non-comment lines, like this:
 # Before:
 dependencies = [
     # Keep sorted.
+    'ddd',
+    'ccc',
+    # TODO: remove this dependency.
+    'bbb',
+    'aaa',
+]
+
+# After:
+dependencies = [
     # Keep sorted.
     'aaa',
     # TODO: remove this dependency.
-    'aaa',
     'bbb',
-    'bbb',
-    # TODO: remove this dependency.
     'ccc',
-    'ccc',
-]
+    'ddd',
 ]
 ```
-# After:
-dependencies = [
 
 You can see more examples in the ./tests/e2e-tests/ directory.
 
