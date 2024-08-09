@@ -132,6 +132,87 @@ y = "4"
 }
 
 #[test]
+fn cargo_toml_ignore_file() {
+    test_inner!(
+        CargoToml,
+        r#"
+# keepsorted:ignore-file
+[dependencies]
+b = "2"
+a = "1"
+
+[dev-dependencies]
+y = "4"
+x = "3"
+        "#,
+        r#"
+# keepsorted:ignore-file
+[dependencies]
+b = "2"
+a = "1"
+
+[dev-dependencies]
+y = "4"
+x = "3"
+        "#
+    );
+}
+
+#[test]
+fn cargo_toml_ignore_block_inside() {
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+# keepsorted:ignore-block
+b = "2"
+a = "1"
+
+[dev-dependencies]
+y = "4"
+x = "3"
+        "#,
+        r#"
+[dependencies]
+# keepsorted:ignore-block
+b = "2"
+a = "1"
+
+[dev-dependencies]
+x = "3"
+y = "4"
+        "#
+    );
+}
+
+#[test]
+fn cargo_toml_ignore_block_before() {
+    test_inner!(
+        CargoToml,
+        r#"
+# keepsorted:ignore-block
+[dependencies]
+b = "2"
+a = "1"
+
+[dev-dependencies]
+y = "4"
+x = "3"
+        "#,
+        r#"
+# keepsorted:ignore-block
+[dependencies]
+b = "2"
+a = "1"
+
+[dev-dependencies]
+x = "3"
+y = "4"
+        "#
+    );
+}
+
+#[test]
 fn cargo_toml_nested_list() {
     test_inner!(
         CargoToml,
