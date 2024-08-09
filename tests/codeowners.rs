@@ -44,6 +44,52 @@ fn codeowners_two_blocks() {
 }
 
 #[test]
+fn codeowners_ignore_file() {
+    test_inner!(
+        Gitignore,
+        r#"
+# keepsorted:ignore-file
+/.d/                 @company/teams/a
+/.c/                 @company/teams/b
+
+/.b/workflows        @company/teams/c @company/teams/d
+/.a/CODEOWNERS       @company/teams/e
+        "#,
+        r#"
+# keepsorted:ignore-file
+/.d/                 @company/teams/a
+/.c/                 @company/teams/b
+
+/.b/workflows        @company/teams/c @company/teams/d
+/.a/CODEOWNERS       @company/teams/e
+        "#
+    );
+}
+
+#[test]
+fn codeowners_ignore_block() {
+    test_inner!(
+        Gitignore,
+        r#"
+# keepsorted:ignore-block
+/.d/                 @company/teams/a
+/.c/                 @company/teams/b
+
+/.b/workflows        @company/teams/c @company/teams/d
+/.a/CODEOWNERS       @company/teams/e
+        "#,
+        r#"
+# keepsorted:ignore-block
+/.d/                 @company/teams/a
+/.c/                 @company/teams/b
+
+/.a/CODEOWNERS       @company/teams/e
+/.b/workflows        @company/teams/c @company/teams/d
+        "#
+    );
+}
+
+#[test]
 fn codeowners_1() {
     test_inner!(
         Gitignore,

@@ -135,6 +135,111 @@ y
     );
 }
 
+#[test]
+fn generic_ignore_file() {
+    test_inner!(
+        Generic,
+        r#"
+    keepsorted:ignore-file
+# Keep sorted.
+1b
+1a
+
+# Keep sorted.
+2b
+2a
+
+# Keep sorted.
+3b
+3a
+        "#,
+        r#"
+    keepsorted:ignore-file
+# Keep sorted.
+1b
+1a
+
+# Keep sorted.
+2b
+2a
+
+# Keep sorted.
+3b
+3a
+        "#
+    );
+}
+
+#[test]
+fn generic_ignore_block_inside() {
+    test_inner!(
+        Generic,
+        r#"
+# Keep sorted.
+1b
+1a
+
+# Keep sorted.
+    keepsorted:ignore-block
+2b
+2a
+
+# Keep sorted.
+3b
+3a
+        "#,
+        r#"
+# Keep sorted.
+1a
+1b
+
+# Keep sorted.
+    keepsorted:ignore-block
+2b
+2a
+
+# Keep sorted.
+3a
+3b
+        "#
+    );
+}
+
+#[test]
+fn generic_ignore_block_before() {
+    test_inner!(
+        Generic,
+        r#"
+# Keep sorted.
+1b
+1a
+
+    keepsorted:ignore-block
+# Keep sorted.
+2b
+2a
+
+# Keep sorted.
+3b
+3a
+        "#,
+        r#"
+# Keep sorted.
+1a
+1b
+
+    keepsorted:ignore-block
+# Keep sorted.
+2b
+2a
+
+# Keep sorted.
+3a
+3b
+        "#
+    );
+}
+
 // TODO: move to the appropriate place.
 #[test]
 #[ignore]

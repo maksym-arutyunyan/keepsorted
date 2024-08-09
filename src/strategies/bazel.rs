@@ -2,6 +2,8 @@ use regex::Regex;
 use std::cmp::Ordering;
 use std::io;
 
+use crate::is_ignore_block;
+
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
@@ -9,6 +11,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let mut block = Vec::new();
     let mut is_scope = false;
     let mut is_sorting_block = false;
+    let mut is_ignore_block_prev_line = false;
 
     for line in lines {
         // Trim the input line
@@ -22,13 +25,17 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
             output_lines.push(line);
         } else if is_scope {
             if re.is_match(&line) {
+                if let Some(prev_line) = output_lines.last() {
+                    is_ignore_block_prev_line = is_ignore_block(&[prev_line.clone()]);
+                }
                 is_sorting_block = true;
                 output_lines.push(line);
             } else if is_sorting_block
                 && (line_without_comment.contains(']') || line.trim().is_empty())
             {
+                block = sort(block, is_ignore_block_prev_line);
+                is_ignore_block_prev_line = false;
                 is_sorting_block = false;
-                block = sort(block);
                 output_lines.append(&mut block);
                 output_lines.push(line);
             } else if is_sorting_block {
@@ -42,7 +49,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     }
 
     if is_sorting_block {
-        block = sort(block);
+        block = sort(block, is_ignore_block_prev_line);
         output_lines.append(&mut block);
     }
 
@@ -57,7 +64,10 @@ struct Item {
 }
 
 /// Sorts a block of lines, keeping associated comments with their items.
-fn sort(block: Vec<String>) -> Vec<String> {
+fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
+    if is_ignore_block_prev_line || is_ignore_block(&block) {
+        return block;
+    }
     let n = block.len();
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();

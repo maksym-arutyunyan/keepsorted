@@ -220,6 +220,105 @@ block_2 = [
 }
 
 #[test]
+fn bazel_ignore_file() {
+    test_inner!(
+        Bazel,
+        r#"
+# keepsorted:ignore-file
+block_1 = [
+    # Keep sorted.
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "y",
+    "x",
+],
+        "#,
+        r#"
+# keepsorted:ignore-file
+block_1 = [
+    # Keep sorted.
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "y",
+    "x",
+],
+        "#
+    );
+}
+
+#[test]
+fn bazel_ignore_block_inside() {
+    test_inner!(
+        Bazel,
+        r#"
+block_1 = [
+    # Keep sorted.
+    # keepsorted:ignore-block
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "y",
+    "x",
+],
+        "#,
+        r#"
+block_1 = [
+    # Keep sorted.
+    # keepsorted:ignore-block
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "x",
+    "y",
+],
+        "#
+    );
+}
+
+#[test]
+fn bazel_ignore_block_before() {
+    test_inner!(
+        Bazel,
+        r#"
+block_1 = [
+    # keepsorted:ignore-block
+    # Keep sorted.
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "y",
+    "x",
+],
+        "#,
+        r#"
+block_1 = [
+    # keepsorted:ignore-block
+    # Keep sorted.
+    "b",
+    "a",
+],
+block_2 = [
+    # Keep sorted.
+    "x",
+    "y",
+],
+        "#
+    );
+}
+
+#[test]
 fn bazel_blocks_with_select() {
     test_inner!(
         Bazel,
