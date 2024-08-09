@@ -40,6 +40,9 @@ pub enum Strategy {
 }
 
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
+    if is_ignore_file(&lines) {
+        return Ok(lines);
+    }
     match strategy {
         Strategy::Generic => crate::strategies::generic::process(lines),
         Strategy::Bazel => crate::strategies::bazel::process(lines),
@@ -62,6 +65,14 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
         return Strategy::Gitignore;
     }
     Strategy::Generic
+}
+
+fn is_ignore_file(lines: &[String]) -> bool {
+    lines.iter().any(|line| line.contains("keepsorted:ignore-file"))
+}
+
+fn is_ignore_block(lines: &[String]) -> bool {
+    lines.iter().any(|line| line.contains("keepsorted:ignore-block"))
 }
 
 fn is_bazel(path: &Path) -> bool {

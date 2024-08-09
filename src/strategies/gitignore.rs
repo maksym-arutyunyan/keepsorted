@@ -1,5 +1,7 @@
 use std::io;
 
+use crate::is_ignore_block;
+
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let mut output_lines = Vec::new();
     let mut block = Vec::new();
@@ -40,6 +42,9 @@ struct Item {
 
 /// Sorts a block of lines, keeping associated comments with their items.
 fn sort(block: Vec<String>) -> Vec<String> {
+    if is_ignore_block(&block) {
+        return block;
+    }
     let n = block.len();
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();
