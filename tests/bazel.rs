@@ -224,7 +224,7 @@ fn bazel_ignore_file() {
     test_inner!(
         Bazel,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 block_1 = [
     # Keep sorted.
     "b",
@@ -237,7 +237,7 @@ block_2 = [
 ],
         "#,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 block_1 = [
     # Keep sorted.
     "b",
@@ -259,7 +259,7 @@ fn bazel_ignore_block_inside() {
         r#"
 block_1 = [
     # Keep sorted.
-    # keepsorted:ignore-block
+    # keepsorted: ignore block
     "b",
     "a",
 ],
@@ -272,7 +272,7 @@ block_2 = [
         r#"
 block_1 = [
     # Keep sorted.
-    # keepsorted:ignore-block
+    # keepsorted: ignore block
     "b",
     "a",
 ],
@@ -291,7 +291,7 @@ fn bazel_ignore_block_before() {
         Bazel,
         r#"
 block_1 = [
-    # keepsorted:ignore-block
+    # keepsorted: ignore block
     # Keep sorted.
     "b",
     "a",
@@ -304,7 +304,7 @@ block_2 = [
         "#,
         r#"
 block_1 = [
-    # keepsorted:ignore-block
+    # keepsorted: ignore block
     # Keep sorted.
     "b",
     "a",

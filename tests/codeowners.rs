@@ -48,7 +48,7 @@ fn codeowners_ignore_file() {
     test_inner!(
         Gitignore,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
 
@@ -56,7 +56,7 @@ fn codeowners_ignore_file() {
 /.a/CODEOWNERS       @company/teams/e
         "#,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
 
@@ -71,7 +71,7 @@ fn codeowners_ignore_block() {
     test_inner!(
         Gitignore,
         r#"
-# keepsorted:ignore-block
+# keepsorted: ignore block
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
 
@@ -79,7 +79,7 @@ fn codeowners_ignore_block() {
 /.a/CODEOWNERS       @company/teams/e
         "#,
         r#"
-# keepsorted:ignore-block
+# keepsorted: ignore block
 /.d/                 @company/teams/a
 /.c/                 @company/teams/b
 

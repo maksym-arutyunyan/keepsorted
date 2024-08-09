@@ -1,18 +1,15 @@
-use regex::Regex;
 use std::io;
 
-use crate::is_ignore_block;
+use crate::{is_ignore_block, RE_KEEP_SORTED};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
-    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
     let mut is_ignore_block_prev_line = false;
 
     for line in lines {
-        if re.is_match(&line) {
+        if RE_KEEP_SORTED.is_match(&line) {
             if let Some(prev_line) = output_lines.last() {
                 is_ignore_block_prev_line = is_ignore_block(&[prev_line.clone()]);
             }

@@ -136,7 +136,7 @@ fn cargo_toml_ignore_file() {
     test_inner!(
         CargoToml,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 [dependencies]
 b = "2"
 a = "1"
@@ -146,7 +146,7 @@ y = "4"
 x = "3"
         "#,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 [dependencies]
 b = "2"
 a = "1"
@@ -164,7 +164,7 @@ fn cargo_toml_ignore_block_inside() {
         CargoToml,
         r#"
 [dependencies]
-# keepsorted:ignore-block
+# keepsorted: ignore block
 b = "2"
 a = "1"
 
@@ -174,7 +174,7 @@ x = "3"
         "#,
         r#"
 [dependencies]
-# keepsorted:ignore-block
+# keepsorted: ignore block
 b = "2"
 a = "1"
 
@@ -190,7 +190,7 @@ fn cargo_toml_ignore_block_before() {
     test_inner!(
         CargoToml,
         r#"
-# keepsorted:ignore-block
+# keepsorted: ignore block
 [dependencies]
 b = "2"
 a = "1"
@@ -200,7 +200,7 @@ y = "4"
 x = "3"
         "#,
         r#"
-# keepsorted:ignore-block
+# keepsorted: ignore block
 [dependencies]
 b = "2"
 a = "1"

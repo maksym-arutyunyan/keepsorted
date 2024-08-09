@@ -1,25 +1,43 @@
 # keepsorted
 
-`keepsorted` is a command-line tool for sorting blocks of lines in your code files.
+`keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 
-It sorts lines following the comment `# Keep sorted`.
+It works by sorting lines within a block that starts with the activation comment `# Keep sorted` or `// Keep sorted`. In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
 
-For some files, like `Cargo.toml`, `.gitignore`, and `CODEOWNERS`, it sorts automatically without needing the `# Keep sorted` comment. It handles sections and blocks separated by newlines while preserving comments.
+The tool can also recognize comments attached to non-comment lines, like this:
 
-See examples in `./tests/e2e-tests/`.
+```py
+# Before:
+dependencies = [
+    # Keep sorted.
+    # Keep sorted.
+    'aaa',
+    # TODO: remove this dependency.
+    'aaa',
+    'bbb',
+    'bbb',
+    # TODO: remove this dependency.
+    'ccc',
+    'ccc',
+]
+]
+```
+# After:
+dependencies = [
 
-## Ignore Keywords
+You can see more examples in the ./tests/e2e-tests/ directory.
 
-In order to make `keepsorted` to ignore certain code you can use special keywords:
+## Keywords
 
-- `keepsorted:ignore-file` can be placed anywhere in the file
-- `keepsorted:ignore-block` can be placed anywhere within the block
+- Use `# Keep sorted`, `// Keep sorted`, or `# keepsorted: keep sorted` to sort the next block of lines
+- Add `# keepsorted: ignore file` anywhere in the file to skip sorting
+- Use `# keepsorted: ignore block` within a block to skip sorting that block
 
 ## Supported Files
 
 ### Generic Text Files
 
-Sort blocks starting with `# Keep sorted` or `// Keep sorted` and ending with a newline.
+For generic text files, the tool sorts blocks that start with `# Keep sorted` or `// Keep sorted` and end with a newline.
 
 ```txt
 # Names
@@ -37,7 +55,7 @@ Red
 
 ### Bazel
 
-Sort blocks inside `[...]` starting with `# Keep sorted`.
+In Bazel files, keepsorted sorts lines within `[...]` blocks that start with `# Keep sorted`.
 
 ```bazel
 DEPENDENCIES = [
@@ -49,14 +67,14 @@ DEPENDENCIES = [
 
 ### Cargo.toml
 
-Sort blocks starting with `[dependencies]`, `[dev-dependencies]`, etc., and ending with an empty line.
+In `Cargo.toml` files, the tool sorts lines within blocks that start with `[dependencies]`, `[dev-dependencies]`, etc., and end with an empty line.
 
 ```toml
 [dependencies]
 a = "0.1.0"
 b = { workspace = true }
 
-# keepsorted:ignore-block
+# keepsorted: ignore block
 [dev-dependencies]
 y = { workspace = true }
 x = "0.3.0"
@@ -64,13 +82,13 @@ x = "0.3.0"
 
 ### .gitignore & CODEOWNERS
 
-*NOTE: These features are experimental and require feature flags:*
+*NOTE: These features are experimental and require feature flags.*
 
 ```shell
 $ keepsorted <path> --features gitignore,codeowners
 ```
 
-Sort blocks separated by empty lines, keeping comments in place (except the opening block comment).
+In `.gitignore` and `CODEOWNERS` files, the tool sorts blocks separated by empty lines while keeping comments in place, except for the opening block comment.
 
 ```.gitignore
 # Various build artifacts
@@ -80,7 +98,7 @@ Sort blocks separated by empty lines, keeping comments in place (except the open
 artifacts
 
 # Bazel outdir dirs
-# keepsorted:ignore-block
+# keepsorted: ignore block
 bazel-c.pb
 user.bazelrc
 bazel-b.txt
