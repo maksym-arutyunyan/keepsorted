@@ -21,6 +21,40 @@ b
 }
 
 #[test]
+fn generic_simple_block_2() {
+    test_inner!(
+        Generic,
+        r#"
+// Keep sorted.
+b
+a
+        "#,
+        r#"
+// Keep sorted.
+a
+b
+        "#
+    );
+}
+
+#[test]
+fn generic_simple_block_3() {
+    test_inner!(
+        Generic,
+        r#"
+# keepsorted: keep sorted
+b
+a
+        "#,
+        r#"
+# keepsorted: keep sorted
+a
+b
+        "#
+    );
+}
+
+#[test]
 fn generic_blocks_with_newline() {
     test_inner!(
         Generic,
@@ -140,7 +174,7 @@ fn generic_ignore_file() {
     test_inner!(
         Generic,
         r#"
-    keepsorted:ignore-file
+    keepsorted: ignore file
 # Keep sorted.
 1b
 1a
@@ -154,7 +188,7 @@ fn generic_ignore_file() {
 3a
         "#,
         r#"
-    keepsorted:ignore-file
+    keepsorted: ignore file
 # Keep sorted.
 1b
 1a
@@ -180,7 +214,7 @@ fn generic_ignore_block_inside() {
 1a
 
 # Keep sorted.
-    keepsorted:ignore-block
+    keepsorted: ignore block
 2b
 2a
 
@@ -194,7 +228,7 @@ fn generic_ignore_block_inside() {
 1b
 
 # Keep sorted.
-    keepsorted:ignore-block
+    keepsorted: ignore block
 2b
 2a
 
@@ -214,7 +248,7 @@ fn generic_ignore_block_before() {
 1b
 1a
 
-    keepsorted:ignore-block
+    keepsorted: ignore block
 # Keep sorted.
 2b
 2a
@@ -228,7 +262,7 @@ fn generic_ignore_block_before() {
 1a
 1b
 
-    keepsorted:ignore-block
+    keepsorted: ignore block
 # Keep sorted.
 2b
 2a

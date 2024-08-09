@@ -41,7 +41,7 @@ fn gitignore_ignore_file() {
     test_inner!(
         Gitignore,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 
 /b
 /a
@@ -55,7 +55,7 @@ fn gitignore_ignore_file() {
 /a
         "#,
         r#"
-# keepsorted:ignore-file
+# keepsorted: ignore file
 
 /b
 /a
@@ -81,7 +81,7 @@ fn gitignore_ignore_block_after_header_comment() {
 /a
 
 # [Bazel]
-# keepsorted:ignore-block
+# keepsorted: ignore block
 /b
 /a
 
@@ -95,7 +95,7 @@ fn gitignore_ignore_block_after_header_comment() {
 /b
 
 # [Bazel]
-# keepsorted:ignore-block
+# keepsorted: ignore block
 /b
 /a
 

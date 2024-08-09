@@ -2,18 +2,38 @@
 
 `keepsorted` is a command-line tool for sorting blocks of lines in your code files.
 
-It sorts lines following the comment `# Keep sorted`.
+It sorts a block of lines following the activation comment `# Keep sorted` or `// Keep sorted`.
+For some files, like `Cargo.toml`, it sorts automatically without needing the activation comment. 
 
-For some files, like `Cargo.toml`, `.gitignore`, and `CODEOWNERS`, it sorts automatically without needing the `# Keep sorted` comment. It handles sections and blocks separated by newlines while preserving comments.
+It also recognizes comments attached to a non-comment lines, for example:
+
+```py
+# Before:
+dependencies = [
+    # Keep sorted.
+    'ccc',
+    'bbb',
+    # TODO: remove this dependency.
+    'aaa',
+]
+
+# After:
+dependencies = [
+    # Keep sorted.
+    # TODO: remove this dependency.
+    'aaa',
+    'bbb',
+    'ccc',
+]
+```
 
 See examples in `./tests/e2e-tests/`.
 
-## Ignore Keywords
+## Keywords
 
-In order to make `keepsorted` to ignore certain code you can use special keywords:
-
-- `keepsorted:ignore-file` can be placed anywhere in the file
-- `keepsorted:ignore-block` can be placed anywhere within the block
+- `# Keep sorted` or `// Keep sorted` or `keepsorted: keep sorted` for sorting the next block of lines
+- `keepsorted: ignore file` can be placed anywhere in the file
+- `keepsorted: ignore block` can be placed anywhere within the block
 
 ## Supported Files
 
@@ -56,7 +76,7 @@ Sort blocks starting with `[dependencies]`, `[dev-dependencies]`, etc., and endi
 a = "0.1.0"
 b = { workspace = true }
 
-# keepsorted:ignore-block
+# keepsorted: ignore block
 [dev-dependencies]
 y = { workspace = true }
 x = "0.3.0"
@@ -80,7 +100,7 @@ Sort blocks separated by empty lines, keeping comments in place (except the open
 artifacts
 
 # Bazel outdir dirs
-# keepsorted:ignore-block
+# keepsorted: ignore block
 bazel-c.pb
 user.bazelrc
 bazel-b.txt
