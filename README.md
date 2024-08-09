@@ -8,6 +8,13 @@ For some files, like `Cargo.toml`, `.gitignore`, and `CODEOWNERS`, it sorts auto
 
 See examples in `./tests/e2e-tests/`.
 
+## Ignore Keywords
+
+In order to make `keepsorted` to ignore certain code you can use special keywords:
+
+- `keepsorted:ignore-file` can be placed anywhere in the file
+- `keepsorted:ignore-block` can be placed anywhere within the block
+
 ## Supported Files
 
 ### Generic Text Files
@@ -48,6 +55,11 @@ Sort blocks starting with `[dependencies]`, `[dev-dependencies]`, etc., and endi
 [dependencies]
 a = "0.1.0"
 b = { workspace = true }
+
+# keepsorted:ignore-block
+[dev-dependencies]
+y = { workspace = true }
+x = "0.3.0"
 ```
 
 ### .gitignore & CODEOWNERS
@@ -59,3 +71,19 @@ $ keepsorted <path> --features gitignore,codeowners
 ```
 
 Sort blocks separated by empty lines, keeping comments in place (except the opening block comment).
+
+```.gitignore
+# Various build artifacts
+**/build
+**/build-out
+**/build-tmp
+artifacts
+
+# Bazel outdir dirs
+# keepsorted:ignore-block
+bazel-c.pb
+user.bazelrc
+bazel-b.txt
+/bazel-*
+bazel-a.txt
+```
