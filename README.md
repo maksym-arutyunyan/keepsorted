@@ -11,10 +11,10 @@ It also recognizes comments attached to a non-comment lines, for example:
 # Before:
 dependencies = [
     # Keep sorted.
-    'ccc',
-    'bbb',
     # TODO: remove this dependency.
     'aaa',
+    'bbb',
+    'ccc',
 ]
 
 # After:
@@ -31,9 +31,9 @@ See examples in `./tests/e2e-tests/`.
 
 ## Keywords
 
-- `# Keep sorted` or `// Keep sorted` or `keepsorted: keep sorted` for sorting the next block of lines
-- `keepsorted: ignore file` can be placed anywhere in the file
-- `keepsorted: ignore block` can be placed anywhere within the block
+- `# Keep sorted` or `// Keep sorted` or `# keepsorted: keep sorted` for sorting the next block of lines
+- `# keepsorted: ignore file` can be placed anywhere in the file
+- `# keepsorted: ignore block` can be placed anywhere within the block
 
 ## Supported Files
 

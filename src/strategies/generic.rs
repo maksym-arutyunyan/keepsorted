@@ -1,11 +1,9 @@
-use regex::Regex;
 use std::io;
 
-use crate::is_ignore_block;
+use crate::{is_ignore_block, re_keyword_keep_sorted};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
-    let re = Regex::new(r"^\s*#\s*Keep\s*sorted\.\s*$")
-        .map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))?;
+    let re = re_keyword_keep_sorted();
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
