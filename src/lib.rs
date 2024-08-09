@@ -68,11 +68,15 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
 }
 
 fn is_ignore_file(lines: &[String]) -> bool {
-    lines.iter().any(|line| line.contains("keepsorted:ignore-file"))
+    lines
+        .iter()
+        .any(|line| line.contains("keepsorted:ignore-file"))
 }
 
 fn is_ignore_block(lines: &[String]) -> bool {
-    lines.iter().any(|line| line.contains("keepsorted:ignore-block"))
+    lines
+        .iter()
+        .any(|line| line.contains("keepsorted:ignore-block"))
 }
 
 fn is_bazel(path: &Path) -> bool {
