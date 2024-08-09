@@ -6,8 +6,8 @@ use std::path::Path;
 
 pub mod strategies;
 
+static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
-
 static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
 
 pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
@@ -73,23 +73,6 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     Strategy::Generic
 }
 
-fn re_keyword_keep_sorted() -> Regex {
-    Regex::new(
-        r"(?i)^\s*(#|\/\/|#\s+keepsorted\s*:|\/\/\s+keepsorted\s*:)\s*keep\s+sorted\s*\.?\s*$",
-    )
-    .expect("Failed to build regex for keep sorted")
-}
-
-fn re_keyword_ignore_file() -> Regex {
-    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
-        .expect("Failed to build regex for ignore file")
-}
-
-fn re_keyword_ignore_block() -> Regex {
-    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+block\s*\.?\s*$")
-        .expect("Failed to build regex for ignore block")
-}
-
 fn is_ignore_file(lines: &[String]) -> bool {
     lines.iter().any(|x| RE_IGNORE_FILE.is_match(x))
 }
@@ -117,6 +100,13 @@ fn is_codeowners(path: &Path) -> bool {
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
 }
 
+fn re_keyword_keep_sorted() -> Regex {
+    Regex::new(
+        r"(?i)^\s*(#|\/\/|#\s+keepsorted\s*:|\/\/\s+keepsorted\s*:)\s*keep\s+sorted\s*\.?\s*$",
+    )
+    .expect("Failed to build regex for keep sorted")
+}
+
 #[test]
 fn test_re_keyword_keep_sorted() {
     let re = re_keyword_keep_sorted();
@@ -135,6 +125,11 @@ fn test_re_keyword_keep_sorted() {
     }
 }
 
+fn re_keyword_ignore_file() -> Regex {
+    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
+        .expect("Failed to build regex for ignore file")
+}
+
 #[test]
 fn test_re_keyword_ignore_file() {
     let re = re_keyword_ignore_file();
@@ -148,6 +143,11 @@ fn test_re_keyword_ignore_file() {
             line
         );
     }
+}
+
+fn re_keyword_ignore_block() -> Regex {
+    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+block\s*\.?\s*$")
+        .expect("Failed to build regex for ignore block")
 }
 
 #[test]

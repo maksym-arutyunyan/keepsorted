@@ -10,20 +10,20 @@ The tool can also recognize comments attached to non-comment lines, like this:
 # Before:
 dependencies = [
     # Keep sorted.
-    # TODO: remove this dependency.
-    'ccc',
-    'bbb',
-    'aaa',
-]
-# After:
-dependencies = [
     # Keep sorted.
+    'aaa',
     # TODO: remove this dependency.
     'aaa',
     'bbb',
+    'bbb',
+    # TODO: remove this dependency.
     'ccc',
+    'ccc',
+]
 ]
 ```
+# After:
+dependencies = [
 
 You can see more examples in the ./tests/e2e-tests/ directory.
 
@@ -60,8 +60,8 @@ In Bazel files, keepsorted sorts lines within `[...]` blocks that start with `# 
 ```bazel
 DEPENDENCIES = [
     # Keep sorted
-    "b",
     "a",
+    "b",
 ]
 ```
 

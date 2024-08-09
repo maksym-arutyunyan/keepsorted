@@ -1,16 +1,15 @@
 use std::io;
 
-use crate::{is_ignore_block, re_keyword_keep_sorted};
+use crate::{is_ignore_block, RE_KEEP_SORTED};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
-    let re = re_keyword_keep_sorted();
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
     let mut is_ignore_block_prev_line = false;
 
     for line in lines {
-        if re.is_match(&line) {
+        if RE_KEEP_SORTED.is_match(&line) {
             if let Some(prev_line) = output_lines.last() {
                 is_ignore_block_prev_line = is_ignore_block(&[prev_line.clone()]);
             }
