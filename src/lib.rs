@@ -38,13 +38,14 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     writer.flush()
 }
 
+#[derive(Clone, Copy)]
 pub enum Strategy {
     Generic,
     Bazel,
     CargoToml,
     Gitignore,
     RustDeriveAlphabetical,
-    //RustDeriveCanonical,
+    RustDeriveCanonical,
 }
 
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -56,7 +57,10 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
         Strategy::Gitignore => crate::strategies::gitignore::process(lines),
-        Strategy::RustDeriveAlphabetical => crate::strategies::rust_derive::process(lines),
+        Strategy::RustDeriveAlphabetical => {
+            crate::strategies::rust_derive::process(lines, strategy)
+        }
+        Strategy::RustDeriveCanonical => crate::strategies::rust_derive::process(lines, strategy),
     }
 }
 

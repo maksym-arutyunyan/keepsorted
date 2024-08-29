@@ -1,3 +1,4 @@
+use crate::Strategy;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::io;
@@ -7,7 +8,7 @@ use crate::is_ignore_block;
 static RE_DERIVE_BEGIN: Lazy<Regex> = Lazy::new(re_derive_begin);
 static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
 
-pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
+pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<String>> {
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
@@ -27,7 +28,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
             if !is_derive_begin {
                 block.push(line.clone());
             }
-            block = sort(block, is_ignore_block_prev_line);
+            block = sort(block, is_ignore_block_prev_line, strategy);
             is_ignore_block_prev_line = false;
             is_sorting_block = false;
             output_lines.append(&mut block);
@@ -39,14 +40,14 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     }
 
     if is_sorting_block {
-        block = sort(block, is_ignore_block_prev_line);
+        block = sort(block, is_ignore_block_prev_line, strategy);
         output_lines.append(&mut block);
     }
 
     Ok(output_lines)
 }
 
-fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
+fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy) -> Vec<String> {
     if is_ignore_block_prev_line || is_ignore_block(&block) {
         return block;
     }
@@ -66,7 +67,51 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
             let derive_content = &trimmed_line[derive_start + 9..derive_start + derive_end];
             let mut traits: Vec<&str> = derive_content.split(',').map(str::trim).collect();
 
-            traits.sort_unstable();
+            match strategy {
+                Strategy::RustDeriveAlphabetical => {
+                    traits.sort_unstable();
+                }
+                Strategy::RustDeriveCanonical => {
+                    // Define the canonical order of traits
+                    let canonical_traits = [
+                        "Copy",
+                        "Clone",
+                        "Eq",
+                        "PartialEq",
+                        "Ord",
+                        "PartialOrd",
+                        "Hash",
+                        "Debug",
+                        "Display",
+                        "Default",
+                    ];
+
+                    // Partition traits into canonical and non-canonical
+                    let mut canonical_sorted: Vec<&str> = traits
+                        .iter()
+                        .filter(|&&t| canonical_traits.contains(&t))
+                        .cloned()
+                        .collect();
+                    let mut non_canonical_sorted: Vec<&str> = traits
+                        .iter()
+                        .filter(|&&t| !canonical_traits.contains(&t))
+                        .cloned()
+                        .collect();
+
+                    // Sort canonical traits by the predefined order
+                    canonical_sorted
+                        .sort_by_key(|t| canonical_traits.iter().position(|&ct| ct == *t).unwrap());
+
+                    // Sort non-canonical traits alphabetically
+                    non_canonical_sorted.sort_unstable();
+
+                    // Combine the two sorted lists
+                    canonical_sorted.extend(non_canonical_sorted);
+
+                    traits = canonical_sorted;
+                }
+                _ => (),
+            }
 
             let sorted_traits = traits.join(", ");
             let new_derive = format!("#[derive({})]", sorted_traits);
@@ -99,29 +144,58 @@ fn re_derive_end() -> Regex {
 #[test]
 fn test_sort() {
     assert_eq!(
-        sort(vec!["#[derive(b, a)]".to_string()], false),
-        vec!["#[derive(a, b)]".to_string()]
+        sort(
+            vec!["#[derive(B, A)]".to_string()],
+            false,
+            Strategy::RustDeriveAlphabetical
+        ),
+        vec!["#[derive(A, B)]".to_string()]
     );
 }
 
 #[test]
 fn test_rust_derive_process() {
     assert_eq!(
-        process(vec!["#[derive(b, a)]\n".to_string()]).unwrap(),
-        vec!["#[derive(a, b)]\n".to_string()]
+        process(
+            vec!["#[derive(B, A)]\n".to_string()],
+            Strategy::RustDeriveAlphabetical
+        )
+        .unwrap(),
+        vec!["#[derive(A, B)]\n".to_string()]
     );
 }
 
 #[test]
 fn test_rust_derive_process_2() {
     assert_eq!(
-        process(vec![
-            "#[derive(b, a)]\n".to_string(),
-            "struct Tmp {}\n".to_string()
-        ])
+        process(
+            vec![
+                "#[derive(B, A)]\n".to_string(),
+                "struct Tmp {}\n".to_string()
+            ],
+            Strategy::RustDeriveAlphabetical
+        )
         .unwrap(),
         vec![
-            "#[derive(a, b)]\n".to_string(),
+            "#[derive(A, B)]\n".to_string(),
+            "struct Tmp {}\n".to_string()
+        ]
+    );
+}
+
+#[test]
+fn test_rust_derive_process_canonical() {
+    assert_eq!(
+        process(
+            vec![
+                "#[derive(B, A, Ord, Copy)]\n".to_string(),
+                "struct Tmp {}\n".to_string()
+            ],
+            Strategy::RustDeriveCanonical
+        )
+        .unwrap(),
+        vec![
+            "#[derive(Copy, Ord, A, B)]\n".to_string(),
             "struct Tmp {}\n".to_string()
         ]
     );

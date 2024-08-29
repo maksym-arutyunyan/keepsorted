@@ -120,8 +120,6 @@ bazel-a.txt
 $ keepsorted <path> --features rust_derive_alphabetical
 # or
 $ keepsorted <path> --features rust_derive_canonical
-# or
-$ keepsorted <path> --features rust_derive_trait_path
 ```
 
 The feature is inspired by a closed ticket to update rust style, [link](https://github.com/rust-lang/style-team/issues/154).

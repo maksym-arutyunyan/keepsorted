@@ -1,15 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
+format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [unreleased]
+## [Unreleased]
 
-- add generic sorting by keywords
-- add support for Bazel files
-- add support for `Cargo.toml` files
-- (experimental) add support for `.gitignore` files
-- (experimental) add support for `CODEOWNERS` files
-- (experimental) add sorting Rust derive traits
+### Added
+- Generic keyword sorting functionality
+- Support for Bazel files
+- Support for `Cargo.toml` files
 
+### Experimental
+- Support for `.gitignore` files
+- Support for `CODEOWNERS` files
+- Sorting of Rust `#[derive(...)]` traits
