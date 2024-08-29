@@ -170,15 +170,15 @@ fn test_rust_derive_process_2() {
     assert_eq!(
         process(
             vec![
-                "#[derive(B, A)]\n".to_string(),
-                "struct Tmp {}\n".to_string()
+                "  #[derive(B, A)]  \n".to_string(),
+                "  struct Tmp {}  \n".to_string()
             ],
             Strategy::RustDeriveAlphabetical
         )
         .unwrap(),
         vec![
-            "#[derive(A, B)]\n".to_string(),
-            "struct Tmp {}\n".to_string()
+            "  #[derive(A, B)]  \n".to_string(),
+            "  struct Tmp {}  \n".to_string()
         ]
     );
 }
@@ -188,15 +188,15 @@ fn test_rust_derive_process_canonical() {
     assert_eq!(
         process(
             vec![
-                "#[derive(B, A, Ord, Copy)]\n".to_string(),
-                "struct Tmp {}\n".to_string()
+                "  #[derive(B, A, Ord, Copy)]  \n".to_string(),
+                "  struct Tmp {}  \n".to_string()
             ],
             Strategy::RustDeriveCanonical
         )
         .unwrap(),
         vec![
-            "#[derive(Copy, Ord, A, B)]\n".to_string(),
-            "struct Tmp {}\n".to_string()
+            "  #[derive(Copy, Ord, A, B)]  \n".to_string(),
+            "  struct Tmp {}  \n".to_string()
         ]
     );
 }
