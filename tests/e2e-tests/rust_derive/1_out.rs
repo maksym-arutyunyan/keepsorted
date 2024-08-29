@@ -1,2 +1,2 @@
-#[derive(A, B, C)]
+#[derive(A, B, C, Copy, Ord)]
 struct Data {}

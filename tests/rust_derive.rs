@@ -8,11 +8,11 @@ fn rust_derive_alphabetical() {
     test_inner!(
         RustDeriveAlphabetical,
         r#"
-#[derive(C, B, A)]
+#[derive(C, B, A, Ord, Copy)]
 struct Data {}
         "#,
         r#"
-#[derive(A, B, C)]
+#[derive(A, B, C, Copy, Ord)]
 struct Data {}
         "#
     );
