@@ -141,15 +141,20 @@ fn re_derive_end() -> Regex {
     Regex::new(r"\)\]\s*$").expect("Failed to build regex for rust derive end")
 }
 
+#[cfg(test)]
+fn to_lines(text: &str) -> Vec<String> {
+    text.lines().map(String::from).collect()
+}
+
 #[test]
 fn test_sort() {
     assert_eq!(
         sort(
-            vec!["#[derive(B, A)]".to_string()],
+            to_lines("#[derive(B, A)]"),
             false,
             Strategy::RustDeriveAlphabetical
         ),
-        vec!["#[derive(A, B)]".to_string()]
+        to_lines("#[derive(A, B)]")
     );
 }
 
@@ -157,11 +162,15 @@ fn test_sort() {
 fn test_rust_derive_process() {
     assert_eq!(
         process(
-            vec!["#[derive(B, A)]\n".to_string()],
+            to_lines(r#"
+                #[derive(B, A)]
+            "#),
             Strategy::RustDeriveAlphabetical
         )
         .unwrap(),
-        vec!["#[derive(A, B)]\n".to_string()]
+        to_lines(r#"
+                #[derive(A, B)]
+            "#),
     );
 }
 
@@ -169,17 +178,17 @@ fn test_rust_derive_process() {
 fn test_rust_derive_process_2() {
     assert_eq!(
         process(
-            vec![
-                "#[derive(B, A)]\n".to_string(),
-                "struct Tmp {}\n".to_string()
-            ],
+            to_lines(r#"
+                #[derive(B, A)]
+                struct Tmp {}
+            "#),
             Strategy::RustDeriveAlphabetical
         )
         .unwrap(),
-        vec![
-            "#[derive(A, B)]\n".to_string(),
-            "struct Tmp {}\n".to_string()
-        ]
+        to_lines(r#"
+                #[derive(A, B)]
+                struct Tmp {}
+            "#)
     );
 }
 
@@ -187,16 +196,16 @@ fn test_rust_derive_process_2() {
 fn test_rust_derive_process_canonical() {
     assert_eq!(
         process(
-            vec![
-                "#[derive(B, A, Ord, Copy)]\n".to_string(),
-                "struct Tmp {}\n".to_string()
-            ],
+            to_lines(r#"
+                #[derive(B, A, Ord, Copy)]
+                struct Tmp {}
+            "#),
             Strategy::RustDeriveCanonical
         )
         .unwrap(),
-        vec![
-            "#[derive(Copy, Ord, A, B)]\n".to_string(),
-            "struct Tmp {}\n".to_string()
-        ]
+        to_lines(r#"
+                #[derive(Copy, Ord, A, B)]
+                struct Tmp {}
+            "#),
     );
 }
