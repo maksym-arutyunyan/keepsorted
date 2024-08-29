@@ -80,6 +80,9 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     if features.contains(&"rust_derive_alphabetical".to_string()) && is_rust(path) {
         return Strategy::RustDeriveAlphabetical;
     }
+    if features.contains(&"rust_derive_canonical".to_string()) && is_rust(path) {
+        return Strategy::RustDeriveCanonical;
+    }
     Strategy::Generic
 }
 

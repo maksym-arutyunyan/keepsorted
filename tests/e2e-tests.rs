@@ -129,3 +129,12 @@ fn test_e2e_rust_derive_1() {
         "rust_derive_alphabetical",
     );
 }
+
+#[test]
+fn test_e2e_rust_derive_2() {
+    run_test(
+        &dir("rust_derive/2_in.rs"),
+        &dir("rust_derive/2_out.rs"),
+        "rust_derive_canonical",
+    );
+}
