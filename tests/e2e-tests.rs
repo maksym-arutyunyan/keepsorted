@@ -120,3 +120,12 @@ fn test_e2e_codeowners_1() {
         "codeowners",
     );
 }
+
+#[test]
+fn test_e2e_rust_derive_1() {
+    run_test(
+        &dir("rust_derive/1_in.rs"),
+        &dir("rust_derive/1_out.rs"),
+        "rust_derive_alphabetical",
+    );
+}

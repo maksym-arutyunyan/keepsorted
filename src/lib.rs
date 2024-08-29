@@ -43,6 +43,8 @@ pub enum Strategy {
     Bazel,
     CargoToml,
     Gitignore,
+    RustDeriveAlphabetical,
+    //RustDeriveCanonical,
 }
 
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -54,6 +56,7 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
         Strategy::Gitignore => crate::strategies::gitignore::process(lines),
+        Strategy::RustDeriveAlphabetical => crate::strategies::rust_derive::process(lines),
     }
 }
 
@@ -69,6 +72,9 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     }
     if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
         return Strategy::Gitignore;
+    }
+    if features.contains(&"rust_derive_alphabetical".to_string()) && is_rust(path) {
+        return Strategy::RustDeriveAlphabetical;
     }
     Strategy::Generic
 }
@@ -98,6 +104,10 @@ fn is_gitignore(path: &Path) -> bool {
 
 fn is_codeowners(path: &Path) -> bool {
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
+}
+
+fn is_rust(path: &Path) -> bool {
+    path.is_file() && path.extension() == Some(std::ffi::OsStr::new("rs"))
 }
 
 fn re_keyword_keep_sorted() -> Regex {
