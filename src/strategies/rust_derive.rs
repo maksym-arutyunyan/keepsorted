@@ -78,7 +78,9 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 Strategy::RustDeriveCanonical => {
                     traits = canonical_sort(traits);
                 }
-                _ => (),
+                _ => {
+                    return block;
+                }
             }
             traits.retain(|t| !t.is_empty());
             let sorted_traits = traits.join(", ");
