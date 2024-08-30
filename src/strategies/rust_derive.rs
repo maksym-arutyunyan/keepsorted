@@ -112,7 +112,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 }
                 _ => (),
             }
-            traits = traits.iter().filter(|&&t| !t.is_empty()).cloned().collect();
+            traits.retain(|t| !t.is_empty());
 
             let sorted_traits = traits.join(", ");
             let new_derive = format!("#[derive({})]", sorted_traits);
