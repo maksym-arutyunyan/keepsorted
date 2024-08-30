@@ -134,8 +134,8 @@ fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
         .map(|(i, &trait_name)| (trait_name, i))
         .collect();
 
-    // Sort based on canonical index, with non-canonical traits sorted last
-    let mut sorted_traits: Vec<_> = traits;
+    // Sort traits by canonical index, and by trait name if indices are the same
+    let mut sorted_traits = traits;
     sorted_traits.sort_by(|a, b| {
         let index_a = canonical_index.get(a).unwrap_or(&usize::MAX);
         let index_b = canonical_index.get(b).unwrap_or(&usize::MAX);
