@@ -72,48 +72,11 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                     traits.sort_unstable();
                 }
                 Strategy::RustDeriveCanonical => {
-                    // Define the canonical order of traits
-                    let canonical_traits = [
-                        "Copy",
-                        "Clone",
-                        "Eq",
-                        "PartialEq",
-                        "Ord",
-                        "PartialOrd",
-                        "Hash",
-                        "Debug",
-                        "Display",
-                        "Default",
-                    ];
-
-                    // Partition traits into canonical and non-canonical
-                    let mut canonical_sorted: Vec<&str> = traits
-                        .iter()
-                        .filter(|&&t| canonical_traits.contains(&t))
-                        .cloned()
-                        .collect();
-                    let mut non_canonical_sorted: Vec<&str> = traits
-                        .iter()
-                        .filter(|&&t| !canonical_traits.contains(&t))
-                        .cloned()
-                        .collect();
-
-                    // Sort canonical traits by the predefined order
-                    canonical_sorted
-                        .sort_by_key(|t| canonical_traits.iter().position(|&ct| ct == *t).unwrap());
-
-                    // Sort non-canonical traits alphabetically
-                    non_canonical_sorted.sort_unstable();
-
-                    // Combine the two sorted lists
-                    canonical_sorted.extend(non_canonical_sorted);
-
-                    traits = canonical_sorted;
+                    traits = canonical_sort(traits);
                 }
                 _ => (),
             }
             traits.retain(|t| !t.is_empty());
-
             let sorted_traits = traits.join(", ");
             let new_derive = format!("#[derive({})]", sorted_traits);
 
@@ -143,6 +106,45 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     }
 
     result
+}
+
+fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
+    // Define the canonical order of traits
+    let canonical_traits = [
+        "Copy",
+        "Clone",
+        "Eq",
+        "PartialEq",
+        "Ord",
+        "PartialOrd",
+        "Hash",
+        "Debug",
+        "Display",
+        "Default",
+    ];
+
+    // Partition traits into canonical and non-canonical
+    let mut canonical_sorted: Vec<&str> = traits
+        .iter()
+        .filter(|&&t| canonical_traits.contains(&t))
+        .cloned()
+        .collect();
+    let mut non_canonical_sorted: Vec<&str> = traits
+        .iter()
+        .filter(|&&t| !canonical_traits.contains(&t))
+        .cloned()
+        .collect();
+
+    // Sort canonical traits by the predefined order
+    canonical_sorted.sort_by_key(|t| canonical_traits.iter().position(|&ct| ct == *t).unwrap());
+
+    // Sort non-canonical traits alphabetically
+    non_canonical_sorted.sort_unstable();
+
+    // Combine the two sorted lists
+    canonical_sorted.extend(non_canonical_sorted);
+
+    canonical_sorted
 }
 
 fn re_derive_begin() -> Regex {
