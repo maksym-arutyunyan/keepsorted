@@ -77,11 +77,16 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
         return Strategy::Gitignore;
     }
-    if features.contains(&"rust_derive_alphabetical".to_string()) && is_rust(path) {
-        return Strategy::RustDeriveAlphabetical;
-    }
-    if features.contains(&"rust_derive_canonical".to_string()) && is_rust(path) {
-        return Strategy::RustDeriveCanonical;
+    if is_rust(path) {
+        match (
+            features.contains(&"rust_derive_alphabetical".to_string()),
+            features.contains(&"rust_derive_canonical".to_string()),
+        ) {
+            (true, true) => panic!("Mutually exclusive rust_derive feature flags are not allowed"),
+            (true, false) => return Strategy::RustDeriveAlphabetical,
+            (false, true) => return Strategy::RustDeriveCanonical,
+            _ => {}
+        }
     }
     Strategy::Generic
 }
