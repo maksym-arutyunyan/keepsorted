@@ -8,6 +8,10 @@ use crate::is_ignore_block;
 static RE_DERIVE_BEGIN: Lazy<Regex> = Lazy::new(re_derive_begin);
 static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
 
+// These values count the number of characters and an extra '\n'.
+const STAY_ONE_LINE_LEN: usize = 97;
+const BREAK_INTO_MANY_LINES_LEN: usize = 101;
+
 pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<String>> {
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
@@ -86,11 +90,11 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 &line[line.rfind(trimmed_line).unwrap_or(line.len()) + trimmed_line.len()..];
 
             let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
-            if new_line.len() <= 97 {
+            if new_line.len() <= STAY_ONE_LINE_LEN {
                 result.push(new_line);
             } else {
                 let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
-                if mid_line.len() <= 101 {
+                if mid_line.len() <= BREAK_INTO_MANY_LINES_LEN {
                     result.push(format!("{}#[derive(\n", prefix_whitespace));
                     result.push(format!("{}\n", mid_line));
                     result.push(format!("{})]\n", prefix_whitespace));
