@@ -106,7 +106,7 @@ fn is_single_line_comment(line: &str) -> bool {
 // beginning with "@". The next significant part of the comparison is the list
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug, Default)]
 pub struct BazelSortKey {
     phase: i16,
     split: Vec<String>,

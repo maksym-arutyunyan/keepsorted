@@ -38,7 +38,7 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     writer.flush()
 }
 
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 pub enum Strategy {
     Generic,
     Bazel,
