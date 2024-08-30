@@ -33,10 +33,48 @@ struct Data {}
     );
 }
 
+#[test]
+fn rust_derive_alphabetical_indented() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+mod foo {
+    #[derive(C, B, A, Ord, Copy)]
+    struct Data {}
+}
+        "#,
+        r#"
+mod foo {
+    #[derive(A, B, C, Copy, Ord)]
+    struct Data {}
+}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_canonical_indented() {
+    test_inner!(
+        RustDeriveCanonical,
+        r#"
+mod foo {
+    #[derive(C, B, A, Ord, Copy)]
+    struct Data {}
+}
+        "#,
+        r#"
+mod foo {
+    #[derive(Copy, Ord, A, B, C)]
+    struct Data {}
+}
+        "#
+    );
+}
+
 //       1         2         3         4         5         6         7         8         9
 //3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
 #[test]
-fn rust_derive_long_1() {
+fn rust_derive_long_stays_one_line() {
     test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9
@@ -55,7 +93,7 @@ struct Data {}
 //       1         2         3         4         5         6         7         8         9
 //34567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
 #[test]
-fn rust_derive_long_2() {
+fn rust_derive_long_breaks_into_three_lines() {
     test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9
@@ -76,7 +114,7 @@ struct Data {}
 //       1         2         3         4         5         6         7         8         9         0
 //345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #[test]
-fn rust_derive_long_3() {
+fn rust_derive_long_stays_three_lines() {
     test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9         0
@@ -99,7 +137,7 @@ struct Data {}
 //       1         2         3         4         5         6         7         8         9         0
 //3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
 #[test]
-fn rust_derive_long_4() {
+fn rust_derive_long_breaks_into_many_lines() {
     test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9         0
@@ -131,6 +169,73 @@ struct Data {}
     A17xx,
     B01,
     B02xx,
+)]
+struct Data {}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_one_line_ignored() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+// keepsorted: ignore block
+#[derive(C, B, A, Ord, Copy)]
+struct Data {}
+        "#,
+        r#"
+// keepsorted: ignore block
+#[derive(C, B, A, Ord, Copy)]
+struct Data {}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_three_lines_ignored() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+// keepsorted: ignore block
+#[derive(
+    C, B, A, Ord, Copy,
+)]
+struct Data {}
+        "#,
+        r#"
+// keepsorted: ignore block
+#[derive(
+    C, B, A, Ord, Copy,
+)]
+struct Data {}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_many_lines_ignored() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+// keepsorted: ignore block
+#[derive(
+    C,
+    B,
+    A,
+    Ord,
+    Copy,
+)]
+struct Data {}
+        "#,
+        r#"
+// keepsorted: ignore block
+#[derive(
+    C,
+    B,
+    A,
+    Ord,
+    Copy,
 )]
 struct Data {}
         "#
