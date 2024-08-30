@@ -127,14 +127,14 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 result.push(new_line);
             } else {
                 let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
-                if mid_line.len() <= 102 {
+                if mid_line.len() <= 101 {
                     result.push(format!("{}#[derive(\n", prefix_whitespace));
                     result.push(format!("{}\n", mid_line));
                     result.push(format!("{})]\n", prefix_whitespace));
                 } else {
                     result.push(format!("{}#[derive(\n", prefix_whitespace));
                     for x in traits {
-                        result.push(format!("{},\n", x));
+                        result.push(format!("{}    {},\n", prefix_whitespace, x));
                     }
                     result.push(format!("{})]\n", prefix_whitespace));
                 }
