@@ -140,7 +140,6 @@ fn test_e2e_rust_derive_2() {
 }
 
 #[test]
-#[ignore]
 fn test_e2e_rust_derive_3() {
     run_test(
         &dir("rust_derive/3_in.rs"),

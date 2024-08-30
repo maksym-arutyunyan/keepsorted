@@ -32,8 +32,10 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<
             is_ignore_block_prev_line = false;
             is_sorting_block = false;
             output_lines.append(&mut block);
-        } else if !is_derive_begin && is_sorting_block {
-            block.push(line);
+        } else if is_sorting_block {
+            if !is_derive_begin {
+                block.push(line);
+            }
         } else {
             output_lines.push(line);
         }
@@ -51,16 +53,14 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     if is_ignore_block_prev_line || is_ignore_block(&block) {
         return block;
     }
-    // TODO: add support for multiline derive.
-    if block.len() > 1 {
-        return block;
-    }
-    let n = block.len();
-    let mut result = Vec::with_capacity(n);
-
-    let line = &block[0];
+    let line: String = block
+        .iter()
+        .map(|line| line.trim_end_matches('\n'))
+        .collect();
+    let line = format!("{}\n", line);
     let trimmed_line = line.trim();
 
+    let mut result = Vec::new();
     // Check if the line contains a #[derive(...)] statement
     if let Some(derive_start) = trimmed_line.find("#[derive(") {
         if let Some(derive_end) = trimmed_line[derive_start..].find(")]") {
@@ -112,6 +112,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 }
                 _ => (),
             }
+            traits = traits.iter().filter(|&&t| !t.is_empty()).cloned().collect();
 
             let sorted_traits = traits.join(", ");
             let new_derive = format!("#[derive({})]", sorted_traits);
@@ -122,12 +123,23 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
                 &line[line.rfind(trimmed_line).unwrap_or(line.len()) + trimmed_line.len()..];
 
             let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
-            result.push(new_line);
-        } else {
-            result.push(line.clone());
+            if new_line.len() <= 97 {
+                result.push(new_line);
+            } else {
+                let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
+                if mid_line.len() <= 102 {
+                    result.push(format!("{}#[derive(\n", prefix_whitespace));
+                    result.push(format!("{}\n", mid_line));
+                    result.push(format!("{})]\n", prefix_whitespace));
+                } else {
+                    result.push(format!("{}#[derive(\n", prefix_whitespace));
+                    for x in traits {
+                        result.push(format!("{},\n", x));
+                    }
+                    result.push(format!("{})]\n", prefix_whitespace));
+                }
+            }
         }
-    } else {
-        result.push(line.clone());
     }
 
     result
@@ -145,11 +157,11 @@ fn re_derive_end() -> Regex {
 fn test_sort() {
     assert_eq!(
         sort(
-            vec!["#[derive(B, A)]".to_string()],
+            vec!["#[derive(B, A)]\n".to_string()],
             false,
             Strategy::RustDeriveAlphabetical
         ),
-        vec!["#[derive(A, B)]".to_string()]
+        vec!["#[derive(A, B)]\n".to_string()]
     );
 }
 
@@ -171,14 +183,14 @@ fn test_rust_derive_process_2() {
         process(
             vec![
                 "  #[derive(B, A)]  \n".to_string(),
-                "  struct Tmp {}  \n".to_string()
+                "  struct Data {}  \n".to_string()
             ],
             Strategy::RustDeriveAlphabetical
         )
         .unwrap(),
         vec![
             "  #[derive(A, B)]  \n".to_string(),
-            "  struct Tmp {}  \n".to_string()
+            "  struct Data {}  \n".to_string()
         ]
     );
 }
@@ -189,14 +201,85 @@ fn test_rust_derive_process_canonical() {
         process(
             vec![
                 "  #[derive(B, A, Ord, Copy)]  \n".to_string(),
-                "  struct Tmp {}  \n".to_string()
+                "  struct Data {}  \n".to_string()
             ],
             Strategy::RustDeriveCanonical
         )
         .unwrap(),
         vec![
             "  #[derive(Copy, Ord, A, B)]  \n".to_string(),
-            "  struct Tmp {}  \n".to_string()
+            "  struct Data {}  \n".to_string()
+        ]
+    );
+}
+
+#[test]
+fn test_rust_derive_process_canonical_2() {
+    assert_eq!(
+        process(
+            vec![
+                "\n".to_string(),
+                "#[derive(B, A, Ord, Copy)]\n".to_string(),
+                "struct Data {}\n".to_string(),
+                "\n".to_string(),
+            ],
+            Strategy::RustDeriveCanonical
+        )
+        .unwrap(),
+        vec![
+            "\n".to_string(),
+            "#[derive(Copy, Ord, A, B)]\n".to_string(),
+            "struct Data {}\n".to_string(),
+            "\n".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn test_sort_long_1() {
+    assert_eq!(
+        sort(
+            vec!["#[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx)]\n".to_string()],
+            false,
+            Strategy::RustDeriveAlphabetical
+        ),
+        vec!["#[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx)]\n".to_string()]
+    );
+}
+
+#[test]
+fn test_sort_long_2() {
+    assert_eq!(
+        sort(
+            vec![
+                "#[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx)]\n".to_string(),
+            ],
+            false,
+            Strategy::RustDeriveAlphabetical
+        ),
+        vec![
+            "#[derive(\n".to_string(),
+            "    A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx,\n".to_string(),
+            ")]\n".to_string(),
+        ]
+    );
+}
+
+#[test]
+fn test_process_long_1() {
+    assert_eq!(
+        process(
+            vec![
+                "#[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx)]\n".to_string(),
+                "struct Data {}\n".to_string()
+            ],
+            Strategy::RustDeriveAlphabetical
+        ).unwrap(),
+        vec![
+            "#[derive(\n".to_string(),
+            "    A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx,\n".to_string(),
+            ")]\n".to_string(),
+            "struct Data {}\n".to_string(),
         ]
     );
 }
