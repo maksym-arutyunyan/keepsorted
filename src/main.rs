@@ -11,7 +11,7 @@ fn about() -> String {
     )
 }
 
-#[derive(Parser, Debug)]
+#[derive(Debug, Parser)]
 #[command(
     version,
     about = about(),

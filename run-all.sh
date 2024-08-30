@@ -29,7 +29,7 @@ fmt_status=$?
 # Also ignore `./misc/` and `./tests/`.
 git ls-files -co --exclude-standard \
     | grep -vE "^misc/|^tests/|^README.md" \
-    | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore" {}
+    | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
 keepsorted_status=$?
 
 # Check if keepsorted changed any files.

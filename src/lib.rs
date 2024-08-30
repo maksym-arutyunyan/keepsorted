@@ -38,11 +38,14 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     writer.flush()
 }
 
+#[derive(Copy, Clone)]
 pub enum Strategy {
     Generic,
     Bazel,
     CargoToml,
     Gitignore,
+    RustDeriveAlphabetical,
+    RustDeriveCanonical,
 }
 
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -54,6 +57,10 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
         Strategy::Gitignore => crate::strategies::gitignore::process(lines),
+        Strategy::RustDeriveAlphabetical => {
+            crate::strategies::rust_derive::process(lines, strategy)
+        }
+        Strategy::RustDeriveCanonical => crate::strategies::rust_derive::process(lines, strategy),
     }
 }
 
@@ -69,6 +76,17 @@ fn classify(path: &Path, features: Vec<String>) -> Strategy {
     }
     if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
         return Strategy::Gitignore;
+    }
+    if is_rust(path) {
+        match (
+            features.contains(&"rust_derive_alphabetical".to_string()),
+            features.contains(&"rust_derive_canonical".to_string()),
+        ) {
+            (true, true) => panic!("Mutually exclusive rust_derive feature flags are not allowed"),
+            (true, false) => return Strategy::RustDeriveAlphabetical,
+            (false, true) => return Strategy::RustDeriveCanonical,
+            _ => {}
+        }
     }
     Strategy::Generic
 }
@@ -98,6 +116,10 @@ fn is_gitignore(path: &Path) -> bool {
 
 fn is_codeowners(path: &Path) -> bool {
     path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
+}
+
+fn is_rust(path: &Path) -> bool {
+    path.is_file() && path.extension() == Some(std::ffi::OsStr::new("rs"))
 }
 
 fn re_keyword_keep_sorted() -> Regex {
