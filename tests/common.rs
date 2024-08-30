@@ -3,12 +3,12 @@ use std::io::{self};
 
 // Helper function to hide text-lines conversion.
 pub fn process_input(strategy: Strategy, text: &str) -> io::Result<String> {
-    let lines: Vec<String> = text.lines().map(|line| format!("{}\n", line)).collect();
+    let lines: Vec<_> = text.lines().map(|line| format!("{}\n", line)).collect();
     let mut processed_lines = process_lines(strategy, lines)?;
     if let Some(last) = processed_lines.last_mut() {
-        *last = last.trim_end_matches('\n').to_string();
+        last.truncate(last.trim_end_matches('\n').len());
     }
-    Ok(processed_lines.join(""))
+    Ok(processed_lines.concat())
 }
 
 // Macro for defining the core test logic.
