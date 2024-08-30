@@ -114,7 +114,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
 
 fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
     // Define the canonical order of traits
-    let canonical_traits = [
+    let canonical_order = [
         "Copy",
         "Clone",
         "Eq",
@@ -127,28 +127,22 @@ fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
         "Default",
     ];
 
-    // Partition traits into canonical and non-canonical
-    let mut canonical_sorted: Vec<&str> = traits
+    // Create a mapping from trait to its canonical index
+    let canonical_index: std::collections::HashMap<_, _> = canonical_order
         .iter()
-        .filter(|&&t| canonical_traits.contains(&t))
-        .cloned()
-        .collect();
-    let mut non_canonical_sorted: Vec<&str> = traits
-        .iter()
-        .filter(|&&t| !canonical_traits.contains(&t))
-        .cloned()
+        .enumerate()
+        .map(|(i, &trait_name)| (trait_name, i))
         .collect();
 
-    // Sort canonical traits by the predefined order
-    canonical_sorted.sort_by_key(|t| canonical_traits.iter().position(|&ct| ct == *t).unwrap());
+    // Sort based on canonical index, with non-canonical traits sorted last
+    let mut sorted_traits: Vec<_> = traits;
+    sorted_traits.sort_by(|a, b| {
+        let index_a = canonical_index.get(a).unwrap_or(&usize::MAX);
+        let index_b = canonical_index.get(b).unwrap_or(&usize::MAX);
+        (index_a, a).cmp(&(index_b, b))
+    });
 
-    // Sort non-canonical traits alphabetically
-    non_canonical_sorted.sort_unstable();
-
-    // Combine the two sorted lists
-    canonical_sorted.extend(non_canonical_sorted);
-
-    canonical_sorted
+    sorted_traits
 }
 
 fn re_derive_begin() -> Regex {
