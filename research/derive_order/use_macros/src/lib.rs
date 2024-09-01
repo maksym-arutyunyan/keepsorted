@@ -12,7 +12,7 @@ mod tests {
 
     #[test]
     fn test_first_second() {
-        #[derive(First, Second)]
+        #[derive(First, Second)] // <- This is expected to work.
         struct MyStruct;
 
         assert!(MyStruct::check_first_is_implemented());
