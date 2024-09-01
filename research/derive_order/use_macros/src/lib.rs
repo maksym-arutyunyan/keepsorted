@@ -20,6 +20,7 @@ mod tests {
 
     #[test]
     fn test_second_first() {
+        // keepsorted: ignore block
         #[derive(Second, First)] // <- Seems the order is not important.
         struct MyStruct;
 
