@@ -12,17 +12,17 @@ mod tests {
 
     #[test]
     fn test_first_second() {
-        #[derive(First, Second)] // <-- This should work correctly.
+        #[derive(First, Second)]
         struct MyStruct;
 
-        assert!(<MyStruct as Second>::check_first_is_implemented());
+        assert!(MyStruct::check_first_is_implemented());
     }
 
     #[test]
     fn test_second_first() {
-        #[derive(Second, First)] // <-- Clarify if this should work or fail.
+        #[derive(Second, First)]
         struct MyStruct;
 
-        assert!(<MyStruct as Second>::check_first_is_implemented());
+        assert!(MyStruct::check_first_is_implemented());
     }
 }
