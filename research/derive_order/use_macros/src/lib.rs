@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn test_second_first() {
-        #[derive(Second, First)]
+        #[derive(Second, First)] // <- Seems the order is not important.
         struct MyStruct;
 
         assert!(MyStruct::check_first_is_implemented());
