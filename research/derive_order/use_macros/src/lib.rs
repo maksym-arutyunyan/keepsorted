@@ -12,6 +12,7 @@ mod tests {
 
     #[test]
     fn test_first_second() {
+        // keepsorted: ignore block
         #[derive(First, Second)] // <- This is expected to work.
         struct MyStruct;
 
