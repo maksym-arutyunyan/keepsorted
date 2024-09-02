@@ -243,7 +243,22 @@ struct Data {}
 }
 
 #[test]
-fn rust_derive_issue_25() {
+fn rust_derive_issue_25_1() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+#[derive(Parser, Debug)] // Some comment.
+struct Data {}
+        "#,
+        r#"
+#[derive(Debug, Parser)] // Some comment.
+struct Data {}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_issue_25_2() {
     test_inner!(
         RustDeriveAlphabetical,
         r#"
@@ -253,6 +268,23 @@ struct Data {}
         "#,
         r#"
 #[derive(Debug, Parser)] // Some comment.
+#[command(about = "description", long_about = None)]
+struct Data {}
+        "#
+    );
+}
+
+#[test]
+fn rust_derive_issue_25_3() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+#[derive(Parser, Debug)] // Some comment comment with #[derive(Parser, Debug)].
+#[command(about = "description", long_about = None)]
+struct Data {}
+        "#,
+        r#"
+#[derive(Debug, Parser)] // Some comment comment with #[derive(Parser, Debug)].
 #[command(about = "description", long_about = None)]
 struct Data {}
         "#
