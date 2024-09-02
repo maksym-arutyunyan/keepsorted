@@ -66,14 +66,10 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     let line_without_comment = line.trim().split("//").next().unwrap_or("").trim();
 
     // Check if the line contains a #[derive(...)] statement
-    if let Some(derive_range) = line_without_comment
-        .find("#[derive(")
-        .map(|start| {
-            let end = line_without_comment[start..].find(")]")?;
-            Some(start + 9..start + end)
-        })
-        .flatten()
-    {
+    if let Some(derive_range) = line_without_comment.find("#[derive(").and_then(|start| {
+        let end = line_without_comment[start..].find(")]")?;
+        Some(start + 9..start + end)
+    }) {
         let derive_content = &line_without_comment[derive_range.clone()];
         let mut traits: Vec<&str> = derive_content
             .split(',')
