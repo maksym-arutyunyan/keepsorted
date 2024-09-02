@@ -28,7 +28,8 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<
             is_sorting_block = true;
             block.push(line.clone());
         }
-        if is_sorting_block && RE_DERIVE_END.is_match(&line) {
+        let line_without_comment = line.trim().split("//").next().unwrap_or("").trim();
+        if is_sorting_block && RE_DERIVE_END.is_match(line_without_comment) {
             if !is_derive_begin {
                 block.push(line.clone());
             }
@@ -62,56 +63,55 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
         .map(|line| line.trim_end_matches('\n'))
         .collect();
     let line = format!("{}\n", line);
-    let trimmed_line = line.trim();
+    let line_without_comment = line.trim().split("//").next().unwrap_or("").trim();
 
-    let mut result = Vec::new();
     // Check if the line contains a #[derive(...)] statement
-    if let Some(derive_start) = trimmed_line.find("#[derive(") {
-        if let Some(derive_end) = trimmed_line[derive_start..].find(")]") {
-            let derive_content = &trimmed_line[derive_start + 9..derive_start + derive_end];
-            let mut traits: Vec<&str> = derive_content.split(',').map(str::trim).collect();
+    if let Some(derive_range) = line_without_comment.find("#[derive(").and_then(|start| {
+        let end = line_without_comment[start..].find(")]")?;
+        Some(start + 9..start + end)
+    }) {
+        let derive_content = &line_without_comment[derive_range.clone()];
+        let mut traits: Vec<&str> = derive_content
+            .split(',')
+            .map(str::trim)
+            .filter(|t| !t.is_empty())
+            .collect();
 
-            match strategy {
-                Strategy::RustDeriveAlphabetical => {
-                    traits.sort_unstable();
-                }
-                Strategy::RustDeriveCanonical => {
-                    traits = canonical_sort(traits);
-                }
-                _ => {
-                    return block;
-                }
-            }
-            traits.retain(|t| !t.is_empty());
-            let sorted_traits = traits.join(", ");
-            let new_derive = format!("#[derive({})]", sorted_traits);
-
-            // Reconstruct the line with preserved whitespaces
-            let prefix_whitespace = &line[..line.find(trimmed_line).unwrap_or(0)];
-            let suffix_whitespace =
-                &line[line.rfind(trimmed_line).unwrap_or(line.len()) + trimmed_line.len()..];
-
-            let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
-            if new_line.len() <= STAY_ONE_LINE_LEN {
-                result.push(new_line);
-            } else {
-                let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
-                if mid_line.len() <= BREAK_INTO_MANY_LINES_LEN {
-                    result.push(format!("{}#[derive(\n", prefix_whitespace));
-                    result.push(format!("{}\n", mid_line));
-                    result.push(format!("{})]\n", prefix_whitespace));
-                } else {
-                    result.push(format!("{}#[derive(\n", prefix_whitespace));
-                    for x in traits {
-                        result.push(format!("{}    {},\n", prefix_whitespace, x));
-                    }
-                    result.push(format!("{})]\n", prefix_whitespace));
-                }
-            }
+        match strategy {
+            Strategy::RustDeriveAlphabetical => traits.sort_unstable(),
+            Strategy::RustDeriveCanonical => traits = canonical_sort(traits),
+            _ => return block,
         }
+
+        let sorted_traits = traits.join(", ");
+        let new_derive = format!("#[derive({})]", sorted_traits);
+
+        // Preserve the prefix and suffix whitespace
+        let prefix_whitespace = &line[..line.find(line_without_comment).unwrap_or(0)];
+        let suffix_whitespace =
+            &line[line_without_comment.len() + line.find(line_without_comment).unwrap_or(0)..];
+
+        let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
+        if new_line.len() <= STAY_ONE_LINE_LEN {
+            return vec![new_line];
+        }
+
+        let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
+        let mut result = vec![format!("{}#[derive(\n", prefix_whitespace)];
+
+        if mid_line.len() <= BREAK_INTO_MANY_LINES_LEN {
+            result.push(format!("{}\n{})]\n", mid_line, prefix_whitespace));
+        } else {
+            for trait_item in traits {
+                result.push(format!("{}    {},\n", prefix_whitespace, trait_item));
+            }
+            result.push(format!("{})]\n", prefix_whitespace));
+        }
+
+        return result;
     }
 
-    result
+    block
 }
 
 fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
