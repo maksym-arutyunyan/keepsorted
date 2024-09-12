@@ -1,0 +1,50 @@
+name: Build and Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        architecture: [x86_64] # Since Rust doesn't natively target x86 for modern platforms, we're focusing on x86_64
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Install Rust
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
+
+    # Step 3: Build the project
+    - name: Build the project
+      run: cargo build --release --all-targets
+
+    # Step 4: Create a release binary file name
+    - name: Prepare release binary
+      run: |
+        mkdir -p release
+        cp target/release/keepsorted release/keepsorted-${{ matrix.os }}-${{ matrix.architecture }}
+
+    # Step 5: Compress the binary using tar.gz
+    - name: Tar the binary
+      run: |
+        tar -czvf keepsorted-${{ matrix.os }}-${{ matrix.architecture }}.tar.gz -C release keepsorted-${{ matrix.os }}-${{ matrix.architecture }}
+
+    # Step 6: Upload the tar.gz to the GitHub release
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v2
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./keepsorted-${{ matrix.os }}-${{ matrix.architecture }}.tar.gz
+        asset_name: keepsorted-${{ matrix.os }}-${{ matrix.architecture }}.tar.gz
+        asset_content_type: application/gzip
+
