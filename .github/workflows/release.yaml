@@ -41,7 +41,7 @@ jobs:
 
     # Step 6: Upload the tar.gz to the GitHub release
     - name: Upload Release Assets
-      uses: actions/upload-release-asset@v2
+      uses: actions/upload-release-asset@v1.0.2
       with:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: ./keepsorted-${{ matrix.os }}-${{ matrix.architecture }}.tar.gz
