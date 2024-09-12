@@ -6,12 +6,12 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.1.0] - 2024-09-12
+
 ### Added
 - Generic keyword sorting functionality
 - Support for Bazel files
 - Support for `Cargo.toml` files
-
-### Experimental
-- Support for `.gitignore` files
-- Support for `CODEOWNERS` files
-- Sorting of Rust `#[derive(...)]` traits
+- (Experimental) Support for `.gitignore` files
+- (Experimental) Support for `CODEOWNERS` files
+- (Experimental) Sorting of Rust `#[derive(...)]` traits

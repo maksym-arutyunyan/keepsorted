@@ -10,7 +10,7 @@ mod tests {
         fn is_first_implemented() -> bool;
     }
 
-    trait Second {
+    trait Second: First {
         fn check_first_is_implemented() -> bool;
     }
 
