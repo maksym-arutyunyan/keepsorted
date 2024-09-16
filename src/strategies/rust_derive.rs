@@ -78,7 +78,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
             .collect();
 
         match strategy {
-            Strategy::RustDeriveAlphabetical => traits.sort_unstable(),
+            Strategy::RustDeriveAlphabetical => traits = aphabetical_sort(traits),
             Strategy::RustDeriveCanonical => traits = canonical_sort(traits),
             _ => return block,
         }
@@ -114,37 +114,50 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     block
 }
 
-fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
-    // Define the canonical order of traits
-    let canonical_order = [
-        "Copy",
-        "Clone",
-        "Eq",
-        "PartialEq",
-        "Ord",
-        "PartialOrd",
-        "Hash",
-        "Debug",
-        "Display",
-        "Default",
-    ];
+fn extract_last_token(s: &str) -> &str {
+    s.split("::").last().unwrap_or(s)
+}
 
-    // Create a mapping from trait to its canonical index
-    let canonical_index: std::collections::HashMap<_, _> = canonical_order
+fn priority_sort<'a>(traits: Vec<&'a str>, priority_traits: &[&'a str]) -> Vec<&'a str> {
+    // Create a mapping from trait to its priority index
+    let priority_index: std::collections::HashMap<_, _> = priority_traits
         .iter()
         .enumerate()
         .map(|(i, &trait_name)| (trait_name, i))
         .collect();
 
-    // Sort traits by canonical index, and by trait name if indices are the same
+    // Sort traits by priority index, and by trait name if indices are the same
     let mut sorted_traits = traits;
     sorted_traits.sort_by(|a, b| {
-        let index_a = canonical_index.get(a).unwrap_or(&usize::MAX);
-        let index_b = canonical_index.get(b).unwrap_or(&usize::MAX);
-        (index_a, a).cmp(&(index_b, b))
+        let index_a = priority_index.get(a).unwrap_or(&usize::MAX);
+        let index_b = priority_index.get(b).unwrap_or(&usize::MAX);
+        (index_a, extract_last_token(a), a).cmp(&(index_b, extract_last_token(b), b))
     });
 
     sorted_traits
+}
+
+fn aphabetical_sort(traits: Vec<&str>) -> Vec<&str> {
+    priority_sort(traits, &[])
+}
+
+fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
+    priority_sort(
+        traits,
+        // Define the canonical order of traits
+        &[
+            "Copy",
+            "Clone",
+            "Eq",
+            "PartialEq",
+            "Ord",
+            "PartialOrd",
+            "Hash",
+            "Debug",
+            "Display",
+            "Default",
+        ],
+    )
 }
 
 fn re_derive_begin() -> Regex {

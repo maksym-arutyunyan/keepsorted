@@ -8,11 +8,11 @@ fn rust_derive_alphabetical() {
     test_inner!(
         RustDeriveAlphabetical,
         r#"
-#[derive(C, B, A, Ord, Copy)]
+#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
 struct Data {}
         "#,
         r#"
-#[derive(A, B, C, Copy, Ord)]
+#[derive(A, B, C, Copy, Ord, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#
     );
@@ -23,11 +23,11 @@ fn rust_derive_canonical() {
     test_inner!(
         RustDeriveCanonical,
         r#"
-#[derive(C, B, A, Ord, Copy)]
+#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
 struct Data {}
         "#,
         r#"
-#[derive(Copy, Ord, A, B, C)]
+#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#
     );
