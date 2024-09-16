@@ -114,6 +114,10 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     block
 }
 
+fn extract_last_token(s: &str) -> &str {
+    s.split("::").last().unwrap_or(s)
+}
+
 fn priority_sort<'a>(traits: Vec<&'a str>, priority_traits: &[&'a str]) -> Vec<&'a str> {
     // Create a mapping from trait to its priority index
     let priority_index: std::collections::HashMap<_, _> = priority_traits
@@ -127,7 +131,7 @@ fn priority_sort<'a>(traits: Vec<&'a str>, priority_traits: &[&'a str]) -> Vec<&
     sorted_traits.sort_by(|a, b| {
         let index_a = priority_index.get(a).unwrap_or(&usize::MAX);
         let index_b = priority_index.get(b).unwrap_or(&usize::MAX);
-        (index_a, a).cmp(&(index_b, b))
+        (index_a, extract_last_token(a), a).cmp(&(index_b, extract_last_token(b), b))
     });
 
     sorted_traits
