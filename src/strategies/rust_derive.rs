@@ -143,18 +143,21 @@ fn aphabetical_sort(traits: Vec<&str>) -> Vec<&str> {
 
 fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
     // Define the canonical order of traits
-    priority_sort(traits, &[
-        "Copy",
-        "Clone",
-        "Eq",
-        "PartialEq",
-        "Ord",
-        "PartialOrd",
-        "Hash",
-        "Debug",
-        "Display",
-        "Default",
-    ])
+    priority_sort(
+        traits,
+        &[
+            "Copy",
+            "Clone",
+            "Eq",
+            "PartialEq",
+            "Ord",
+            "PartialOrd",
+            "Hash",
+            "Debug",
+            "Display",
+            "Default",
+        ],
+    )
 }
 
 fn re_derive_begin() -> Regex {
