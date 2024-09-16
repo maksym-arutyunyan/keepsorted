@@ -142,9 +142,9 @@ fn aphabetical_sort(traits: Vec<&str>) -> Vec<&str> {
 }
 
 fn canonical_sort(traits: Vec<&str>) -> Vec<&str> {
-    // Define the canonical order of traits
     priority_sort(
         traits,
+        // Define the canonical order of traits
         &[
             "Copy",
             "Clone",
