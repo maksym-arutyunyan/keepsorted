@@ -28,7 +28,7 @@ jobs:
           cp target/release/keepsorted release/${{ matrix.asset_name }}
           tar -czvf keepsorted-${{ matrix.asset_name }}.tar.gz -C release keepsorted-${{ matrix.asset_name }}
 
-      - name: Upload Release Asset
+      - name: Upload Compressed Release Asset (tar.gz)
         uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,3 +37,13 @@ jobs:
           asset_path: ./keepsorted-${{ matrix.asset_name }}.tar.gz
           asset_name: keepsorted-${{ matrix.asset_name }}.tar.gz
           asset_content_type: application/gzip
+
+      - name: Upload Original Binary
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./release/${{ matrix.asset_name }}
+          asset_name: keepsorted-${{ matrix.asset_name }}
+          asset_content_type: application/octet-stream
