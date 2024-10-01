@@ -5,18 +5,15 @@ on:
 
 jobs:
   build:
-    name: Build for ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    strategy:      
+    strategy:
       matrix:
         include:
           - os: ubuntu-20.04
             name: linux64
-            artifact_name: target/release/keepsorted
             asset_name: keepsorted-linux64
           - os: macos-12
             name: macos
-            artifact_name: target/release/keepsorted
             asset_name: keepsorted-macos
 
     steps:
@@ -28,19 +25,13 @@ jobs:
       - name: Prepare Release Binary
         run: |
           mkdir -p release
-          cp target/release/keepsorted release/keepsorted-${{ matrix.asset_name }}
-
-      - name: Compress Release Binary
-        run: |
+          cp target/release/keepsorted release/${{ matrix.asset_name }}
           tar -czvf keepsorted-${{ matrix.asset_name }}.tar.gz -C release keepsorted-${{ matrix.asset_name }}
 
-      - name: Upload Release Assets
+      - name: Upload Release Asset
         uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./keepsorted-${{ matrix.asset_name }}.tar.gz
           asset_name: keepsorted-${{ matrix.asset_name }}.tar.gz
           asset_content_type: application/gzip
-
