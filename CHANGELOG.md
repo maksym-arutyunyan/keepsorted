@@ -6,9 +6,13 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+- (add updates here)
+
+## [0.1.1] - 2024-10-01
+
 ### Added
 
-- Keep Rust derive tokens together, eg. `Serialize` and `serde::Serialize`
+- (Experimental) Keep Rust derive tokens together, eg. `Serialize` and `serde::Serialize`
 
 ## [0.1.0] - 2024-09-12
 
