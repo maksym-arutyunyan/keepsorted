@@ -8,6 +8,11 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - (add updates here)
 
+## [0.1.2] - 2025-06-03
+
+### Fixed
+- fix multi-line arrays in Cargo.toml, [issue 34](https://github.com/maksym-arutyunyan/keepsorted/issues/34)
+
 ## [0.1.1] - 2024-10-01
 
 ### Added
