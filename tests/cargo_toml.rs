@@ -246,11 +246,20 @@ fn cargo_toml_features() {
 workspace = true
 features = [
   # lots of features here
+  "a", "b", "c",
+  "d", # comment
+  "e",
+  # trailing comment
 ]
         "#,
         r#"
+[dependencies]
 features = [
   # lots of features here
+  "a", "b", "c",
+  "d", # comment
+  "e",
+  # trailing comment
 ]
 workspace = true
         "#
