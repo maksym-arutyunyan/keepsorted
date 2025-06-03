@@ -117,7 +117,8 @@ fn is_multi_line_code(line: &str) -> bool {
 fn is_code_section_completed(line: &str) -> bool {
     // Split the line at the '#' character, take the first part, trim it,
     // and check if it ends with '}' or ']'.
-    let x = line.trim()
+    let x = line
+        .trim()
         .split_once('#')
         .map_or(line, |(code, _comment)| code)
         .trim();
