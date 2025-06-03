@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             name: linux64
             asset_name: keepsorted-linux64
           - os: macos-12

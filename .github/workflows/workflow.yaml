@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-12 ]
+        os: [ ubuntu-latest, macos-12 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
     needs: cargo-build
     strategy:
       matrix:
-        os: [ ubuntu-20.04, macos-12 ]
+        os: [ ubuntu-latest, macos-12 ]
 
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +71,7 @@ jobs:
           RUST_BACKTRACE: 1
 
   cargo-clippy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -94,7 +94,7 @@ jobs:
           args: --all-targets -- -D warnings
 
   rustfmt:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust + Clippy
@@ -114,7 +114,7 @@ jobs:
           args: --all -- --check
 
   keepsorted:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: cargo-build
 
     steps:
@@ -154,7 +154,7 @@ jobs:
 
   shell-checks:
     name: ShellCheck
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Run ShellCheck
