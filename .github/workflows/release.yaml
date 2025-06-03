@@ -12,7 +12,7 @@ jobs:
           - os: ubuntu-latest
             name: linux64
             asset_name: keepsorted-linux64
-          - os: macos-12
+          - os: macos-latest
             name: macos
             asset_name: keepsorted-macos
 
