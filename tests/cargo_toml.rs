@@ -236,3 +236,32 @@ b = { workspace = true, default-features = false, features = [
         "#
     );
 }
+
+#[test]
+fn cargo_toml_features() {
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+workspace = true
+features = [
+  # lots of features here
+  "a", "b", "c",
+  "d", # comment
+  "e",
+  # trailing comment
+]
+        "#,
+        r#"
+[dependencies]
+features = [
+  # lots of features here
+  "a", "b", "c",
+  "d", # comment
+  "e",
+  # trailing comment
+]
+workspace = true
+        "#
+    );
+}

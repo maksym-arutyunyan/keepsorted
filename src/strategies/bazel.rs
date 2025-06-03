@@ -124,9 +124,9 @@ impl BazelSortKey {
             _ => 4,
         };
 
-        let split = line_without_comment
-            .split(|c| c == '.' || c == ':' || c == '"')
-            .map(ToString::to_string)
+        let split: Vec<String> = line_without_comment
+            .split(['.', ':', '"'])
+            .map(str::to_owned)
             .collect();
 
         Self { phase, split }

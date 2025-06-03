@@ -78,12 +78,12 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     let mut current_item = Item::default();
     let mut is_multiline_code = false;
     for line in block {
-        if is_single_line_comment(&line) {
+        if !is_multiline_code && is_single_line_comment(&line) {
             current_item.comment.push(line);
             is_multiline_code = false;
         } else {
             current_item.code.push(line.clone());
-            if line.contains('{') {
+            if is_multi_line_code(&line) {
                 is_multiline_code = true;
             }
             if !is_multiline_code || is_code_section_completed(&line) {
@@ -110,11 +110,17 @@ fn is_single_line_comment(line: &str) -> bool {
     line.trim().starts_with('#')
 }
 
+fn is_multi_line_code(line: &str) -> bool {
+    line.contains('{') || line.contains('[')
+}
+
 fn is_code_section_completed(line: &str) -> bool {
-    // Split the line at the '#' character, take the first part, trim it, and check if it ends with '}'
-    line.trim()
-        .split_once('#')
-        .map_or(line, |(code, _)| code)
+    // Split the line at the '#' character, take the first part, trim it,
+    // and check if it ends with '}' or ']'.
+    let x = line
         .trim()
-        .ends_with('}')
+        .split_once('#')
+        .map_or(line, |(code, _comment)| code)
+        .trim();
+    x.ends_with('}') || x.ends_with(']')
 }
