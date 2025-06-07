@@ -76,8 +76,6 @@ fn main() -> io::Result<()> {
     #[cfg(feature = "config")]
     let config = {
         use keepsorted::Config;
-        use std::path::PathBuf;
-        use toml::from_str;
         // Get the configuration file path from the args or the environment
         let config_path: Option<String> = args.config.or(std::env::var("KEEPSORTED_CONFIG").ok());
         // Create the configuration
@@ -89,13 +87,12 @@ fn main() -> io::Result<()> {
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    process_file(
-        path,
-        features,
-        #[cfg(feature = "config")]
-        config,
-    )
-    .map_err(|e| {
+    #[cfg(not(feature = "config"))]
+    let result = process_file(path, features, None);
+    #[cfg(feature = "config")]
+    let result = process_file(path, features, Some(&config.groups));
+
+    result.map_err(|e| {
         eprintln!(
             "{}: failed to process file {}: {}",
             env!("CARGO_PKG_NAME"),

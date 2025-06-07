@@ -1,6 +1,5 @@
-#[cfg(feature = "config")]
-use crate::Config;
-use crate::Strategy;
+use crate::TraitGroups;
+use itertools::Itertools;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{collections::HashMap, io};
@@ -26,17 +25,27 @@ const CANONICAL_TRAITS: &[&str] = &[
     "Display",
     "Default",
 ];
-const GROUP_PRIORITY_OFFSET: usize = CANONICAL_TRAITS.len();
+
+#[derive(Copy, Clone)]
+pub enum RustDeriveStrategy {
+    Alphabetical,
+    Canonical,
+}
 
 pub(crate) fn process(
     lines: Vec<String>,
-    strategy: Strategy,
-    #[cfg(feature = "config")] config: Config,
+    strategy: RustDeriveStrategy,
+    groups: Option<&TraitGroups>,
 ) -> io::Result<Vec<String>> {
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
     let mut is_ignore_block_prev_line = false;
+
+    let priority_index = match strategy {
+        RustDeriveStrategy::Alphabetical => build_priority_index(&[], groups),
+        RustDeriveStrategy::Canonical => build_priority_index(CANONICAL_TRAITS, groups),
+    };
 
     for line in lines {
         let mut is_derive_begin = false;
@@ -53,13 +62,7 @@ pub(crate) fn process(
             if !is_derive_begin {
                 block.push(line.clone());
             }
-            block = sort(
-                block,
-                is_ignore_block_prev_line,
-                strategy,
-                #[cfg(feature = "config")]
-                &config,
-            );
+            block = sort(block, is_ignore_block_prev_line, &priority_index);
             is_ignore_block_prev_line = false;
             is_sorting_block = false;
             output_lines.append(&mut block);
@@ -73,13 +76,7 @@ pub(crate) fn process(
     }
 
     if is_sorting_block {
-        block = sort(
-            block,
-            is_ignore_block_prev_line,
-            strategy,
-            #[cfg(feature = "config")]
-            &config,
-        );
+        block = sort(block, is_ignore_block_prev_line, &priority_index);
         output_lines.append(&mut block);
     }
 
@@ -89,8 +86,7 @@ pub(crate) fn process(
 fn sort(
     block: Vec<String>,
     is_ignore_block_prev_line: bool,
-    strategy: Strategy,
-    #[cfg(feature = "config")] config: &Config,
+    priority_index: &HashMap<&str, usize>,
 ) -> Vec<String> {
     if is_ignore_block_prev_line || is_ignore_block(&block) {
         return block;
@@ -114,11 +110,7 @@ fn sort(
             .filter(|t| !t.is_empty())
             .collect();
 
-        match strategy {
-            Strategy::RustDeriveAlphabetical => traits = aphabetical_sort(config, traits),
-            Strategy::RustDeriveCanonical => traits = canonical_sort(config, traits),
-            _ => return block,
-        }
+        traits = priority_sort(traits, priority_index);
 
         let sorted_traits = traits.join(", ");
         let new_derive = format!("#[derive({})]", sorted_traits);
@@ -155,7 +147,7 @@ fn extract_last_token(s: &str) -> &str {
     s.split("::").last().unwrap_or(s)
 }
 
-fn priority_sort<'a>(traits: Vec<&'a str>, priority_index: HashMap<&str, usize>) -> Vec<&'a str> {
+fn priority_sort<'a>(traits: Vec<&'a str>, priority_index: &HashMap<&str, usize>) -> Vec<&'a str> {
     // Sort traits by priority index, and by trait name if indices are the same
     let mut sorted_traits = traits;
     sorted_traits.sort_by(|a, b| {
@@ -168,35 +160,31 @@ fn priority_sort<'a>(traits: Vec<&'a str>, priority_index: HashMap<&str, usize>)
 }
 
 fn build_priority_index<'a>(
-    config: &'a Config,
     priority_traits: &[&'a str],
+    groups: Option<&'a TraitGroups>,
 ) -> HashMap<&'a str, usize> {
-    let grouped_traits: Vec<&'a str> = {
-        let mut keys: Vec<_> = config.groups.keys().collect();
-        keys.sort();
-        keys.into_iter()
-            .flat_map(|key| config.groups.get(key).unwrap())
-            .map(|s| String::as_str(s))
+    if let Some(groups) = groups {
+        let grouped_traits: Vec<&'a str> = groups
+            .keys()
+            .sorted()
+            .flat_map(|key| groups.get(key).unwrap().iter().sorted())
+            .map(String::as_str)
+            .collect();
+        priority_traits
+            .iter()
+            .copied()
+            .chain(grouped_traits)
+            .enumerate()
+            .map(|(i, trait_name)| (trait_name, i))
             .collect()
-    };
-
-    priority_traits
-        .iter()
-        .copied()
-        .chain(grouped_traits.into_iter())
-        .enumerate()
-        .map(|(i, trait_name)| (trait_name, i))
-        .collect()
-}
-
-fn aphabetical_sort<'a>(config: &'a Config, traits: Vec<&'a str>) -> Vec<&'a str> {
-    let index = build_priority_index(config, &[]);
-    priority_sort(traits, index)
-}
-
-fn canonical_sort<'a>(config: &'a Config, traits: Vec<&'a str>) -> Vec<&'a str> {
-    let index = build_priority_index(config, CANONICAL_TRAITS);
-    priority_sort(traits, index)
+    } else {
+        priority_traits
+            .iter()
+            .copied()
+            .enumerate()
+            .map(|(i, trait_name)| (trait_name, i))
+            .collect()
+    }
 }
 
 fn re_derive_begin() -> Regex {
