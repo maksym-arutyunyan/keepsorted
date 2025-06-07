@@ -9,6 +9,7 @@ readme = "README.md"
 keywords = ["sorting", "code", "command-line"]
 
 [features]
+default = ["config"]
 config = ["dep:toml", "dep:serde"]
 
 [dependencies]
