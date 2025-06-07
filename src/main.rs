@@ -42,6 +42,15 @@ struct Args {
         help = "Experimental feature flags. Provide a list of features to enable."
     )]
     features: Option<Vec<String>>,
+
+    #[cfg(feature = "config")]
+    #[arg(
+        short = 'c',
+        long,
+        value_name = "CONFIG",
+        help = "Path to a toml file containg rust-derive groups"
+    )]
+    config: Option<String>,
 }
 
 fn main() -> io::Result<()> {
@@ -64,9 +73,29 @@ fn main() -> io::Result<()> {
         std::process::exit(1);
     }
 
+    #[cfg(feature = "config")]
+    let config = {
+        use keepsorted::Config;
+        use std::path::PathBuf;
+        use toml::from_str;
+        // Get the configuration file path from the args or the environment
+        let config_path: Option<String> = args.config.or(std::env::var("KEEPSORTED_CONFIG").ok());
+        // Create the configuration
+        config_path
+            .and_then(|path| std::fs::read_to_string(path).ok())
+            .and_then(|text| toml::from_str::<Config>(&text).ok())
+            .unwrap_or_default()
+    };
+
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    process_file(path, features).map_err(|e| {
+    process_file(
+        path,
+        features,
+        #[cfg(feature = "config")]
+        config,
+    )
+    .map_err(|e| {
         eprintln!(
             "{}: failed to process file {}: {}",
             env!("CARGO_PKG_NAME"),

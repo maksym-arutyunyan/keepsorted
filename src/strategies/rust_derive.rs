@@ -1,3 +1,5 @@
+#[cfg(feature = "config")]
+use crate::Config;
 use crate::Strategy;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -12,7 +14,11 @@ static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
 const STAY_ONE_LINE_LEN: usize = 97;
 const BREAK_INTO_MANY_LINES_LEN: usize = 101;
 
-pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<String>> {
+pub(crate) fn process(
+    lines: Vec<String>,
+    strategy: Strategy,
+    #[cfg(feature = "config")] config: Config,
+) -> io::Result<Vec<String>> {
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;

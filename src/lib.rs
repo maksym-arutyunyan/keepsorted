@@ -1,16 +1,29 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
+use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub mod strategies;
+
+#[cfg(feature = "config")]
+#[derive(Debug, Default, serde::Deserialize)]
+pub struct Config {
+    #[serde(skip)]
+    pub(crate) path: PathBuf,
+    pub(crate) groups: HashMap<String, Vec<String>>,
+}
 
 static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
 static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
 
-pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
+pub fn process_file(
+    path: &Path,
+    features: Vec<String>,
+    #[cfg(feature = "config")] config: Config,
+) -> io::Result<()> {
     let mut content = fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
     if !ends_with_newline {
@@ -19,7 +32,12 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     }
 
     let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
-    let output_lines = process_lines(classify(path, features), lines)?;
+    let output_lines = process_lines(
+        classify(path, features),
+        lines,
+        #[cfg(feature = "config")]
+        config,
+    )?;
 
     let mut writer = BufWriter::new(File::create(path)?);
     for (i, line) in output_lines.iter().enumerate() {
@@ -48,7 +66,11 @@ pub enum Strategy {
     RustDeriveCanonical,
 }
 
-pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
+pub fn process_lines(
+    strategy: Strategy,
+    lines: Vec<String>,
+    #[cfg(feature = "config")] config: Config,
+) -> io::Result<Vec<String>> {
     if is_ignore_file(&lines) {
         return Ok(lines);
     }
@@ -57,10 +79,14 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
         Strategy::Gitignore => crate::strategies::gitignore::process(lines),
-        Strategy::RustDeriveAlphabetical => {
-            crate::strategies::rust_derive::process(lines, strategy)
+        Strategy::RustDeriveAlphabetical | Strategy::RustDeriveCanonical => {
+            crate::strategies::rust_derive::process(
+                lines,
+                strategy,
+                #[cfg(feature = "config")]
+                config,
+            )
         }
-        Strategy::RustDeriveCanonical => crate::strategies::rust_derive::process(lines, strategy),
     }
 }
 

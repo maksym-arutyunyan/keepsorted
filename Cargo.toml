@@ -8,10 +8,15 @@ repository = "https://github.com/maksym-arutyunyan/keepsorted"
 readme = "README.md"
 keywords = ["sorting", "code", "command-line"]
 
+[features]
+config = ["dep:toml", "dep:serde"]
+
 [dependencies]
 clap = { version = "4.0", features = ["derive"] }
 once_cell = "1.19.0"
 regex = "1"
+serde = { version = "1.0.219", features = ["derive"], optional = true }
+toml = { version = "0.8.23", optional = true }
 
 [dev-dependencies]
 tempfile = "3.2"
