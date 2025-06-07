@@ -3,15 +3,13 @@ use regex::Regex;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::{self, BufWriter, Write};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub mod strategies;
 
 #[cfg(feature = "config")]
 #[derive(Debug, Default, serde::Deserialize)]
 pub struct Config {
-    #[serde(skip)]
-    pub(crate) path: PathBuf,
     pub(crate) groups: HashMap<String, Vec<String>>,
 }
 
