@@ -358,3 +358,28 @@ local config = {
         "#
     );
 }
+
+#[test]
+fn generic_nested_lua_tables_specific_example() {
+    test_inner!(
+        Generic,
+        r#"
+local candidates = {
+  light = {
+    -- keep sorted
+    "catppuccin-latte",
+    "base16-catppuccin-latte",
+  },
+  dark = {},
+}"#,
+        r#"
+local candidates = {
+  light = {
+    -- keep sorted
+    "base16-catppuccin-latte",
+    "catppuccin-latte",
+  },
+  dark = {},
+}"#
+    )
+}
