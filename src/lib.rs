@@ -57,10 +57,17 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
         Strategy::Gitignore => crate::strategies::gitignore::process(lines),
-        Strategy::RustDeriveAlphabetical => {
-            crate::strategies::rust_derive::process(lines, strategy)
+        Strategy::RustDeriveAlphabetical | Strategy::RustDeriveCanonical => {
+            crate::strategies::rust_derive::process(lines, strategy).and_then(
+                |(lines, requires_generic_sort)| {
+                    if requires_generic_sort {
+                        crate::strategies::generic::process(lines)
+                    } else {
+                        Ok(lines)
+                    }
+                },
+            )
         }
-        Strategy::RustDeriveCanonical => crate::strategies::rust_derive::process(lines, strategy),
     }
 }
 

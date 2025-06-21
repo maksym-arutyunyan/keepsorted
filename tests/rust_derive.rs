@@ -290,3 +290,35 @@ struct Data {}
         "#
     );
 }
+
+#[test]
+fn rust_both_derive_and_generic_sort() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+fn setup_systems(app: &mut App) {
+    app.add_plugins((
+        // keepsorted: keep sorted
+        b,
+        a,
+    ));
+}
+
+#[derive(Copy, Clone)]
+struct Data {}
+        "#,
+        r#"
+fn setup_systems(app: &mut App) {
+    app.add_plugins((
+        // keepsorted: keep sorted
+        a,
+        b,
+    ));
+}
+
+#[derive(Clone, Copy)]
+struct Data {}
+        "#
+    );
+}
+
