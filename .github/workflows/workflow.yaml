@@ -1,24 +1,25 @@
 name: CI
 
-env:
-  RUST_VERSION: 1.76.0
-
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
-jobs:
+env:
+  RUST_VERSION: 1.76.0           # Must match rust-toolchain.toml
+  CARGO_TERM_COLOR: always
+  TERM: xterm-256color
 
-  cargo-build:
+jobs:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -33,23 +34,22 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Build
-        shell: bash
-        run: |
-          cargo build --release --all-targets
+        run: cargo build --release --all-targets
         env:
           RUST_BACKTRACE: 1
 
-  cargo-tests:
+  test:
     runs-on: ${{ matrix.os }}
-    needs: cargo-build
+    needs: build
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -64,16 +64,16 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Run Tests
-        shell: bash
-        run: |
-          cargo test --release --all-targets --workspace --exclude benchmarks
+        run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
           RUST_BACKTRACE: 1
 
-  cargo-clippy:
+  clippy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -95,12 +95,9 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust + Clippy
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
 
       - name: Install Rust + Rustfmt
         run: |
@@ -115,12 +112,13 @@ jobs:
 
   keepsorted:
     runs-on: ubuntu-latest
-    needs: cargo-build
+    needs: build
 
     steps:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -139,12 +137,12 @@ jobs:
 
       - name: Run KeepSorted
         shell: bash
-        # Run `keepsorted` only on files that are not ignored by `.gitignore`.
-        # Also ignore `./misc/` and `./tests/`.
         run: |
+          # Run `keepsorted` only on files that are not ignored by `.gitignore`.
+          # Also ignore `./misc/` and `./tests/`.
           git ls-files -co --exclude-standard \
-              | grep -vE "^misc/|^tests/|^README.md" \
-              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
+            | grep -vE "^misc/|^tests/|^README.md" \
+            | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical"
         env:
           RUST_BACKTRACE: 1
 
@@ -155,10 +153,11 @@ jobs:
   shell-checks:
     name: ShellCheck
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Run ShellCheck
-      uses: ludeeus/action-shellcheck@master
-      env:
-        SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
