@@ -6,6 +6,7 @@ on:
   pull_request:
 
 env:
+  RUST_VERSION: 1.76.0
   CARGO_TERM_COLOR: always
   TERM: xterm-256color
 
@@ -18,13 +19,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug check toolchain file
-        run: |
-          echo "Working directory: $(pwd)"
-          echo "Contents of rust-toolchain.toml:"
-          cat rust-toolchain.toml || echo "rust-toolchain.toml not found"
-
       - uses: actions/cache@v4
         with:
           path: |
@@ -32,18 +26,14 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
-
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-
+        run: |
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
       - name: Build
         run: cargo build --release --all-targets
         env:
           RUST_BACKTRACE: 1
-
 
   test:
     runs-on: ${{ matrix.os }}
@@ -65,8 +55,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
         run: |
-          rustup show
-          rustup toolchain install
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
       - name: Run Tests
         run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
@@ -85,9 +75,9 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust + Clippy
         run: |
-          rustup show
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
           rustup component add clippy
-          rustup toolchain install
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -99,9 +89,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Rust + Rustfmt
         run: |
-          rustup show
-          rustup component add rustfmt
-          rustup toolchain install
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -124,9 +113,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
         run: |
-          rustup show
-          rustup component add rustfmt
-          rustup toolchain install
+          rustup update $RUST_VERSION --no-self-update
+          rustup default $RUST_VERSION
       - name: Build Project
         run: cargo build --release
       - name: Run KeepSorted
