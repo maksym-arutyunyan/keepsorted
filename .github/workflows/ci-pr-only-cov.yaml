@@ -1,5 +1,6 @@
 # Copied & adapted (job name, version label) from
 # https://github.com/ytanikin/PRConventionalCommits?tab=readme-ov-file#usage-with-labeling-where-label-is-just-a-task-type
+
 name: PR Conventional Commit Validation
 
 on:
