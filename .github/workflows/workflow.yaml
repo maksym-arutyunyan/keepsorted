@@ -1,17 +1,17 @@
 name: CI
 
-env:
-  RUST_VERSION: 1.76.0
-
 on:
   push:
     branches:
       - main
   pull_request:
 
-jobs:
+env:
+  CARGO_TERM_COLOR: always # Force Cargo to use colors
+  TERM: xterm-256color
 
-  cargo-build:
+jobs:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -29,8 +29,8 @@ jobs:
 
       - name: Install Rust
         run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+          rustup show
+          rustup toolchain install nightly
 
       - name: Build
         shell: bash
@@ -39,7 +39,7 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
-  cargo-tests:
+  test:
     runs-on: ${{ matrix.os }}
     needs: cargo-build
     strategy:
@@ -60,17 +60,17 @@ jobs:
 
       - name: Install Rust
         run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+          rustup show
+          rustup toolchain install nightly
 
       - name: Run Tests
         shell: bash
         run: |
-          cargo test --release --all-targets --workspace --exclude benchmarks
+          cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
           RUST_BACKTRACE: 1
 
-  cargo-clippy:
+  clippy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -84,9 +84,9 @@ jobs:
 
       - name: Install Rust + Clippy
         run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+          rustup show
           rustup component add clippy
+          rustup toolchain install nightly
 
       - uses: actions-rs/clippy-check@v1
         with:
@@ -97,16 +97,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust + Clippy
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
 
-      - name: Install Rust + Rustfmt
+      - name: Install Rust
         run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+          rustup show
           rustup component add rustfmt
+          rustup toolchain install nightly
 
       - uses: actions-rs/cargo@v1
         with:
