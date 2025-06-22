@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  RUST_VERSION: 1.76.0 # Use the same version as in `rust-toolchain.toml`.
+  RUST_VERSION: 1.76.0           # Must match rust-toolchain.toml
   CARGO_TERM_COLOR: always
   TERM: xterm-256color
 
@@ -19,6 +19,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -26,10 +27,12 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
       - name: Install Rust
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
+
       - name: Build
         run: cargo build --release --all-targets
         env:
@@ -46,6 +49,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -53,10 +57,12 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
       - name: Install Rust
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
+
       - name: Run Tests
         run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
@@ -64,8 +70,10 @@ jobs:
 
   clippy:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -73,11 +81,13 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
       - name: Install Rust + Clippy
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
           rustup component add clippy
+
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -85,13 +95,16 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Install Rust + Rustfmt
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
           rustup component add rustfmt
+
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -105,6 +118,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
       - uses: actions/cache@v4
         with:
           path: |
@@ -112,22 +126,26 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+
       - name: Install Rust
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
+
       - name: Build Project
         run: cargo build --release
+
       - name: Run KeepSorted
         shell: bash
-        # Run `keepsorted` only on files that are not ignored by `.gitignore`.
-        # Also ignore `./misc/` and `./tests/`.
         run: |
+          # Run `keepsorted` only on files that are not ignored by `.gitignore`.
+          # Also ignore `./misc/` and `./tests/`.
           git ls-files -co --exclude-standard \
-              | grep -vE "^misc/|^tests/|^README.md" \
-              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
+            | grep -vE "^misc/|^tests/|^README.md" \
+            | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical"
         env:
           RUST_BACKTRACE: 1
+
       - name: Git Diff
         # Check if keepsorted changed any files.
         run: git diff --exit-code
@@ -135,8 +153,10 @@ jobs:
   shell-checks:
     name: ShellCheck
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
         env:
