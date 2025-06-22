@@ -28,7 +28,7 @@ jobs:
       - name: Install Rust
         run: |
           rustup show
-          rustup toolchain install nightly
+          rustup toolchain install
       - name: Build
         run: cargo build --release --all-targets
         env:
@@ -55,7 +55,7 @@ jobs:
       - name: Install Rust
         run: |
           rustup show
-          rustup toolchain install nightly
+          rustup toolchain install
       - name: Run Tests
         run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
@@ -76,7 +76,7 @@ jobs:
         run: |
           rustup show
           rustup component add clippy
-          rustup toolchain install nightly
+          rustup toolchain install
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -90,7 +90,7 @@ jobs:
         run: |
           rustup show
           rustup component add rustfmt
-          rustup toolchain install nightly
+          rustup toolchain install
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -112,10 +112,10 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
+        run: |
+          rustup show
+          rustup component add rustfmt
+          rustup toolchain install
       - name: Build Project
         run: cargo build --release
       - name: Run KeepSorted
