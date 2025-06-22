@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Debug: check toolchain file
+      - name: Debug check toolchain file
         run: |
           echo "Working directory: $(pwd)"
           echo "Contents of rust-toolchain.toml:"
