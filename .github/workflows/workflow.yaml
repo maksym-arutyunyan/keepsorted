@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  RUST_VERSION: 1.76.0
+  RUST_VERSION: 1.76.0 # Use the same version as in `rust-toolchain.toml`.
   CARGO_TERM_COLOR: always
   TERM: xterm-256color
 
@@ -91,6 +91,7 @@ jobs:
         run: |
           rustup update $RUST_VERSION --no-self-update
           rustup default $RUST_VERSION
+          rustup component add rustfmt
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
@@ -128,6 +129,7 @@ jobs:
         env:
           RUST_BACKTRACE: 1
       - name: Git Diff
+        # Check if keepsorted changed any files.
         run: git diff --exit-code
 
   shell-checks:
