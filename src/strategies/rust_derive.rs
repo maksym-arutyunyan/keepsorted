@@ -1,4 +1,4 @@
-use crate::Strategy;
+use crate::{Strategy, RE_KEEP_SORTED};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::io;
@@ -12,13 +12,20 @@ static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
 const STAY_ONE_LINE_LEN: usize = 97;
 const BREAK_INTO_MANY_LINES_LEN: usize = 101;
 
-pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<String>> {
+pub(crate) type ProcessResult = (Vec<String>, bool);
+
+pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<ProcessResult> {
     let mut output_lines: Vec<String> = Vec::new();
     let mut block = Vec::new();
     let mut is_sorting_block = false;
     let mut is_ignore_block_prev_line = false;
+    let mut requires_generic_sort = false;
 
     for line in lines {
+        // if we see at least on match, we also need to apply generic sort
+        if !requires_generic_sort && RE_KEEP_SORTED.is_match(&line) {
+            requires_generic_sort = true;
+        }
         let mut is_derive_begin = false;
         if RE_DERIVE_BEGIN.is_match(&line) {
             if let Some(prev_line) = output_lines.last() {
@@ -51,7 +58,7 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Vec<
         output_lines.append(&mut block);
     }
 
-    Ok(output_lines)
+    Ok((output_lines, requires_generic_sort))
 }
 
 fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy) -> Vec<String> {
