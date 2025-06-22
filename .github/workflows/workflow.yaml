@@ -26,9 +26,10 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
-        run: |
-          rustup show
-          rustup toolchain install
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          override: true
       - name: Build
         run: cargo build --release --all-targets
         env:
