@@ -119,10 +119,12 @@ jobs:
         run: cargo build --release
       - name: Run KeepSorted
         shell: bash
+        # Run `keepsorted` only on files that are not ignored by `.gitignore`.
+        # Also ignore `./misc/` and `./tests/`.
         run: |
           git ls-files -co --exclude-standard \
               | grep -vE "^misc/|^tests/|^README.md" \
-              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical"
+              | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
         env:
           RUST_BACKTRACE: 1
       - name: Git Diff
