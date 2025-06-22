@@ -304,3 +304,82 @@ y,
         "#
     );
 }
+
+#[test]
+fn generic_simple_lua_table() {
+    test_inner!(
+        Generic,
+        r#"
+local config = {
+    -- Keep sorted.
+    setting = true,
+    name = "some name",
+}
+        "#,
+        r#"
+local config = {
+    -- Keep sorted.
+    name = "some name",
+    setting = true,
+}
+        "#
+    );
+}
+
+#[test]
+fn generic_nested_lua_tables() {
+    test_inner!(
+        Generic,
+        r#"
+local config = {
+    b = {
+        "ghijkl",
+        "abcdef",
+    },
+    a = {
+        -- Keep sorted.
+        "ghijkl",
+        "abcdef",
+    }
+}
+        "#,
+        r#"
+local config = {
+    b = {
+        "ghijkl",
+        "abcdef",
+    },
+    a = {
+        -- Keep sorted.
+        "abcdef",
+        "ghijkl",
+    }
+}
+        "#
+    );
+}
+
+#[test]
+fn generic_nested_lua_tables_specific_example() {
+    test_inner!(
+        Generic,
+        r#"
+local candidates = {
+  light = {
+    -- keep sorted
+    "catppuccin-latte",
+    "base16-catppuccin-latte",
+  },
+  dark = {},
+}"#,
+        r#"
+local candidates = {
+  light = {
+    -- keep sorted
+    "base16-catppuccin-latte",
+    "catppuccin-latte",
+  },
+  dark = {},
+}"#
+    )
+}

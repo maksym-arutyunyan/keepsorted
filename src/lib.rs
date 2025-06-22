@@ -130,21 +130,23 @@ fn is_rust(path: &Path) -> bool {
 }
 
 fn re_keyword_keep_sorted() -> Regex {
-    Regex::new(
-        r"(?i)^\s*(#|\/\/|#\s+keepsorted\s*:|\/\/\s+keepsorted\s*:)\s*keep\s+sorted\s*\.?\s*$",
-    )
-    .expect("Failed to build regex for keep sorted")
+    Regex::new(r"(?i)^\s*(#|\/\/|--)(\s*keepsorted\s*:)?\s*keep\s+sorted\s*\.?\s*$")
+        .expect("Failed to build regex for keep sorted")
 }
 
 #[test]
 fn test_re_keyword_keep_sorted() {
     let re = re_keyword_keep_sorted();
     for line in [
+        "  #Keep sorted",
         "  # Keep sorted  ",
         "  # Keep   sorted .  ",
         "  #   keepsorted  : keep   sorted  .  ",
         "  //  Keep sorted   .  ",
+        "  //keepsorted: keep sorted",
         "  //   keepsorted  : keep   sorted  .  ",
+        "--keepsorted: keep sorted",
+        "-- keep sorted",
     ] {
         assert!(
             re.is_match(line),

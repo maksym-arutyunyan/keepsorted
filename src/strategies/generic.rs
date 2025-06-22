@@ -15,7 +15,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
             }
             is_sorting_block = true;
             output_lines.push(line);
-        } else if is_sorting_block && line.trim().is_empty() {
+        } else if is_sorting_block && is_block_end(&line) {
             block = sort(block, is_ignore_block_prev_line);
             is_ignore_block_prev_line = false;
             is_sorting_block = false;
@@ -40,6 +40,11 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 struct Item {
     comment: Vec<String>,
     code: String,
+}
+
+fn is_block_end(line: &str) -> bool {
+    let trimmed = line.trim();
+    trimmed.is_empty() || trimmed.starts_with([')', ']', '}'])
 }
 
 /// Sorts a block of lines, keeping associated comments with their items.
@@ -76,5 +81,5 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
 
 fn is_single_line_comment(line: &str) -> bool {
     let trimmed = line.trim();
-    trimmed.starts_with('#') || trimmed.starts_with("//")
+    trimmed.starts_with('#') || trimmed.starts_with("//") || trimmed.starts_with("--")
 }
