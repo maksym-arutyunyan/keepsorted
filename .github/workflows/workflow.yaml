@@ -26,10 +26,9 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
+        run: |
+          rustup show
+          rustup toolchain install nightly
       - name: Build
         run: cargo build --release --all-targets
         env:
@@ -54,10 +53,9 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
+        run: |
+          rustup show
+          rustup toolchain install nightly
       - name: Run Tests
         run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
         env:
@@ -75,11 +73,10 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
       - name: Install Rust + Clippy
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-          components: clippy
+        run: |
+          rustup show
+          rustup component add clippy
+          rustup toolchain install nightly
       - uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -90,11 +87,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust + Rustfmt
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          override: true
-          components: rustfmt
+        run: |
+          rustup show
+          rustup component add rustfmt
+          rustup toolchain install nightly
       - uses: actions-rs/cargo@v1
         with:
           command: fmt
