@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide describes how to prepare and publish a new release of the `keepsorted` crate to GitHub and [crates.io](https://crates.io).
+This guide describes how to prepare and publish a new release of the `keepsorted` crate to GitHub and [crates.io](https://crates.io/crates/keepsorted).
 
 ## 1. Bump Version & Merge PR
 
