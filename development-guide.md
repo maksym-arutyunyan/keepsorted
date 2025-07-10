@@ -10,7 +10,7 @@ This guide describes how to prepare and publish a new release of the `keepsorted
 ## 2. Create GitHub Release
 
 1. Identify the merge commit.
-2. Go to [Releases](https://github.com/dfinity/keepsorted/releases) → **Draft a new release**.
+2. Go to [Releases](https://github.com/maksym-arutyunyan/keepsorted/releases) → **Draft a new release**.
 3. Set:
    - Tag: `vX.X.X`
    - Target: the merge commit
