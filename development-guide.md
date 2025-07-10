@@ -1,28 +1,36 @@
 # Development Guide
 
-## Release Preparation
+This guide describes how to prepare and publish a new release of the `keepsorted` crate to GitHub and [crates.io](https://crates.io).
 
-There is one package published to crates.io: `keepsorted`.
-Before publishing it, you should create a PR to bump the version of the package, and then cut a new release on GitHub after the PR with the new version is merged. Let's say it's version `vX.X.X`.
+## 1. Bump Version & Merge PR
 
-Here's an example PR bumping the versions: <TODO>.
+1. Update `keepsorted` version in `Cargo.toml`.
+2. Create and merge a PR with the change, example: `<TODO - link to previous PR>`
 
-## Steps to Cut a Release
+## 2. Create GitHub Release
 
-1. Identify the commit for the release, e.g. <TODO>.
-2. Draft a new pre-release:
-    - Click on **Draft a new release** at the [releases page](https://github.com/dfinity/keepsorted/releases), and make sure the correct commit is selected.
-    - Create a new tag named `vX.X.X`.
-    - Set the title to `vX.X.X`.
-    - Choose the previous tag as the last release.
-    - Add release notes. GitHub can generate them by clicking **Generate release notes**, modify as needed.
-3. Click **Publish release** when ready.
+1. Identify the merge commit.
+2. Go to [Releases](https://github.com/dfinity/keepsorted/releases) → **Draft a new release**.
+3. Set:
+   - Tag: `vX.X.X`
+   - Target: the merge commit
+   - Title: `vX.X.X`
+   - Previous tag: last release
+   - Notes: click **Generate release notes**, edit if needed
+4. Click **Publish release**.
 
-## Steps to Publish the Package to crates.io
+## 3. Publish to crates.io
 
-1. Generate an API token to use with crates.io:  
-   Log in to crates.io with your GitHub account, go to **Account Settings**, and generate a new token under **API Tokens**.
-2. Run `cargo login` in the terminal and enter your API key when prompted.
-3. Check out the repo at the tag created for the release, e.g. `git checkout vX.X.X`.
-4. Publish the crate:
-   - `cargo publish -p keepsorted`
+1. Get a crates.io token at [Account Settings → API Tokens](https://crates.io/settings/tokens)
+2. Authenticate:
+   ```bash
+   cargo login
+   ```
+2. Check out the release tag:
+   ```bash
+   git checkout vX.X.X
+   ```
+3. Publish the crate:
+   ```bash
+   cargo publish -p keepsorted
+   ```
