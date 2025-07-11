@@ -4,7 +4,7 @@ This guide describes how to prepare and publish a new release of the `keepsorted
 
 ## 1. Bump Version & Merge PR
 
-1. Update `keepsorted` version in `Cargo.toml`, [#45](https://github.com/maksym-arutyunyan/keepsorted/pull/45)
+1. Update `keepsorted` version in `Cargo.toml`, [#45](https://github.com/maksym-arutyunyan/keepsorted/pull/45/files)
 
 ## 2. Create GitHub Release
 
