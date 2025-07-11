@@ -2,10 +2,9 @@
 
 This guide describes how to prepare and publish a new release of the `keepsorted` crate to GitHub and [crates.io](https://crates.io/crates/keepsorted).
 
-## 1. Bump Version & Merge PR
+## 1. Bump Version
 
-1. Update `keepsorted` version in `Cargo.toml`.
-2. Create and merge a PR with the change, example: `<TODO - link to previous PR>`
+1. Update `keepsorted` version in `Cargo.toml`, example PR [#45](https://github.com/maksym-arutyunyan/keepsorted/pull/45/files)
 
 ## 2. Create GitHub Release
 
