@@ -108,8 +108,11 @@ fn is_ignore_block(lines: &[String]) -> bool {
 
 fn is_bazel(path: &Path) -> bool {
     match path.extension().and_then(|s| s.to_str()) {
-        Some(ext) => matches!(ext, "bazel" | "bzl" | "BUILD" | "WORKSPACE"),
-        None => false,
+        Some(ext) => matches!(ext, "bazel" | "bzl"),
+        None => matches!(
+            path.file_name().and_then(|s| s.to_str()),
+            Some("BUILD") | Some("WORKSPACE")
+        ),
     }
 }
 
@@ -194,4 +197,32 @@ fn test_re_keyword_ignore_block() {
             line
         );
     }
+}
+
+#[test]
+fn test_classify_bazel_files() {
+    assert!(matches!(
+        classify(Path::new("BUILD"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("WORKSPACE"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("foo.bazel"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("BUILD.bazel"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("WORKSPACE.bazel"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("foo.bzl"), vec![]),
+        Strategy::Bazel
+    ));
 }
