@@ -8,6 +8,31 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - (add updates here)
 
+## [0.1.4] - 2025-07-14
+
+### Fixed
+- Correct Bazel file detection
+- Support Lua-style `--` comments for ignore directives
+
+### Documentation
+- Fix link in the development guide
+- Fix numbering in the publish guide
+
+### Misc
+- Added license file
+- Corrected alphabetical sort function typo
+
+## [0.1.3] - 2025-07-10
+
+### Added
+- Support for Lua files
+
+### Fixed
+- Improved `rust_derive` and generic sorting interaction
+
+### CI
+- Simplified workflow configuration
+
 ## [0.1.2] - 2025-06-03
 
 ### Fixed

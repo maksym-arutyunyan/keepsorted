@@ -16,7 +16,8 @@ This guide describes how to prepare and publish a new release of the `keepsorted
    - Title: `vX.X.X`
    - Previous tag: last release
    - Notes: click **Generate release notes**, edit if needed
-4. Click **Publish release**.
+4. Summarize the highlights and add them to `CHANGELOG.md`.
+5. Click **Publish release**.
 
 ## 3. Publish to crates.io
 
