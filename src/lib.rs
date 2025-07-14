@@ -208,6 +208,14 @@ fn test_classify_bazel_files() {
         Strategy::Bazel
     ));
     assert!(matches!(
+        classify(Path::new("BUILD.bazel"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("WORKSPACE.bazel"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
         classify(Path::new("foo.bzl"), vec![]),
         Strategy::Bazel
     ));
