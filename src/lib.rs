@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::fs::{self, File};
@@ -10,6 +12,9 @@ static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
 static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
 
+/// Sorts a file in place using an appropriate strategy.
+///
+/// The `features` list enables optional experimental strategies.
 pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     let mut content = fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
@@ -38,16 +43,26 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     writer.flush()
 }
 
+/// Available sorting strategies.
+///
+/// `Strategy` values describe how `process_lines` will sort a file.
 #[derive(Copy, Clone)]
 pub enum Strategy {
+    /// Generic text sorting activated by the `# Keep sorted` comment.
     Generic,
+    /// Sorting for Bazel `BUILD` and `.bzl` files.
     Bazel,
+    /// Sorting for the dependency sections of `Cargo.toml`.
     CargoToml,
+    /// Sorting for `.gitignore` and `CODEOWNERS` files.
     Gitignore,
+    /// Alphabetical ordering for `#[derive(...)]` attributes in Rust code.
     RustDeriveAlphabetical,
+    /// Canonical ordering for `#[derive(...)]` attributes in Rust code.
     RustDeriveCanonical,
 }
 
+/// Sorts `lines` according to the chosen [`Strategy`] and returns the reordered lines.
 pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
     if is_ignore_file(&lines) {
         return Ok(lines);
