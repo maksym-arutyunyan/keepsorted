@@ -107,13 +107,13 @@ fn is_single_line_comment(line: &str) -> bool {
 // of elements in the value, where elements are split at `.' and `:'. Finally
 // we compare by value and break ties by original index.
 #[derive(Eq, PartialEq, Debug, Default)]
-pub struct BazelSortKey {
+struct BazelSortKey {
     phase: i16,
     split: Vec<String>,
 }
 
 impl BazelSortKey {
-    pub(crate) fn new(line: &str) -> Self {
+    fn new(line: &str) -> Self {
         let line_without_comment = line.trim().split('#').next().unwrap_or("").trim();
 
         let phase = match line_without_comment {
