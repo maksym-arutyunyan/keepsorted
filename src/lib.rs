@@ -169,8 +169,11 @@ fn test_re_keyword_ignore_file() {
     let re = re_keyword_ignore_file();
     for line in [
         "  #   keepsorted  : ignore   file  .  ",
+        "#keepsorted:ignore file",
         "  //   keepsorted  : ignore   file  .  ",
+        "//keepsorted:ignore file",
         "  --   keepsorted  : ignore   file  .  ",
+        "--keepsorted:ignore file",
     ] {
         assert!(
             re.is_match(line),
@@ -190,8 +193,11 @@ fn test_re_keyword_ignore_block() {
     let re = re_keyword_ignore_block();
     for line in [
         "  #   keepsorted  : ignore   block  .  ",
+        "#keepsorted:ignore block",
         "  //   keepsorted  : ignore   block  .  ",
+        "//keepsorted:ignore block",
         "  --   keepsorted  : ignore   block  .  ",
+        "--keepsorted:ignore block",
     ] {
         assert!(
             re.is_match(line),
