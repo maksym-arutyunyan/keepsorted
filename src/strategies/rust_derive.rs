@@ -85,7 +85,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
             .collect();
 
         match strategy {
-            Strategy::RustDeriveAlphabetical => traits = aphabetical_sort(traits),
+            Strategy::RustDeriveAlphabetical => traits = alphabetical_sort(traits),
             Strategy::RustDeriveCanonical => traits = canonical_sort(traits),
             _ => return block,
         }
@@ -144,7 +144,7 @@ fn priority_sort<'a>(traits: Vec<&'a str>, priority_traits: &[&'a str]) -> Vec<&
     sorted_traits
 }
 
-fn aphabetical_sort(traits: Vec<&str>) -> Vec<&str> {
+fn alphabetical_sort(traits: Vec<&str>) -> Vec<&str> {
     priority_sort(traits, &[])
 }
 
