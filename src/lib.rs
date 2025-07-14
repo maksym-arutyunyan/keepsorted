@@ -201,8 +201,14 @@ fn test_re_keyword_ignore_block() {
 
 #[test]
 fn test_classify_bazel_files() {
-    assert!(matches!(classify(Path::new("BUILD"), vec![]), Strategy::Bazel));
-    assert!(matches!(classify(Path::new("WORKSPACE"), vec![]), Strategy::Bazel));
+    assert!(matches!(
+        classify(Path::new("BUILD"), vec![]),
+        Strategy::Bazel
+    ));
+    assert!(matches!(
+        classify(Path::new("WORKSPACE"), vec![]),
+        Strategy::Bazel
+    ));
     assert!(matches!(
         classify(Path::new("foo.bazel"), vec![]),
         Strategy::Bazel
