@@ -1,5 +1,16 @@
 # keepsorted
 
+[gh-image]: https://github.com/maksym-arutyunyan/keepsorted/workflows/CI/badge.svg
+[gh-checks]: https://github.com/maksym-arutyunyan/keepsorted/actions/workflows/workflow.yaml
+[cratesio-image]: https://img.shields.io/crates/v/keepsorted.svg
+[cratesio]: https://crates.io/crates/keepsorted
+[docsrs-image]: https://docs.rs/keepsorted/badge.svg
+[docsrs]: https://docs.rs/keepsorted
+
+[![keepsorted GitHub Actions][gh-image]][gh-checks]
+[![keepsorted on crates.io][cratesio-image]][cratesio]
+[![keepsorted on docs.rs][docsrs-image]][docsrs]
+
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 
 It works by sorting lines within a block that starts with the activation comment `# Keep sorted`.
