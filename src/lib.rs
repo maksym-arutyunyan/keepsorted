@@ -160,7 +160,7 @@ fn test_re_keyword_keep_sorted() {
 }
 
 fn re_keyword_ignore_file() -> Regex {
-    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
+    Regex::new(r"(?i)^\s*(#|\/\/|--)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
         .expect("Failed to build regex for ignore file")
 }
 
@@ -169,7 +169,11 @@ fn test_re_keyword_ignore_file() {
     let re = re_keyword_ignore_file();
     for line in [
         "  #   keepsorted  : ignore   file  .  ",
+        "#keepsorted:ignore file",
         "  //   keepsorted  : ignore   file  .  ",
+        "//keepsorted:ignore file",
+        "  --   keepsorted  : ignore   file  .  ",
+        "--keepsorted:ignore file",
     ] {
         assert!(
             re.is_match(line),
@@ -180,7 +184,7 @@ fn test_re_keyword_ignore_file() {
 }
 
 fn re_keyword_ignore_block() -> Regex {
-    Regex::new(r"(?i)^\s*(#|\/\/)\s*keepsorted\s*:\s*ignore\s+block\s*\.?\s*$")
+    Regex::new(r"(?i)^\s*(#|\/\/|--)\s*keepsorted\s*:\s*ignore\s+block\s*\.?\s*$")
         .expect("Failed to build regex for ignore block")
 }
 
@@ -189,7 +193,11 @@ fn test_re_keyword_ignore_block() {
     let re = re_keyword_ignore_block();
     for line in [
         "  #   keepsorted  : ignore   block  .  ",
+        "#keepsorted:ignore block",
         "  //   keepsorted  : ignore   block  .  ",
+        "//keepsorted:ignore block",
+        "  --   keepsorted  : ignore   block  .  ",
+        "--keepsorted:ignore block",
     ] {
         assert!(
             re.is_match(line),

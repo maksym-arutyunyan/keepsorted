@@ -2,7 +2,7 @@
 
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 
-It works by sorting lines within a block that starts with the activation comment `# Keep sorted` or `// Keep sorted`. 
+It works by sorting lines within a block that starts with the activation comment `# Keep sorted`.
 In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
 
 The tool can also recognize comments attached to non-comment lines, like this:
@@ -33,15 +33,17 @@ You can see more examples in the `./tests/e2e-tests/` directory.
 
 ## Keywords
 
-- Use `# Keep sorted`, `// Keep sorted`, or `# keepsorted: keep sorted` to sort the next block of lines
-- Add `# keepsorted: ignore file` anywhere in the file to skip sorting
-- Use `# keepsorted: ignore block` within a block to skip sorting that block
+Comments can begin with `#`, `//`, or `--`. The following examples use `#`.
+
+- `# Keep sorted` or `# keepsorted: keep sorted` sorts the next block of lines
+- `# keepsorted: ignore file` anywhere in the file skips sorting
+- `# keepsorted: ignore block` within a block skips sorting that block
 
 ## Supported Files
 
 ### Generic Text Files
 
-For generic text files, the tool sorts blocks that start with `# Keep sorted` or `// Keep sorted` and end with a newline.
+For generic text files, the tool sorts blocks that start with `# Keep sorted` and end with a newline.
 
 ```txt
 # Names
@@ -50,8 +52,8 @@ Alice
 Bob
 Conrad
 
-// Colors
-// Keep sorted
+# Colors
+# Keep sorted
 Blue
 Green
 Red
