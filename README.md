@@ -33,9 +33,11 @@ You can see more examples in the `./tests/e2e-tests/` directory.
 
 ## Keywords
 
-- Use `# Keep sorted`, `// Keep sorted`, or `# keepsorted: keep sorted` to sort the next block of lines
-- Add `# keepsorted: ignore file` anywhere in the file to skip sorting
-- Use `# keepsorted: ignore block` within a block to skip sorting that block
+Comments can begin with `#`, `//`, or `--`. The following examples use `#`.
+
+- `# Keep sorted` or `# keepsorted: keep sorted` sorts the next block of lines
+- `# keepsorted: ignore file` anywhere in the file skips sorting
+- `# keepsorted: ignore block` within a block skips sorting that block
 
 ## Supported Files
 
