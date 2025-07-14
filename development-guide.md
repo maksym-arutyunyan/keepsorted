@@ -25,11 +25,11 @@ This guide describes how to prepare and publish a new release of the `keepsorted
    ```bash
    cargo login
    ```
-2. Check out the release tag:
+3. Check out the release tag:
    ```bash
    git checkout vX.X.X
    ```
-3. Publish the crate:
+4. Publish the crate:
    ```bash
    cargo publish -p keepsorted
    ```
