@@ -137,4 +137,13 @@ $ keepsorted <path> --features rust_derive_canonical
 
 The feature is inspired by a closed ticket to update rust style, [link](https://github.com/rust-lang/style-team/issues/154).
 
+### Check mode
+
+Use `--check` to verify that a file is already sorted without modifying it.
+The command exits with status `0` when no changes are needed and `1` otherwise.
+
+```shell
+$ keepsorted --check Cargo.toml
+```
+
 
