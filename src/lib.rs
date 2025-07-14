@@ -2,8 +2,8 @@
 
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::fs::{self, File};
-use std::io::{self, BufWriter, Write};
+use std::fs;
+use std::io::{self};
 use std::path::Path;
 
 mod strategies;
@@ -12,10 +12,10 @@ static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
 static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
 
-/// Sorts a file in place using an appropriate strategy.
+/// Returns the sorted content of a file using an appropriate strategy.
 ///
 /// The `features` list enables optional experimental strategies.
-pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
+pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<String> {
     let mut content = fs::read_to_string(path)?;
     let ends_with_newline = content.ends_with('\n');
     if !ends_with_newline {
@@ -26,21 +26,16 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<()> {
     let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
     let output_lines = process_lines(classify(path, features), lines)?;
 
-    let mut writer = BufWriter::new(File::create(path)?);
+    let mut result = String::new();
     for (i, line) in output_lines.iter().enumerate() {
-        write!(
-            writer,
-            "{}",
-            if i + 1 == output_lines.len() && !ends_with_newline {
-                // Remove the newline if it wasn’t in the original.
-                line.trim_end_matches('\n')
-            } else {
-                line
-            }
-        )?;
+        if i + 1 == output_lines.len() && !ends_with_newline {
+            result.push_str(line.trim_end_matches('\n'));
+        } else {
+            result.push_str(line);
+        }
     }
 
-    writer.flush()
+    Ok(result)
 }
 
 /// Available sorting strategies.

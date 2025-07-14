@@ -42,6 +42,10 @@ struct Args {
         help = "Experimental feature flags. Provide a list of features to enable."
     )]
     features: Option<Vec<String>>,
+
+    /// Only check whether the file is sorted. Exit with code 1 if changes are needed.
+    #[arg(long)]
+    check: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -66,7 +70,7 @@ fn main() -> io::Result<()> {
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    process_file(path, features).map_err(|e| {
+    let sorted = process_file(path, features).map_err(|e| {
         eprintln!(
             "{}: failed to process file {}: {}",
             env!("CARGO_PKG_NAME"),
@@ -74,5 +78,16 @@ fn main() -> io::Result<()> {
             e
         );
         e
-    })
+    })?;
+
+    if args.check {
+        let original = std::fs::read_to_string(path)?;
+        if original != sorted {
+            std::process::exit(1);
+        }
+    } else {
+        std::fs::write(path, sorted)?;
+    }
+
+    Ok(())
 }

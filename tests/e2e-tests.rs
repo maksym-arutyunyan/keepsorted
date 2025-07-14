@@ -56,6 +56,42 @@ fn run_test(input_file_path: &str, expected_file_path: &str, features: &str) {
     );
 }
 
+fn run_check_test(input_file_path: &str, features: &str, expect_success: bool) {
+    let input_content = fs::read_to_string(input_file_path).expect("Failed to read input file");
+    let temp_dir = tempdir().expect("Failed to create temporary directory");
+    let temp_input_file_path = temp_dir
+        .path()
+        .join(Path::new(input_file_path).file_name().unwrap());
+    fs::write(&temp_input_file_path, &input_content).expect("Failed to write to temporary file");
+
+    let keepsorted_binary = if cfg!(debug_assertions) {
+        "./target/debug/keepsorted"
+    } else {
+        "./target/release/keepsorted"
+    };
+    let mut command = Command::new(keepsorted_binary);
+    command
+        .arg("--check")
+        .arg(temp_input_file_path.to_str().unwrap());
+    if !features.is_empty() {
+        command.arg("--features").arg(features);
+    }
+
+    let output = command.output().expect("Failed to execute keepsorted");
+    if expect_success {
+        assert!(output.status.success(), "keepsorted --check should succeed");
+    } else {
+        assert!(!output.status.success(), "keepsorted --check should fail");
+    }
+
+    let output_content =
+        fs::read_to_string(&temp_input_file_path).expect("Failed to read output file");
+    assert_eq!(
+        input_content, output_content,
+        "--check should not modify the file"
+    );
+}
+
 fn dir(path: &str) -> String {
     format!("./tests/e2e-tests/{path}")
 }
@@ -146,4 +182,14 @@ fn test_e2e_rust_derive_3() {
         &dir("rust_derive/3_out.rs"),
         "rust_derive_alphabetical",
     );
+}
+
+#[test]
+fn test_check_fails_on_unsorted() {
+    run_check_test(&dir("generic/1_in.txt"), "", false);
+}
+
+#[test]
+fn test_check_succeeds_on_sorted() {
+    run_check_test(&dir("generic/1_out.txt"), "", true);
 }
