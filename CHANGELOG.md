@@ -8,6 +8,12 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - (add updates here)
 
+## [0.1.5] - 2025-07-15
+
+- Added `--check` mode to lint command for CI and pre-commit use
+- Improved crate-level documentation
+- Updated README with badges
+
 ## [0.1.4] - 2025-07-14
 
 ### Fixed
