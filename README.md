@@ -12,6 +12,7 @@
 [![keepsorted on docs.rs][docsrs-image]][docsrs]
 
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
+The tool is inspired by the Bazel build tool `buildifier`, which sorts items marked with `# Keep sorted` comments. `keepsorted` brings this functionality to any text file.
 
 It works by sorting lines within a block that starts with the activation comment `# Keep sorted`.
 In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
@@ -137,13 +138,21 @@ $ keepsorted <path> --features rust_derive_canonical
 
 The feature is inspired by a closed ticket to update rust style, [link](https://github.com/rust-lang/style-team/issues/154).
 
-### Check mode
+### Formatting mode
 
-Use `--check` to verify that a file is already sorted without modifying it.
-The command exits with status `0` when no changes are needed and `1` otherwise.
+The `--mode` option controls whether the file is modified. It accepts `check` or
+`fix` (the default).
+
+Use `--mode check` to verify that a file is already sorted without modifying it.
+Use `--mode fix` to rewrite the file in place.
+
+The command exits with these codes:
+1. `0` — no changes were needed
+2. `1` — the file requires sorting or an error occurred
 
 ```shell
-$ keepsorted --check Cargo.toml
+$ keepsorted --mode check Cargo.toml
+$ keepsorted --mode fix Cargo.toml
 ```
 
 

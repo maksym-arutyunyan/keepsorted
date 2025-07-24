@@ -1,14 +1,23 @@
-use clap::{arg, command, Parser};
+use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
 use std::io::{self};
 use std::path::Path;
 
 fn about() -> String {
     format!(
-        "{}\n{}",
+        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode fix or --mode check and enable extra features with flags. {}",
         env!("CARGO_PKG_DESCRIPTION"),
         env!("CARGO_PKG_REPOSITORY")
     )
+}
+
+/// Formatting mode controlling whether the file is overwritten or only verified.
+#[derive(Copy, Clone, Debug, ValueEnum)]
+enum Mode {
+    /// Verify that the file is already sorted.
+    Check,
+    /// Rewrite the file with sorted content.
+    Fix,
 }
 
 #[derive(Debug, Parser)]
@@ -43,9 +52,15 @@ struct Args {
     )]
     features: Option<Vec<String>>,
 
-    /// Only check whether the file is sorted. Exit with code 1 if changes are needed.
-    #[arg(long)]
-    check: bool,
+    /// Formatting mode: check or fix (default fix)
+    #[arg(
+        short = 'm',
+        long,
+        value_enum,
+        default_value_t = Mode::Fix,
+        help = "formatting mode: check or fix (default fix)"
+    )]
+    mode: Mode,
 }
 
 fn main() -> io::Result<()> {
@@ -80,13 +95,16 @@ fn main() -> io::Result<()> {
         e
     })?;
 
-    if args.check {
-        let original = std::fs::read_to_string(path)?;
-        if original != sorted {
-            std::process::exit(1);
+    match args.mode {
+        Mode::Check => {
+            let original = std::fs::read_to_string(path)?;
+            if original != sorted {
+                std::process::exit(1);
+            }
         }
-    } else {
-        std::fs::write(path, sorted)?;
+        Mode::Fix => {
+            std::fs::write(path, sorted)?;
+        }
     }
 
     Ok(())
