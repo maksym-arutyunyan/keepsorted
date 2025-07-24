@@ -47,7 +47,10 @@ fn run_test(
     if expect_success {
         assert!(output.status.success(), "keepsorted command failed");
     } else {
-        assert!(!output.status.success(), "keepsorted command unexpectedly succeeded");
+        assert!(
+            !output.status.success(),
+            "keepsorted command unexpectedly succeeded"
+        );
     }
 
     // Read the content of the temporary file after running keepsorted
@@ -81,27 +84,57 @@ fn dir(path: &str) -> String {
 
 #[test]
 fn test_e2e_bazel_1() {
-    run_test(&dir("bazel/1_in.bazel"), &dir("bazel/1_out.bazel"), "", "fix", true);
+    run_test(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out.bazel"),
+        "",
+        "fix",
+        true,
+    );
 }
 
 #[test]
 fn test_e2e_bazel_2() {
-    run_test(&dir("bazel/2_in.bazel"), &dir("bazel/2_out.bazel"), "", "fix", true);
+    run_test(
+        &dir("bazel/2_in.bazel"),
+        &dir("bazel/2_out.bazel"),
+        "",
+        "fix",
+        true,
+    );
 }
 
 #[test]
 fn test_e2e_generic_1() {
-    run_test(&dir("generic/1_in.txt"), &dir("generic/1_out.txt"), "", "fix", true);
+    run_test(
+        &dir("generic/1_in.txt"),
+        &dir("generic/1_out.txt"),
+        "",
+        "fix",
+        true,
+    );
 }
 
 #[test]
 fn test_e2e_generic_2() {
-    run_test(&dir("generic/2_in.txt"), &dir("generic/2_out.txt"), "", "fix", true);
+    run_test(
+        &dir("generic/2_in.txt"),
+        &dir("generic/2_out.txt"),
+        "",
+        "fix",
+        true,
+    );
 }
 
 #[test]
 fn test_e2e_generic_3() {
-    run_test(&dir("generic/3_in.txt"), &dir("generic/3_out.txt"), "", "fix", true);
+    run_test(
+        &dir("generic/3_in.txt"),
+        &dir("generic/3_out.txt"),
+        "",
+        "fix",
+        true,
+    );
 }
 
 #[test]
