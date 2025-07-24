@@ -71,7 +71,8 @@ fn run_check_test(input_file_path: &str, features: &str, expect_success: bool) {
     };
     let mut command = Command::new(keepsorted_binary);
     command
-        .arg("--check")
+        .arg("--mode")
+        .arg("check")
         .arg(temp_input_file_path.to_str().unwrap());
     if !features.is_empty() {
         command.arg("--features").arg(features);
@@ -79,16 +80,23 @@ fn run_check_test(input_file_path: &str, features: &str, expect_success: bool) {
 
     let output = command.output().expect("Failed to execute keepsorted");
     if expect_success {
-        assert!(output.status.success(), "keepsorted --check should succeed");
+        assert!(
+            output.status.success(),
+            "keepsorted --mode check should succeed"
+        );
     } else {
-        assert!(!output.status.success(), "keepsorted --check should fail");
+        assert!(
+            !output.status.success(),
+            "keepsorted --mode check should fail"
+        );
     }
 
     let output_content =
         fs::read_to_string(&temp_input_file_path).expect("Failed to read output file");
     assert_eq!(
-        input_content, output_content,
-        "--check should not modify the file"
+        input_content,
+        output_content,
+        "--mode check should not modify the file"
     );
 }
 

@@ -14,6 +14,8 @@
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 
 It works by sorting lines within a block that starts with the activation comment `# Keep sorted`.
+The idea is inspired by the Bazel build tool's **buildifier**, which sorts lists marked with that comment.
+Unlike buildifier, `keepsorted` can apply this rule to any text file.
 In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
 
 The tool can also recognize comments attached to non-comment lines, like this:
@@ -139,11 +141,11 @@ The feature is inspired by a closed ticket to update rust style, [link](https://
 
 ### Check mode
 
-Use `--check` to verify that a file is already sorted without modifying it.
+Use `--mode check` to verify that a file is already sorted without modifying it.
 The command exits with status `0` when no changes are needed and `1` otherwise.
 
 ```shell
-$ keepsorted --check Cargo.toml
+$ keepsorted --mode check Cargo.toml
 ```
 
 

@@ -1,4 +1,4 @@
-use clap::{arg, command, Parser};
+use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
 use std::io::{self};
 use std::path::Path;
@@ -9,6 +9,12 @@ fn about() -> String {
         env!("CARGO_PKG_DESCRIPTION"),
         env!("CARGO_PKG_REPOSITORY")
     )
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+enum Mode {
+    Check,
+    Fix,
 }
 
 #[derive(Debug, Parser)]
@@ -43,9 +49,14 @@ struct Args {
     )]
     features: Option<Vec<String>>,
 
-    /// Only check whether the file is sorted. Exit with code 1 if changes are needed.
-    #[arg(long)]
-    check: bool,
+    #[arg(
+        short = 'm',
+        long,
+        value_enum,
+        default_value_t = Mode::Fix,
+        help = "Operation mode: 'check' verifies sorting without writing"
+    )]
+    mode: Mode,
 }
 
 fn main() -> io::Result<()> {
@@ -80,13 +91,16 @@ fn main() -> io::Result<()> {
         e
     })?;
 
-    if args.check {
-        let original = std::fs::read_to_string(path)?;
-        if original != sorted {
-            std::process::exit(1);
+    match args.mode {
+        Mode::Check => {
+            let original = std::fs::read_to_string(path)?;
+            if original != sorted {
+                std::process::exit(1);
+            }
         }
-    } else {
-        std::fs::write(path, sorted)?;
+        Mode::Fix => {
+            std::fs::write(path, sorted)?;
+        }
     }
 
     Ok(())
