@@ -7,6 +7,6 @@ load './helpers.bash'
   cp "$FILES_DIR/generic/1_in.txt" "$TEST_TMPDIR/dir/file.txt"
 
   run_keepsorted --mode fix "$TEST_TMPDIR/dir"
-  [ "$status" -eq 2 ]
+  [ "$status" -eq "$EXIT_USAGE_ERROR" ]
 }
 

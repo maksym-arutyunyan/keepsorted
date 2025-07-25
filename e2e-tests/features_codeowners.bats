@@ -8,7 +8,7 @@ load './helpers.bash'
   expected="$FILES_DIR/codeowners/CODEOWNERS_out"
 
   run_keepsorted --mode fix --features codeowners "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 
