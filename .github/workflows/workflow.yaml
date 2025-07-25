@@ -138,8 +138,8 @@ jobs:
       - name: Run KeepSorted
         shell: bash
         run: |
-          # Use --recursive only on filtered file lists to avoid processing
-          # unrelated paths.
+          # keepsorted can walk directories with --recursive, but we filter tracked files
+          # explicitly to avoid processing examples or tests during validation.
           git ls-files -z \
             | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
             | xargs -0 -n1 ./target/release/keepsorted \
