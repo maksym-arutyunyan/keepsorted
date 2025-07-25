@@ -28,7 +28,13 @@ Some experimental features exist:
 
 ## Experimental Features
 
-The following features are behind flags and must be enabled explicitly using `--features`:
+Several optional features are still evolving and therefore are **disabled by default**. You can opt into them with the `--features` command-line flag or by enabling the corresponding crate features. Features are comma‑separated so you may combine multiple behaviours at once:
+
+```shell
+$ keepsorted <path> --features gitignore,codeowners
+```
+
+Available experimental flags:
 
 - `rust_derive_alphabetical` — sorts `#[derive(...)]` attributes alphabetically
 - `rust_derive_canonical` — sorts `#[derive(...)]` attributes in canonical Rust order
