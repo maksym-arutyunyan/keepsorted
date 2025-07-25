@@ -41,7 +41,7 @@ dependencies = [
 ]
 ```
 
-You can see more examples in the `./tests/e2e-tests/` directory.
+You can see more examples in the `./e2e-tests/files/` directory.
 
 ## Keywords
 
