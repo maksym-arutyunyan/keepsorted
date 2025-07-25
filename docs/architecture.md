@@ -30,7 +30,13 @@ Some experimental features exist:
 
 ## Experimental Features
 
-The following features are behind flags and must be enabled explicitly using `--features`:
+Several optional features are still evolving and therefore are **disabled by default**. You can opt into them with the `--features` command-line flag or by enabling the corresponding crate features. Features are comma‑separated so you may combine multiple behaviours at once:
+
+```shell
+$ keepsorted <path> --features gitignore,codeowners
+```
+
+Available experimental flags:
 
 - `rust_derive_alphabetical` — sorts `#[derive(...)]` attributes alphabetically
 - `rust_derive_canonical` — sorts `#[derive(...)]` attributes in canonical Rust order
@@ -78,9 +84,9 @@ Both functions rely on private helpers such as `classify` for strategy selection
 
 End-to-end tests in `e2e-tests` invoke the CLI using a command-line test framework to simulate real usage. Each flag or parameter has its own test file with descriptive names following the Arrange–Act–Assert style. This keeps tests short and focused while covering many combinations.
 
-Tests use real input files and golden outputs. Each test case includes input.txt and expected.txt stored in the same subdirectory for clarity and simplicity.
+Tests use real input files and golden outputs. Each test case includes `input.txt` and `expected.txt` stored in the same subdirectory for clarity and simplicity. Shared exit codes live in `utils/exit_codes.bash` so that the CLI and tests use the same constants.
 
-Rust unit tests inside `tests/` verify the behaviour of individual strategies for different file and data types.
+Rust unit tests inside `tests/` verify the behaviour of individual strategies for different file and data types. The `run-all.sh` script runs the full validation sequence and should be executed before committing changes.
 
 ## Out of Scope
 
