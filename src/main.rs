@@ -110,6 +110,10 @@ struct Args {
     )]
     positional_path: Option<String>,
 
+    /// Recursively traverse directories for files
+    #[arg(short = 'r', long, help = "Process directories recursively")]
+    recursive: bool,
+
     #[arg(
         short = 'f',
         long,
@@ -162,10 +166,6 @@ struct Args {
         help = "Custom command for '--mode diff'"
     )]
     diff_command: Option<String>,
-
-    /// Recursively traverse directories for files
-    #[arg(short = 'r', long, help = "Process directories recursively")]
-    recursive: bool,
 }
 
 fn main() {
