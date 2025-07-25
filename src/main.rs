@@ -3,7 +3,6 @@ use keepsorted::process_file;
 use std::io;
 use std::path::Path;
 use std::process::{self, Command};
-use walkdir::WalkDir;
 
 /// Exit code used when the command is invoked incorrectly.
 ///
@@ -99,10 +98,6 @@ struct Args {
     )]
     features: Option<Vec<Feature>>,
 
-    /// Recursively process directories
-    #[arg(short = 'r', long, help = "Process directories recursively")]
-    recursive: bool,
-
     /// Verify that the file is already sorted
     #[arg(
         long,
@@ -173,22 +168,12 @@ fn main() {
     let mut exit_code = 0;
 
     if path.is_dir() {
-        if !args.recursive {
-            eprintln!(
-                "{}: read {}: is a directory",
-                env!("CARGO_PKG_NAME"),
-                path.display()
-            );
-            process::exit(EXIT_USAGE_ERROR);
-        }
-
-        for entry in WalkDir::new(path).into_iter().filter_map(Result::ok) {
-            if entry.file_type().is_file()
-                && !handle_file(entry.path(), &features, mode, args.diff_command.as_deref())
-            {
-                exit_code = EXIT_CHECK_FAILED;
-            }
-        }
+        eprintln!(
+            "{}: read {}: is a directory",
+            env!("CARGO_PKG_NAME"),
+            path.display()
+        );
+        process::exit(EXIT_USAGE_ERROR);
     } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
         exit_code = EXIT_CHECK_FAILED;
     }

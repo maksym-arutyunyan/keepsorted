@@ -16,7 +16,7 @@ Each file under `src/strategies/` provides a `process` function that sorts lines
 
 ### CLI (`src/main.rs`)
 
-`main.rs` implements the command‑line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes files to `handle_file`. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
+`main.rs` implements the command‑line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes a single file to `handle_file`. Directory traversal is intentionally left to external scripts so that the binary stays simple and composable. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
 
 ### Crate API (`src/lib.rs`)
 

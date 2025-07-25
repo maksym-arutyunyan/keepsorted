@@ -7,10 +7,12 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [Unreleased]
 
 ### Added
-- `--mode` option with `check`, `diff`, and `fix` modes and alias flags `--check`, `--diff`, and `--fix`
-- `--diff-command` option to delegate diff generation to an external tool
-- Buildifier-style exit codes with `4` indicating failed check mode
-- `--recursive` flag to process directories recursively
+ - `--mode` option with `check`, `diff`, and `fix` modes and alias flags `--check`, `--diff`, and `--fix`
+ - `--diff-command` option to delegate diff generation to an external tool
+ - Buildifier-style exit codes with `4` indicating failed check mode
+
+### Changed
+ - Removed `--recursive` flag; use shell tools to process directories
 
 ### Fixed
 - Show a usage error when an unknown feature is specified

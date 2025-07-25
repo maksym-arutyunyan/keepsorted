@@ -23,4 +23,5 @@
 - Address warnings reported by `cargo clippy` as invoked in `run-all.sh`.
 - Keep entries in `Cargo.toml` and other marked blocks sorted using `keepsorted` comments.
 - Update `CHANGELOG.md` for user‑visible changes following the Keep a Changelog format.
+- Keep `docs/architecture.md` in sync with the current code structure.
 - Commit messages should also follow the Conventional Commits style.
