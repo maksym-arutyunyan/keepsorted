@@ -1,12 +1,13 @@
 A tool for sorting blocks of lines in code files.
+
 Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. Comments starting with '#', '//' or '--' are preserved.
 
 Return codes:
-0: success, everything went well
-1: syntax errors in input
-2: usage errors: invoked incorrectly
-3: unexpected runtime errors: file I/O problems or internal bugs
-4: check mode failed (reformat is needed)
+	0: success, everything went well
+	1: syntax errors in input
+	2: usage errors: invoked incorrectly
+	3: unexpected runtime errors: file I/O problems or internal bugs
+	4: check mode failed (reformat is needed)
 
 Usage: keepsorted [OPTIONS] [PATH]
 
