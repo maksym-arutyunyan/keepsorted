@@ -24,7 +24,8 @@ pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<String> {
     }
 
     let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
-    let output_lines = process_lines(classify(path, features), lines)?;
+    let strategy = classify(path, features)?;
+    let output_lines = process_lines(strategy, lines)?;
 
     let mut result = String::new();
     for (i, line) in output_lines.iter().enumerate() {
@@ -81,31 +82,36 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
     }
 }
 
-fn classify(path: &Path, features: Vec<String>) -> Strategy {
+fn classify(path: &Path, features: Vec<String>) -> io::Result<Strategy> {
     if is_bazel(path) {
-        return Strategy::Bazel;
+        return Ok(Strategy::Bazel);
     }
     if is_cargo_toml(path) {
-        return Strategy::CargoToml;
+        return Ok(Strategy::CargoToml);
     }
     if features.contains(&"gitignore".to_string()) && is_gitignore(path) {
-        return Strategy::Gitignore;
+        return Ok(Strategy::Gitignore);
     }
     if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
-        return Strategy::Gitignore;
+        return Ok(Strategy::Gitignore);
     }
     if is_rust(path) {
         match (
             features.contains(&"rust_derive_alphabetical".to_string()),
             features.contains(&"rust_derive_canonical".to_string()),
         ) {
-            (true, true) => panic!("Mutually exclusive rust_derive feature flags are not allowed"),
-            (true, false) => return Strategy::RustDeriveAlphabetical,
-            (false, true) => return Strategy::RustDeriveCanonical,
+            (true, true) => {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Mutually exclusive rust_derive feature flags are not allowed",
+                ))
+            }
+            (true, false) => return Ok(Strategy::RustDeriveAlphabetical),
+            (false, true) => return Ok(Strategy::RustDeriveCanonical),
             _ => {}
         }
     }
-    Strategy::Generic
+    Ok(Strategy::Generic)
 }
 
 fn is_ignore_file(lines: &[String]) -> bool {
@@ -220,27 +226,27 @@ fn test_re_keyword_ignore_block() {
 #[test]
 fn test_classify_bazel_files() {
     assert!(matches!(
-        classify(Path::new("BUILD"), vec![]),
+        classify(Path::new("BUILD"), vec![]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("WORKSPACE"), vec![]),
+        classify(Path::new("WORKSPACE"), vec![]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("foo.bazel"), vec![]),
+        classify(Path::new("foo.bazel"), vec![]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("BUILD.bazel"), vec![]),
+        classify(Path::new("BUILD.bazel"), vec![]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("WORKSPACE.bazel"), vec![]),
+        classify(Path::new("WORKSPACE.bazel"), vec![]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("foo.bzl"), vec![]),
+        classify(Path::new("foo.bzl"), vec![]).unwrap(),
         Strategy::Bazel
     ));
 }
