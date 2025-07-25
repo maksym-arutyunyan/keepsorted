@@ -1,0 +1,58 @@
+A tool for sorting blocks of lines in code files.
+Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. Comments starting with '#', '//' or '--' are preserved.
+
+Return codes:
+0: success, everything went well
+1: syntax errors in input
+2: usage errors: invoked incorrectly
+3: unexpected runtime errors: file I/O problems or internal bugs
+4: check mode failed (reformat is needed)
+
+Usage: keepsorted [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]
+          File to process (required if '--path' is not used)
+
+Options:
+  -p, --path <PATH>
+          File to process (conflicts with positional path)
+
+  -f, --features <FEATURE>
+          Enable experimental features
+
+          Possible values:
+          - gitignore:                Enable sorting for `.gitignore` files
+          - codeowners:               Enable sorting for `CODEOWNERS` files
+          - rust_derive_alphabetical: Alphabetical ordering for `#[derive(...)]` attributes
+          - rust_derive_canonical:    Canonical ordering for `#[derive(...)]` attributes
+
+      --check
+          alias for '--mode check'
+
+      --diff
+          alias for '--mode diff'
+
+      --fix
+          alias for '--mode fix'
+
+  -m, --mode <MODE>
+          Formatting mode
+          
+          [default: fix]
+
+          Possible values:
+          - check: Verify that the file is already sorted
+          - diff:  Print a diff of the required changes
+          - fix:   Rewrite the file with sorted content
+
+      --diff-command <COMMAND>
+          Custom command for '--mode diff'
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
+For more info, visit: https://github.com/maksym-arutyunyan/keepsorted

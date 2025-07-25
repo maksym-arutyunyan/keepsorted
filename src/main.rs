@@ -16,10 +16,27 @@ const EXIT_RUNTIME_ERROR: i32 = 3;
 const EXIT_CHECK_FAILED: i32 = 4;
 
 fn about() -> String {
-    format!(
-        "{}\nSort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes.",
-        env!("CARGO_PKG_DESCRIPTION")
-    )
+    env!("CARGO_PKG_DESCRIPTION").to_string()
+}
+
+fn long_about() -> String {
+    "A tool for sorting blocks of lines in code files.\n\
+Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. \
+Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. \
+Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. \
+Comments starting with '#', '//' or '--' are preserved.\n\
+\n\
+Return codes:\n\
+  0: success, everything went well\n\
+  1: syntax errors in input\n\
+  2: usage errors: invoked incorrectly\n\
+  3: unexpected runtime errors: file I/O problems or internal bugs\n\
+  4: check mode failed (reformat is needed)"
+        .to_string()
+}
+
+fn after_help() -> &'static str {
+    "For more info, visit: https://github.com/maksym-arutyunyan/keepsorted"
 }
 
 /// Formatting mode controlling whether the file is overwritten or only verified.
@@ -70,8 +87,8 @@ impl fmt::Display for Feature {
 #[command(
     version,
     about = about(),
-    long_about = None,
-    after_help = "For more info, visit: https://github.com/maksym-arutyunyan/keepsorted"
+    long_about = long_about(),
+    after_help = after_help()
 )]
 struct Args {
     #[arg(
