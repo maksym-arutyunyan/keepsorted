@@ -7,11 +7,11 @@ This document explains how the main pieces of the `keepsorted` crate fit togethe
 `keepsorted` was inspired by [Buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier), which sorts items in Bazel `BUILD` files. The command-line flags and exit codes follow a similar design so that tooling can integrate either tool with minimal changes.
 
 The CLI returns these codes:
-1. `0` — success
-2. `1` — syntax errors in input
-3. `2` — incorrect command usage
-4. `3` — unexpected runtime failures
-5. `4` — check mode detected unsorted files
+- `0` — success
+- `1` — syntax errors in input
+- `2` — incorrect command usage
+- `3` — unexpected runtime failures
+- `4` — check mode detected unsorted files
 
 ## Sorting Behaviour
 

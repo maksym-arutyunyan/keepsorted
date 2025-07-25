@@ -8,6 +8,8 @@ use std::process::{self, Command};
 ///
 /// clap also exits with this code on usage errors such as conflicting flags.
 const EXIT_USAGE_ERROR: i32 = 2;
+/// Exit code used for syntax errors in the input.
+const EXIT_SYNTAX_ERROR: i32 = 1;
 /// Exit code used for I/O problems or internal bugs.
 const EXIT_RUNTIME_ERROR: i32 = 3;
 /// Exit code used when `--mode check` or `--mode diff` detects unsorted files.
@@ -270,7 +272,11 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
                         Ok(out) => {
                             print!("{}", String::from_utf8_lossy(&out.stdout));
                             if !out.status.success() {
-                                process::exit(out.status.code().unwrap_or(EXIT_RUNTIME_ERROR));
+                                let code = out.status.code().unwrap_or(EXIT_RUNTIME_ERROR);
+                                if code == 1 {
+                                    process::exit(EXIT_SYNTAX_ERROR);
+                                }
+                                process::exit(code);
                             }
                         }
                         Err(e) => {
