@@ -278,6 +278,17 @@ fn test_diff_succeeds_on_sorted() {
 }
 
 #[test]
+fn test_diff_with_custom_command() {
+    run_test(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out_diff_cmd.bazel"),
+        "",
+        &["--mode", "diff", "--diff-command", "sh -c 'echo executed'"],
+        false,
+    );
+}
+
+#[test]
 fn test_shorthand_check() {
     run_test(
         &dir("generic/1_in.txt"),

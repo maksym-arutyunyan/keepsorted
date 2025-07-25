@@ -146,6 +146,7 @@ aliases for `--mode check`, `--mode diff`, and `--mode fix` respectively.
 
 Use `--mode check` (or `--check`) to verify that a file is already sorted without modifying it.
 Use `--mode diff` (or `--diff`) to print a unified diff of the required changes.
+Use `--diff-command <command>` to delegate diff generation to an external program.
 Use `--mode fix` (or `--fix`) to rewrite the file in place.
 
 The command exits with these codes:
