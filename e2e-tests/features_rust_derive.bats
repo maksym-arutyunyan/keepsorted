@@ -8,7 +8,7 @@ load './helpers.bash'
   expected="$FILES_DIR/rust_derive/1_out.rs"
 
   run_keepsorted --mode fix --features rust_derive_alphabetical "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 
@@ -18,7 +18,7 @@ load './helpers.bash'
   expected="$FILES_DIR/rust_derive/2_out.rs"
 
   run_keepsorted --mode fix --features rust_derive_canonical "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 

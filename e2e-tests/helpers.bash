@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 FILES_DIR="$REPO_ROOT/e2e-tests/files"
 BIN="$REPO_ROOT/target/release/keepsorted"
 
 setup() {
+  source "$REPO_ROOT/utils/exit_codes.bash"
   TEST_TMPDIR="$(mktemp -d)"
 }
 
