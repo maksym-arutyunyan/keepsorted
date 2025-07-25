@@ -7,22 +7,18 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 ## [Unreleased]
 
 ### Added
- - `--mode` option with `check`, `diff`, and `fix` modes and alias flags `--check`, `--diff`, and `--fix`
- - `--diff-command` option to delegate diff generation to an external tool
- - Buildifier-style exit codes with `4` indicating failed check mode
-
-### Added
- - `--recursive` (`-r`) flag to process directories recursively
+- Recursive directory traversal via `-r`/`--recursive`
+- `--mode` with `check`, `diff` and `fix` plus convenience flags
+- `--diff-command` to delegate diff generation
+- Buildifier-style exit code `4` for failed checks
 
 ### Fixed
-- Show a usage error when an unknown feature is specified
+- Proper exit code when diff check fails
+- Usage error for unknown features
 
 ### Documentation
-- Document installation command and provide docs.rs, source code, and issue tracker links near the top of README
-- Remove mention of deprecated `-r` flag from README
-- Explain `# keepsorted: ignore file` and `# keepsorted: ignore block` directives and clarify that directory traversal should be handled externally
-- Expand Experimental Features section with an example of enabling multiple flags
-- Clarify CLI help text with skip keywords, comment types and exit codes
+- Expanded README and help text
+- Clarified ignore directives, experimental features and testing strategy
 
 ## [0.1.5] - 2025-07-15
 
