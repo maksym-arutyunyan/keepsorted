@@ -20,8 +20,8 @@ fn about() -> String {
 }
 
 fn long_about() -> String {
-    "A tool for sorting blocks of lines in code files.\n\
-\n\
+    format!(
+        "{}\n\
 Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. \
 Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. \
 Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. \
@@ -33,7 +33,9 @@ Return codes:\n\
 \t2: usage errors: invoked incorrectly\n\
 \t3: unexpected runtime errors: file I/O problems or internal bugs\n\
 \t4: check mode failed (reformat is needed)"
-        .to_string()
+        ,
+        env!("CARGO_PKG_DESCRIPTION")
+    )
 }
 
 fn after_help() -> &'static str {
