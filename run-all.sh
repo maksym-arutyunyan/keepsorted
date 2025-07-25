@@ -27,9 +27,9 @@ fmt_status=$?
 
 # Run `keepsorted` only on files that are not ignored by `.gitignore`.
 # Also ignore `./misc/` and `./tests/`.
-git ls-files -co --exclude-standard \
-    | grep -vE "^misc/|^tests/|^e2e-tests/|^README.md" \
-    | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
+git ls-files -co -z --exclude-standard \
+    | grep -vzE "^misc/|^tests/|^e2e-tests/|^README.md" \
+    | xargs -0 -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
 keepsorted_status=$?
 
 # Check if keepsorted changed any files.
