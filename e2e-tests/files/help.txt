@@ -1,5 +1,5 @@
 A tool for sorting blocks of lines in code files
-Sort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes. https://github.com/maksym-arutyunyan/keepsorted
+Sort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes.
 
 Usage: keepsorted [OPTIONS] [PATH]
 
@@ -17,3 +17,5 @@ Options:
       --diff-command <COMMAND>  Custom diff command run in diff mode
   -h, --help                    Print help (see more with '--help')
   -V, --version                 Print version
+
+For more info, visit: https://github.com/maksym-arutyunyan/keepsorted

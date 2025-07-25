@@ -15,9 +15,8 @@ const EXIT_CHECK_FAILED: i32 = 4;
 
 fn about() -> String {
     format!(
-        "{}\nSort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes. {}",
-        env!("CARGO_PKG_DESCRIPTION"),
-        env!("CARGO_PKG_REPOSITORY")
+        "{}\nSort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes.",
+        env!("CARGO_PKG_DESCRIPTION")
     )
 }
 
@@ -36,7 +35,8 @@ enum Mode {
 #[command(
     version,
     about = about(),
-    long_about = None
+    long_about = None,
+    after_help = "For more info, visit: https://github.com/maksym-arutyunyan/keepsorted"
 )]
 struct Args {
     #[arg(
