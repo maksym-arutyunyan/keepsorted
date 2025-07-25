@@ -7,7 +7,12 @@ load './helpers.bash'
   [ "$status" -eq 2 ]
 }
 
-@test "test --path with positional arg fails" {
+@test "test \`--path\` with positional arg fails" {
   run_keepsorted -p e2e-tests/files/generic/1_in.txt e2e-tests/files/generic/1_in.txt
+  [ "$status" -eq 2 ]
+}
+
+@test "test conflicting rust_derive features" {
+  run_keepsorted --features rust_derive_alphabetical,rust_derive_canonical e2e-tests/files/rust_derive/1_in.rs
   [ "$status" -eq 2 ]
 }
