@@ -27,3 +27,14 @@ run_keepsorted() {
   popd >/dev/null || return
 }
 
+# Ensure that the given command is available. If not, attempt to
+# install the provided package name (defaults to the command name).
+ensure_tool() {
+  local cmd="$1"
+  local pkg="${2:-$1}"
+  if ! command -v "$cmd" >/dev/null; then
+    apt-get update -y >/dev/null
+    apt-get install -y "$pkg" >/dev/null
+  fi
+}
+
