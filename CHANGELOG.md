@@ -6,13 +6,14 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-- Added `--mode` option with `check`, `diff`, and `fix` variants and added `--check`, `--diff`, and `--fix` convenience flags
-- Added `--diff-command` option to run a custom program when showing diffs
-- Added project website link at the end of `--help` output
-- Simplified help text and clarified `--diff-command`
-- Added documentation link to Cargo.toml
-- Unified quoting style in help output using single quotes
-- Updated `--diff-command` description to quote '--mode diff'
+### Added
+- `--mode` option with `check`, `diff`, and `fix` modes and alias flags `--check`, `--diff`, and `--fix`
+- `--diff-command` option to delegate diff generation to an external tool
+- Buildifier-style exit codes with `4` indicating failed check mode
+- `--recursive` flag to process directories recursively
+
+### Fixed
+- Show a usage error when an unknown feature is specified
 
 ### Documentation
 - Document installation command and provide docs.rs, source code, and issue tracker links near the top of README
