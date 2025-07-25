@@ -4,8 +4,10 @@
 - Name GitHub pull requests using the **Conventional Commits** specification. Example: `feat(parser): support new syntax` or `fix(ci): correct clippy invocation`.
 
 ## Validation Steps
-- Before submitting a PR, run each command from `./run-all.sh` manually. It may
-  include:
+- If a PR only changes Markdown documentation (excluding Rust doc comments),
+  skip formatting, build and test steps.
+- If Rust source files or `Cargo.toml` were modified, run each command from
+  `./run-all.sh` manually. It may include:
   - `cargo build --release --all-targets`
   - `cargo test`
   - `cargo test --release`
