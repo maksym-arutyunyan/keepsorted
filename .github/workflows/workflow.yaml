@@ -138,11 +138,11 @@ jobs:
       - name: Run KeepSorted
         shell: bash
         run: |
-          # Run `keepsorted` only on files that are not ignored by `.gitignore`.
-          # Also ignore `./misc/` and `./tests/`.
-          git ls-files -co -z --exclude-standard \
-            | grep -vzE "^misc/|^tests/|^e2e-tests/|^README.md" \
-            | xargs -0 -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical"
+          # keepsorted works only with file paths; filter tracked files first.
+          git ls-files -z \
+            | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
+            | xargs -0 -n1 ./target/release/keepsorted \
+                --features gitignore,rust_derive_canonical
         env:
           RUST_BACKTRACE: 1
 
