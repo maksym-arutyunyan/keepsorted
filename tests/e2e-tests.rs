@@ -3,11 +3,12 @@ use std::path::Path;
 use std::process::Command;
 use tempfile::tempdir;
 
-fn run_test(
+fn run_test_inner(
     input_file_path: &str,
     expected_file_path: &str,
     features: &str,
     mode: &str,
+    diff_command: Option<&str>,
     expect_success: bool,
 ) {
     // Read the input and expected output files
@@ -41,6 +42,9 @@ fn run_test(
         .arg("--mode")
         .arg(mode)
         .arg(run_path.to_str().unwrap());
+    if let Some(cmd) = diff_command {
+        command.arg("--diff-command").arg(cmd);
+    }
     if !features.is_empty() {
         command.arg("--features").arg(features);
     }
@@ -85,6 +89,39 @@ fn run_test(
     assert_eq!(
         input_content, original_input_content,
         "The input file content was modified"
+    );
+}
+
+fn run_test(
+    input_file_path: &str,
+    expected_file_path: &str,
+    features: &str,
+    mode: &str,
+    expect_success: bool,
+) {
+    run_test_inner(
+        input_file_path,
+        expected_file_path,
+        features,
+        mode,
+        None,
+        expect_success,
+    );
+}
+
+fn run_test_with_diff_command(
+    input_file_path: &str,
+    expected_file_path: &str,
+    diff_command: &str,
+    expect_success: bool,
+) {
+    run_test_inner(
+        input_file_path,
+        expected_file_path,
+        "",
+        "diff",
+        Some(diff_command),
+        expect_success,
     );
 }
 
@@ -266,4 +303,39 @@ fn test_diff_succeeds_on_sorted() {
         "diff",
         true,
     );
+}
+
+#[test]
+fn test_diff_custom_command() {
+    run_test_with_diff_command(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out_diff_custom.bazel"),
+        "sh -c 'echo custom diff'",
+        false,
+    );
+}
+
+#[test]
+fn test_diff_command_requires_diff_mode() {
+    let input = dir("bazel/1_in.bazel");
+    let tmpdir = tempdir().expect("tempdir");
+    let tmpfile = tmpdir.path().join("file.bazel");
+    fs::copy(&input, &tmpfile).expect("copy");
+
+    let binary = if cfg!(debug_assertions) {
+        "./target/debug/keepsorted"
+    } else {
+        "./target/release/keepsorted"
+    };
+
+    let output = Command::new(binary)
+        .arg("--mode")
+        .arg("fix")
+        .arg("--diff-command")
+        .arg("echo diff")
+        .arg(tmpfile.to_str().unwrap())
+        .output()
+        .expect("run keepsorted");
+
+    assert_eq!(output.status.code(), Some(2));
 }

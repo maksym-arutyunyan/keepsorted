@@ -1,10 +1,16 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
+use shell_words;
+use std::io::Write;
 use std::path::Path;
-use std::process;
+use std::process::{self, Command};
+use tempfile::NamedTempFile;
 
 /// Exit code used for I/O problems or internal bugs.
 const EXIT_RUNTIME_ERROR: i32 = 3;
+/// Exit code used when the CLI is invoked incorrectly.
+/// Clap also exits with this code when it encounters command-line parsing errors.
+const EXIT_USAGE_ERROR: i32 = 2;
 /// Exit code used when `--mode check` or `--mode diff` detects unsorted files.
 const EXIT_CHECK_FAILED: i32 = 4;
 
@@ -17,7 +23,7 @@ fn about() -> String {
 }
 
 /// Formatting mode controlling whether the file is overwritten or only verified.
-#[derive(Copy, Clone, Debug, ValueEnum)]
+#[derive(Copy, Clone, Debug, ValueEnum, PartialEq)]
 enum Mode {
     /// Verify that the file is already sorted.
     Check,
@@ -68,6 +74,13 @@ struct Args {
         help = "formatting mode: check, diff, or fix (default fix)"
     )]
     mode: Mode,
+
+    #[arg(
+        long = "diff-command",
+        value_name = "CMD",
+        help = "command to run when the formatting mode is diff"
+    )]
+    diff_command: Option<String>,
 }
 
 fn main() {
@@ -80,6 +93,14 @@ fn main() {
         .expect("Path must be provided");
 
     let path = Path::new(&file_path);
+
+    if args.diff_command.is_some() && args.mode != Mode::Diff {
+        eprintln!(
+            "{}: --diff-command requires --mode diff",
+            env!("CARGO_PKG_NAME")
+        );
+        process::exit(EXIT_USAGE_ERROR);
+    }
 
     if path.is_dir() {
         eprintln!(
@@ -137,11 +158,40 @@ fn main() {
                 }
             };
             if original != sorted {
-                use similar::TextDiff;
-                let diff = TextDiff::from_lines(&original, &sorted);
-                let old = format!("a/{}", path.display());
-                let new = format!("b/{}", path.display());
-                print!("{}", diff.unified_diff().header(&old, &new));
+                if let Some(cmdline) = args.diff_command.as_deref() {
+                    let mut old_file = NamedTempFile::new().expect("tempfile");
+                    old_file.write_all(original.as_bytes()).expect("write temp");
+                    let mut new_file = NamedTempFile::new().expect("tempfile");
+                    new_file.write_all(sorted.as_bytes()).expect("write temp");
+
+                    let parts =
+                        shell_words::split(cmdline).unwrap_or_else(|_| vec![cmdline.to_string()]);
+                    let (prog, rest) = parts.split_first().expect("empty diff command");
+                    let output = Command::new(prog)
+                        .args(rest)
+                        .arg(old_file.path())
+                        .arg(new_file.path())
+                        .output();
+                    match output {
+                        Ok(out) => {
+                            print!("{}", String::from_utf8_lossy(&out.stdout));
+                        }
+                        Err(e) => {
+                            eprintln!(
+                                "{}: failed to run diff command: {}",
+                                env!("CARGO_PKG_NAME"),
+                                e
+                            );
+                            process::exit(EXIT_RUNTIME_ERROR);
+                        }
+                    }
+                } else {
+                    use similar::TextDiff;
+                    let diff = TextDiff::from_lines(&original, &sorted);
+                    let old = format!("a/{}", path.display());
+                    let new = format!("b/{}", path.display());
+                    print!("{}", diff.unified_diff().header(&old, &new));
+                }
                 process::exit(EXIT_CHECK_FAILED);
             }
         }

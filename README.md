@@ -145,14 +145,17 @@ The `--mode` option controls whether the file is modified. It accepts `check`,
 
 Use `--mode check` to verify that a file is already sorted without modifying it.
 Use `--mode diff` to print a unified diff of the required changes.
+You can provide `--diff-command <CMD>` to run an external diff tool instead of
+the built-in diff generator. The option is only valid together with
+`--mode diff`.
 Use `--mode fix` to rewrite the file in place.
 
 The command exits with these codes:
-1. `0` — success
-2. `1` — syntax errors in input
-3. `2` — usage errors
-4. `3` — unexpected runtime errors
-5. `4` — check mode failed (reformat is needed)
+- `0` — success
+- `1` — syntax errors in input
+- `2` — invoked incorrectly
+- `3` — unexpected runtime errors
+- `4` — check mode failed (reformat is needed)
 
 ```shell
 $ keepsorted --mode check Cargo.toml
