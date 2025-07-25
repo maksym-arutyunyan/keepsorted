@@ -17,6 +17,8 @@ The CLI returns these codes:
 
 The core feature is sorting lines while preserving any comments associated with each item. Multi-line items (for example in `Cargo.toml`) are kept intact when possible so that sections remain readable.
 
+Comments are gathered until a non-comment line appears. Lines beginning with `#`, `//` or `--` are treated as comments for this purpose. The collected lines are attached to the next sortable item. When the block ends, any remaining trailing comments are appended at the end. This mirrors the behaviour in `src/strategies/generic.rs`, where each comment group is stored separately from its code line and reinserted after sorting. As a result, remarks or `TODO` notes stay with the relevant entry even after reordering.
+
 Sorting can be skipped with two special directives:
 - **`# keepsorted: ignore file`** anywhere in a file leaves the entire file unchanged.
 - **`# keepsorted: ignore block`** inside a `# Keep sorted` block preserves that block without reordering.
