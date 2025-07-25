@@ -41,3 +41,28 @@ Both functions rely on private helpers such as `classify` for strategy selection
 | `gitignore::process` | `src/strategies/gitignore.rs` | Sort `.gitignore` and `CODEOWNERS` files. |
 | `rust_derive::process` | `src/strategies/rust_derive.rs` | Reorder traits inside `#[derive]` attributes. |
 
+## Inspiration
+
+`keepsorted` was inspired by [Buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier), which sorts items in Bazel `BUILD` files. The command-line flags and exit codes follow a similar design so that tooling can integrate either tool with minimal changes.
+
+The CLI returns these codes:
+1. `0` — success
+2. `1` — syntax errors in input
+3. `2` — incorrect command usage
+4. `3` — unexpected runtime failures
+5. `4` — check mode detected unsorted files
+
+## Sorting Behaviour
+
+The core feature is sorting lines while preserving any comments associated with each item. Multi-line items (for example in `Cargo.toml`) are kept intact when possible so that sections remain readable.
+
+Some experimental features exist:
+- **Rust derive sorting** temporarily supports alphabetical or canonical ordering of `#[derive(...)]` attributes because `cargo fmt` does not yet implement this. The functionality is intentionally basic and may be removed once rustfmt provides a stable implementation.
+- **Gitignore and CODEOWNERS sorting** helps maintain consistent ordering but should be used carefully since pattern order can affect semantics.
+
+## Testing Strategy
+
+End-to-end tests in `e2e-tests` invoke the CLI using a command-line test framework to simulate real usage. Each flag or parameter has its own test file with descriptive names following the Arrange–Act–Assert style. This keeps tests short and focused while covering many combinations.
+
+Rust unit tests inside `tests/` verify the behaviour of individual strategies for different file and data types.
+
