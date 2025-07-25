@@ -18,6 +18,7 @@ cargo install keepsorted
 - [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
+- [Architecture](docs/architecture.md)
 
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 The tool is inspired by the Bazel build tool `buildifier`, which sorts items marked with `# Keep sorted` comments. `keepsorted` brings this functionality to any text file.
