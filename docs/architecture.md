@@ -57,17 +57,3 @@ Both functions rely on private helpers such as `classify` for strategy selection
 End-to-end tests in `e2e-tests` invoke the CLI using a command-line test framework to simulate real usage. Each flag or parameter has its own test file with descriptive names following the Arrange–Act–Assert style. This keeps tests short and focused while covering many combinations.
 
 Rust unit tests inside `tests/` verify the behaviour of individual strategies for different file and data types.
-
-## Key functions
-
-| Function | Location | Responsibility |
-| -------- | -------- | -------------- |
-| `process_file` | `src/lib.rs` | Load a file and return its sorted contents. |
-| `process_lines` | `src/lib.rs` | Apply a sorting strategy to lines. |
-| `classify` | `src/lib.rs` | Identify the strategy for a path and feature set. |
-| `handle_file` | `src/main.rs` | CLI helper that checks, diffs or rewrites a file. |
-| `generic::process` | `src/strategies/generic.rs` | Sort `# Keep sorted` blocks in text files. |
-| `bazel::process` | `src/strategies/bazel.rs` | Sort string lists in Bazel files. |
-| `cargo_toml::process` | `src/strategies/cargo_toml.rs` | Sort dependency sections in `Cargo.toml`. |
-| `gitignore::process` | `src/strategies/gitignore.rs` | Sort `.gitignore` and `CODEOWNERS` files. |
-| `rust_derive::process` | `src/strategies/rust_derive.rs` | Reorder traits inside `#[derive]` attributes. |
