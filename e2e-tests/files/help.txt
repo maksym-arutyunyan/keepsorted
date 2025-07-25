@@ -1,5 +1,4 @@
 A tool for sorting blocks of lines in code files
-Sort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes.
 
 Usage: keepsorted [OPTIONS] [PATH]
 
