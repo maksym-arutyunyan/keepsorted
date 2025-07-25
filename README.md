@@ -51,20 +51,20 @@ git ls-files -z \
 Before:
 
 ```text
-# Keep sorted
-# third
+// Keep sorted
+// third
 z
-# first
+// first
 a
 ```
 
 After:
 
 ```text
-# Keep sorted
-# first
+// Keep sorted
+// first
 a
-# third
+// third
 z
 ```
 
@@ -75,9 +75,9 @@ Before:
 ```bazel
 DEPS = [
     # Keep sorted
-    // zlib library
+    # zlib library
     "zlib",
-    // fmt library
+    # fmt library
     "fmt",
 ]
 ```
@@ -87,9 +87,9 @@ After:
 ```bazel
 DEPS = [
     # Keep sorted
-    // fmt library
+    # fmt library
     "fmt",
-    // zlib library
+    # zlib library
     "zlib",
 ]
 ```
@@ -101,16 +101,16 @@ Before:
 ```toml
 [dependencies]
 # Keep sorted
--- log crate
+# log crate
 log = "0.4"
--- anyhow crate
+# anyhow crate
 anyhow = "1"
 
 # keepsorted: ignore block
 [dev-dependencies]
--- proptest for tests
+# proptest for tests
 proptest = "1"
--- compile-time checks
+# compile-time checks
 trybuild = "1"
 ```
 
@@ -119,37 +119,18 @@ After:
 ```toml
 [dependencies]
 # Keep sorted
--- anyhow crate
+# anyhow crate
 anyhow = "1"
--- log crate
+# log crate
 log = "0.4"
 
 # keepsorted: ignore block
 [dev-dependencies]
--- proptest for tests
+# proptest for tests
 proptest = "1"
--- compile-time checks
+# compile-time checks
 trybuild = "1"
 ```
-
-## Using as a Library
-
-`keepsorted` can be embedded in Rust projects. Two main functions are provided:
-
-```rust
-use keepsorted::{process_lines, Strategy};
-use std::io;
-
-fn main() -> io::Result<()> {
-    // Sort an in-memory list of lines
-    let lines = vec!["# Keep sorted".into(), "b".into(), "a".into()];
-    let sorted = process_lines(Strategy::Generic, lines)?;
-
-    Ok(())
-}
-```
-
-See [Architecture](docs/architecture.md#crate-api-srclibrs) for more details.
 
 ## Experimental Features
 
