@@ -7,13 +7,25 @@ fn run_test(
     input_file_path: &str,
     expected_file_path: &str,
     features: &str,
-    mode: &str,
+    args: &[&str],
     expect_success: bool,
 ) {
     // Read the input and expected output files
     let input_content = fs::read_to_string(input_file_path).expect("Failed to read input file");
     let expected_content = fs::read_to_string(expected_file_path)
         .unwrap_or_else(|_| panic!("Failed to read expected file: {}", expected_file_path));
+
+    let mode = if args.contains(&"--check") {
+        "check"
+    } else if args.contains(&"--diff") {
+        "diff"
+    } else if args.contains(&"--fix") {
+        "fix"
+    } else if let Some(pos) = args.iter().position(|a| *a == "--mode") {
+        args.get(pos + 1).copied().expect("--mode value missing")
+    } else {
+        panic!("no mode flag provided")
+    };
 
     let (run_path, _temp_dir): (std::path::PathBuf, Option<tempfile::TempDir>);
     if mode == "diff" {
@@ -35,12 +47,9 @@ fn run_test(
     } else {
         "./target/release/keepsorted"
     };
-    // Create the command and conditionally add the --features argument if the string is not empty
+    // Create the command and add requested CLI arguments
     let mut command = Command::new(keepsorted_binary);
-    command
-        .arg("--mode")
-        .arg(mode)
-        .arg(run_path.to_str().unwrap());
+    command.args(args).arg(run_path.to_str().unwrap());
     if !features.is_empty() {
         command.arg("--features").arg(features);
     }
@@ -98,7 +107,7 @@ fn test_e2e_bazel_1() {
         &dir("bazel/1_in.bazel"),
         &dir("bazel/1_out.bazel"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -109,7 +118,7 @@ fn test_e2e_bazel_2() {
         &dir("bazel/2_in.bazel"),
         &dir("bazel/2_out.bazel"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -120,7 +129,7 @@ fn test_e2e_generic_1() {
         &dir("generic/1_in.txt"),
         &dir("generic/1_out.txt"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -131,7 +140,7 @@ fn test_e2e_generic_2() {
         &dir("generic/2_in.txt"),
         &dir("generic/2_out.txt"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -142,7 +151,7 @@ fn test_e2e_generic_3() {
         &dir("generic/3_in.txt"),
         &dir("generic/3_out.txt"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -153,7 +162,7 @@ fn test_e2e_cargo_toml_1() {
         &dir("cargo_toml/1/Cargo.toml"),
         &dir("cargo_toml/1/Cargo_out.toml"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -164,7 +173,7 @@ fn test_e2e_cargo_toml_2() {
         &dir("cargo_toml/2/Cargo.toml"),
         &dir("cargo_toml/2/Cargo_out.toml"),
         "",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -175,7 +184,7 @@ fn test_e2e_gitignore_1() {
         &dir("gitignore/.gitignore"),
         &dir("gitignore/.gitignore_out"),
         "gitignore",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -186,7 +195,7 @@ fn test_e2e_codeowners_1() {
         &dir("codeowners/.github/CODEOWNERS"),
         &dir("codeowners/.github/CODEOWNERS_out"),
         "codeowners",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -197,7 +206,7 @@ fn test_e2e_rust_derive_1() {
         &dir("rust_derive/1_in.rs"),
         &dir("rust_derive/1_out.rs"),
         "rust_derive_alphabetical",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -208,7 +217,7 @@ fn test_e2e_rust_derive_2() {
         &dir("rust_derive/2_in.rs"),
         &dir("rust_derive/2_out.rs"),
         "rust_derive_canonical",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -219,7 +228,7 @@ fn test_e2e_rust_derive_3() {
         &dir("rust_derive/3_in.rs"),
         &dir("rust_derive/3_out.rs"),
         "rust_derive_alphabetical",
-        "fix",
+        &["--mode", "fix"],
         true,
     );
 }
@@ -230,7 +239,7 @@ fn test_check_fails_on_unsorted() {
         &dir("generic/1_in.txt"),
         &dir("generic/1_in.txt"),
         "",
-        "check",
+        &["--mode", "check"],
         false,
     );
 }
@@ -241,7 +250,7 @@ fn test_check_succeeds_on_sorted() {
         &dir("generic/1_out.txt"),
         &dir("generic/1_out.txt"),
         "",
-        "check",
+        &["--mode", "check"],
         true,
     );
 }
@@ -252,7 +261,7 @@ fn test_diff_fails_on_unsorted() {
         &dir("bazel/1_in.bazel"),
         &dir("bazel/1_out_diff.bazel"),
         "",
-        "diff",
+        &["--mode", "diff"],
         false,
     );
 }
@@ -263,7 +272,40 @@ fn test_diff_succeeds_on_sorted() {
         &dir("bazel/1_out.bazel"),
         &dir("bazel/1_out_diff_empty.bazel"),
         "",
-        "diff",
+        &["--mode", "diff"],
+        true,
+    );
+}
+
+#[test]
+fn test_shorthand_check() {
+    run_test(
+        &dir("generic/1_in.txt"),
+        &dir("generic/1_in.txt"),
+        "",
+        &["--check"],
+        false,
+    );
+}
+
+#[test]
+fn test_shorthand_diff() {
+    run_test(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out_diff.bazel"),
+        "",
+        &["--diff"],
+        false,
+    );
+}
+
+#[test]
+fn test_shorthand_fix() {
+    run_test(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out.bazel"),
+        "",
+        &["--fix"],
         true,
     );
 }

@@ -1,14 +1,16 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
-use std::io::{self};
 use std::path::Path;
+use std::process;
 
-/// Exit code used when sorting is required or an error occurs.
-const EXIT_CHANGES_NEEDED: i32 = 1;
+/// Exit code used for I/O problems or internal bugs.
+const EXIT_RUNTIME_ERROR: i32 = 3;
+/// Exit code used when `--mode check` or `--mode diff` detects unsorted files.
+const EXIT_CHECK_FAILED: i32 = 4;
 
 fn about() -> String {
     format!(
-        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check, --mode diff, or --mode fix and enable extra features with flags. {}",
+        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check (or --check), --mode diff (or --diff), or --mode fix (or --fix) and enable extra features with flags. {}",
         env!("CARGO_PKG_DESCRIPTION"),
         env!("CARGO_PKG_REPOSITORY")
     )
@@ -57,19 +59,54 @@ struct Args {
     )]
     features: Option<Vec<String>>,
 
+    /// Verify that the file is already sorted
+    #[arg(
+        long,
+        conflicts_with_all = ["diff", "fix", "mode"],
+        help = "alias for `--mode check`",
+    )]
+    check: bool,
+
+    /// Print a diff of the required changes
+    #[arg(
+        long,
+        conflicts_with_all = ["check", "fix", "mode"],
+        help = "alias for `--mode diff`",
+    )]
+    diff: bool,
+
+    /// Rewrite the file with sorted content
+    #[arg(
+        long,
+        conflicts_with_all = ["check", "diff", "mode"],
+        help = "alias for `--mode fix`",
+    )]
+    fix: bool,
+
     /// Formatting mode: check, diff, or fix (default fix)
     #[arg(
         short = 'm',
         long,
         value_enum,
         default_value_t = Mode::Fix,
+        conflicts_with_all = ["check", "diff", "fix"],
         help = "formatting mode: check, diff, or fix (default fix)"
     )]
     mode: Mode,
 }
 
-fn main() -> io::Result<()> {
+fn main() {
     let args = Args::parse();
+
+    let mode = if args.check {
+        Mode::Check
+    } else if args.diff {
+        Mode::Diff
+    } else if args.fix {
+        Mode::Fix
+    } else {
+        args.mode
+    };
 
     // Get the path from either the option or the positional argument
     let file_path = args
@@ -85,43 +122,74 @@ fn main() -> io::Result<()> {
             env!("CARGO_PKG_NAME"),
             path.display()
         );
-        std::process::exit(EXIT_CHANGES_NEEDED);
+        process::exit(EXIT_RUNTIME_ERROR);
     }
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    let sorted = process_file(path, features).map_err(|e| {
-        eprintln!(
-            "{}: failed to process file {}: {}",
-            env!("CARGO_PKG_NAME"),
-            path.display(),
-            e
-        );
-        e
-    })?;
+    let sorted = match process_file(path, features) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!(
+                "{}: failed to process file {}: {}",
+                env!("CARGO_PKG_NAME"),
+                path.display(),
+                e
+            );
+            process::exit(EXIT_RUNTIME_ERROR);
+        }
+    };
 
-    match args.mode {
+    match mode {
         Mode::Check => {
-            let original = std::fs::read_to_string(path)?;
+            let original = match std::fs::read_to_string(path) {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!(
+                        "{}: failed to read file {}: {}",
+                        env!("CARGO_PKG_NAME"),
+                        path.display(),
+                        e
+                    );
+                    process::exit(EXIT_RUNTIME_ERROR);
+                }
+            };
             if original != sorted {
-                std::process::exit(EXIT_CHANGES_NEEDED);
+                process::exit(EXIT_CHECK_FAILED);
             }
         }
         Mode::Diff => {
-            let original = std::fs::read_to_string(path)?;
+            let original = match std::fs::read_to_string(path) {
+                Ok(s) => s,
+                Err(e) => {
+                    eprintln!(
+                        "{}: failed to read file {}: {}",
+                        env!("CARGO_PKG_NAME"),
+                        path.display(),
+                        e
+                    );
+                    process::exit(EXIT_RUNTIME_ERROR);
+                }
+            };
             if original != sorted {
                 use similar::TextDiff;
                 let diff = TextDiff::from_lines(&original, &sorted);
                 let old = format!("a/{}", path.display());
                 let new = format!("b/{}", path.display());
                 print!("{}", diff.unified_diff().header(&old, &new));
-                std::process::exit(EXIT_CHANGES_NEEDED);
+                process::exit(EXIT_CHECK_FAILED);
             }
         }
         Mode::Fix => {
-            std::fs::write(path, sorted)?;
+            if let Err(e) = std::fs::write(path, sorted) {
+                eprintln!(
+                    "{}: failed to write file {}: {}",
+                    env!("CARGO_PKG_NAME"),
+                    path.display(),
+                    e
+                );
+                process::exit(EXIT_RUNTIME_ERROR);
+            }
         }
     }
-
-    Ok(())
 }
