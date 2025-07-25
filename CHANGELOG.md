@@ -8,6 +8,7 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 - Added `--mode` option with `check`, `diff`, and `fix` variants and added `--check`, `--diff`, and `--fix` convenience flags
 - Added `--diff-command` option to run a custom program when showing diffs
+- Fail with usage error if both `rust_derive` feature flags are set
 
 ## [0.1.5] - 2025-07-15
 

@@ -1,5 +1,6 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
+use std::io;
 use std::path::Path;
 use std::process::{self, Command};
 use walkdir::WalkDir;
@@ -167,13 +168,18 @@ fn handle_file(path: &Path, features: &[String], mode: Mode, diff_command: Optio
     let sorted = match process_file(path, features.to_vec()) {
         Ok(s) => s,
         Err(e) => {
-            eprintln!(
-                "{}: failed to process file {}: {}",
-                env!("CARGO_PKG_NAME"),
-                path.display(),
-                e
-            );
-            process::exit(EXIT_RUNTIME_ERROR);
+            if e.kind() == io::ErrorKind::InvalidInput {
+                eprintln!("{}: {}", env!("CARGO_PKG_NAME"), e);
+                process::exit(EXIT_USAGE_ERROR);
+            } else {
+                eprintln!(
+                    "{}: failed to process file {}: {}",
+                    env!("CARGO_PKG_NAME"),
+                    path.display(),
+                    e
+                );
+                process::exit(EXIT_RUNTIME_ERROR);
+            }
         }
     };
 
