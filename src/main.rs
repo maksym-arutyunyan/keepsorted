@@ -27,12 +27,12 @@ Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. \
 Comments starting with '#', '//' or '--' are preserved.\n\
 \n\
 Return codes:\n\
-  0: success, everything went well\n\
-  1: syntax errors in input\n\
-  2: usage errors: invoked incorrectly\n\
-  3: unexpected runtime errors: file I/O problems or internal bugs\n\
-  4: check mode failed (reformat is needed)"
-        .to_string()
+\t0: success, everything went well\n\
+\t1: syntax errors in input\n\
+\t2: usage errors: invoked incorrectly\n\
+\t3: unexpected runtime errors: file I/O problems or internal bugs\n\
+\t4: check mode failed (reformat is needed)"
+      .to_string()
 }
 
 fn after_help() -> &'static str {
