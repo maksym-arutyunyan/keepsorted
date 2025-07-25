@@ -32,18 +32,6 @@ keepsorted --fix <path>
 
 The tool accepts one explicit file path at a time. Use shell commands like `git ls-files` or `find` to generate a list of files for CI or pre-commit hooks.
 
-### Pre-commit Example
-
-```shell
-#!/bin/sh
-git ls-files -z \
-  | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
-  | xargs -0 -n1 keepsorted --check || {
-    echo 'Run keepsorted --fix' >&2
-    exit 1
-}
-```
-
 ## Examples
 
 ### Generic Text
@@ -144,7 +132,7 @@ Available flags:
 
 - `gitignore` – sort `.gitignore` and `CODEOWNERS`
 - `codeowners` – sort `CODEOWNERS` when combined with `gitignore`
-- `rust_derive_alphabetical` – alphabetize `#[derive(...)]`
+- `rust_derive_alphabetical` – alphabetical order of `#[derive(...)]`
 - `rust_derive_canonical` – canonical order of `#[derive(...)]`
 
 ## Limitations
@@ -158,3 +146,15 @@ Available flags:
 - Replace formatters such as `rustfmt` or `prettier`
 
 Refer to [Architecture – Out of Scope](docs/architecture.md#out-of-scope) for the full list.
+
+### Pre-commit Example
+
+```shell
+#!/bin/sh
+git ls-files -z \
+  | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
+  | xargs -0 -n1 keepsorted --check || {
+    echo 'Run keepsorted --fix' >&2
+    exit 1
+}
+```
