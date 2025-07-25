@@ -184,11 +184,11 @@ Use `--diff-command <command>` to delegate diff generation to an external progra
 Use `--mode fix` (or `--fix`) to rewrite the file in place.
 
 The command exits with these codes:
-1. `0` — success
-2. `1` — syntax errors in input
-3. `2` — usage errors: invoked incorrectly
-4. `3` — unexpected runtime errors
-5. `4` — check mode failed (reformat is needed)
+- `0` — success
+- `1` — syntax errors in input
+- `2` — usage errors: invoked incorrectly
+- `3` — unexpected runtime errors
+- `4` — check mode failed (reformat is needed)
 
 ```shell
 $ keepsorted --check Cargo.toml
