@@ -44,6 +44,9 @@ Each file under `src/strategies/` provides a `process` function that sorts lines
 - **`generic.rs`** – handles text blocks marked with `# Keep sorted`.
 - **`bazel.rs`** – sorts lists in Bazel `BUILD`/`.bzl` files.
 - **`cargo_toml.rs`** – sorts dependency tables in `Cargo.toml` files.
+  The strategy tracks multi-line sections and only sorts once the block
+  closes using helpers such as `is_multi_line_code` and
+  `is_code_section_completed`.
 - **`gitignore.rs`** – sorts `.gitignore` or `CODEOWNERS` files when the feature is enabled.
 - **`rust_derive.rs`** – reorders `#[derive(...)]` attributes; may also trigger a generic sort.
 
