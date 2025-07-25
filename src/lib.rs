@@ -83,16 +83,6 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
 }
 
 fn classify(path: &Path, features: Vec<String>) -> io::Result<Strategy> {
-    let has_rust_derive_alphabetical = features.contains(&"rust_derive_alphabetical".to_string());
-    let has_rust_derive_canonical = features.contains(&"rust_derive_canonical".to_string());
-
-    if has_rust_derive_alphabetical && has_rust_derive_canonical {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidInput,
-            "Mutually exclusive rust_derive feature flags are not allowed",
-        ));
-    }
-
     if is_bazel(path) {
         return Ok(Strategy::Bazel);
     }
@@ -106,6 +96,15 @@ fn classify(path: &Path, features: Vec<String>) -> io::Result<Strategy> {
         return Ok(Strategy::Gitignore);
     }
     if is_rust(path) {
+        let has_rust_derive_alphabetical = features.contains(&"rust_derive_alphabetical".to_string());
+        let has_rust_derive_canonical = features.contains(&"rust_derive_canonical".to_string());
+    
+        if has_rust_derive_alphabetical && has_rust_derive_canonical {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Mutually exclusive rust_derive feature flags are not allowed",
+            ));
+        }
         if has_rust_derive_alphabetical {
             return Ok(Strategy::RustDeriveAlphabetical);
         }
