@@ -15,7 +15,7 @@ const EXIT_CHECK_FAILED: i32 = 4;
 
 fn about() -> String {
     format!(
-        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check (or --check), --mode diff (or --diff), or --mode fix (or --fix) and enable extra features with flags. {}",
+        "{}\nSort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes. {}",
         env!("CARGO_PKG_DESCRIPTION"),
         env!("CARGO_PKG_REPOSITORY")
     )
@@ -44,14 +44,14 @@ struct Args {
         long,
         value_name = "PATH",
         conflicts_with = "positional_path",
-        help = "Path to the file to run on. This option is mutually exclusive with the positional path."
+        help = "File to process (conflicts with positional path)"
     )]
     path: Option<String>,
 
     #[arg(
         value_name = "PATH",
         required_unless_present = "path",
-        help = "Path to the file to run on. This is required if the -p option is not used."
+        help = "File to process (required if --path is not used)"
     )]
     positional_path: Option<String>,
 
@@ -60,12 +60,12 @@ struct Args {
         long,
         value_name = "FEATURE",
         use_value_delimiter = true,
-        help = "Experimental feature flags. Provide a list of features to enable."
+        help = "Enable experimental features"
     )]
     features: Option<Vec<String>>,
 
     /// Recursively process directories
-    #[arg(short = 'r', long, help = "Recursively process directories")]
+    #[arg(short = 'r', long, help = "Process directories recursively")]
     recursive: bool,
 
     /// Verify that the file is already sorted
@@ -99,7 +99,7 @@ struct Args {
         value_enum,
         default_value_t = Mode::Fix,
         conflicts_with_all = ["check", "diff", "fix"],
-        help = "formatting mode: check, diff, or fix (default fix)"
+        help = "Formatting mode: check, diff, or fix"
     )]
     mode: Mode,
 
@@ -107,7 +107,7 @@ struct Args {
     #[arg(
         long,
         value_name = "COMMAND",
-        help = "command to run when the formatting mode is diff"
+        help = "Custom diff command run in diff mode"
     )]
     diff_command: Option<String>,
 }

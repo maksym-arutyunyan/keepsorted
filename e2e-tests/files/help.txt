@@ -1,19 +1,46 @@
 A tool for sorting blocks of lines in code files
-This tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check (or --check), --mode diff (or --diff), or --mode fix (or --fix) and enable extra features with flags. https://github.com/maksym-arutyunyan/keepsorted
+Sort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes. https://github.com/maksym-arutyunyan/keepsorted
 
 Usage: keepsorted [OPTIONS] [PATH]
 
 Arguments:
-  [PATH]  Path to the file to run on. This is required if the -p option is not used.
+  [PATH]
+          File to process (required if --path is not used)
 
 Options:
-  -p, --path <PATH>             Path to the file to run on. This option is mutually exclusive with the positional path.
-  -f, --features <FEATURE>      Experimental feature flags. Provide a list of features to enable.
-  -r, --recursive               Recursively process directories
-      --check                   alias for `--mode check`
-      --diff                    alias for `--mode diff`
-      --fix                     alias for `--mode fix`
-  -m, --mode <MODE>             formatting mode: check, diff, or fix (default fix) [default: fix] [possible values: check, diff, fix]
-      --diff-command <COMMAND>  command to run when the formatting mode is diff
-  -h, --help                    Print help (see more with '--help')
-  -V, --version                 Print version
+  -p, --path <PATH>
+          File to process (conflicts with positional path)
+
+  -f, --features <FEATURE>
+          Enable experimental features
+
+  -r, --recursive
+          Process directories recursively
+
+      --check
+          alias for `--mode check`
+
+      --diff
+          alias for `--mode diff`
+
+      --fix
+          alias for `--mode fix`
+
+  -m, --mode <MODE>
+          Formatting mode: check, diff, or fix
+          
+          [default: fix]
+
+          Possible values:
+          - check: Verify that the file is already sorted
+          - diff:  Print a diff of the required changes
+          - fix:   Rewrite the file with sorted content
+
+      --diff-command <COMMAND>
+          Custom diff command run in diff mode
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
