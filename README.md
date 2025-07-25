@@ -148,8 +148,11 @@ Use `--mode diff` to print a unified diff of the required changes.
 Use `--mode fix` to rewrite the file in place.
 
 The command exits with these codes:
-1. `0` — no changes were needed
-2. `1` — the file requires sorting or an error occurred
+1. `0` — success
+2. `1` — syntax errors in input
+3. `2` — usage errors
+4. `3` — unexpected runtime errors
+5. `4` — check mode failed (reformat is needed)
 
 ```shell
 $ keepsorted --mode check Cargo.toml
