@@ -8,7 +8,7 @@ Arguments:
 
 Options:
   -p, --path <PATH>             Path to the file to run on. This option is mutually exclusive with the positional path.
-  -f, --features <FEATURE>      Experimental feature flags. Provide a list of features to enable.
+  -f, --features <FEATURE>      Experimental feature flags. Provide a list of features to enable. [possible values: gitignore, codeowners, rust_derive_alphabetical, rust_derive_canonical]
   -r, --recursive               Recursively process directories
       --check                   alias for `--mode check`
       --diff                    alias for `--mode diff`

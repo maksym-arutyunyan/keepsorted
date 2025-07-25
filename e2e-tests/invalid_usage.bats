@@ -11,3 +11,8 @@ load './helpers.bash'
   run_keepsorted -p e2e-tests/files/generic/1_in.txt e2e-tests/files/generic/1_in.txt
   [ "$status" -eq 2 ]
 }
+
+@test "test unknown feature fails" {
+  run_keepsorted --features nope e2e-tests/files/generic/1_in.txt
+  [ "$status" -eq 2 ]
+}

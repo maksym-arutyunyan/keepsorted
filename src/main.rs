@@ -32,6 +32,31 @@ enum Mode {
     Fix,
 }
 
+/// Experimental features controlled via `--features`.
+#[derive(Copy, Clone, Debug, ValueEnum)]
+#[clap(rename_all = "snake")]
+enum Feature {
+    /// Enable sorting for `.gitignore` files.
+    Gitignore,
+    /// Enable sorting for `CODEOWNERS` files.
+    Codeowners,
+    /// Alphabetical ordering for `#[derive(...)]` attributes.
+    RustDeriveAlphabetical,
+    /// Canonical ordering for `#[derive(...)]` attributes.
+    RustDeriveCanonical,
+}
+
+impl Feature {
+    fn as_str(self) -> &'static str {
+        match self {
+            Feature::Gitignore => "gitignore",
+            Feature::Codeowners => "codeowners",
+            Feature::RustDeriveAlphabetical => "rust_derive_alphabetical",
+            Feature::RustDeriveCanonical => "rust_derive_canonical",
+        }
+    }
+}
+
 #[derive(Debug, Parser)]
 #[command(
     version,
@@ -59,10 +84,11 @@ struct Args {
         short = 'f',
         long,
         value_name = "FEATURE",
+        value_enum,
         use_value_delimiter = true,
         help = "Experimental feature flags. Provide a list of features to enable."
     )]
-    features: Option<Vec<String>>,
+    features: Option<Vec<Feature>>,
 
     /// Recursively process directories
     #[arg(short = 'r', long, help = "Recursively process directories")]
@@ -163,8 +189,9 @@ fn main() {
     }
 }
 
-fn handle_file(path: &Path, features: &[String], mode: Mode, diff_command: Option<&str>) -> bool {
-    let sorted = match process_file(path, features.to_vec()) {
+fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Option<&str>) -> bool {
+    let feature_names: Vec<String> = features.iter().map(|f| f.as_str().to_string()).collect();
+    let sorted = match process_file(path, feature_names) {
         Ok(s) => s,
         Err(e) => {
             eprintln!(
