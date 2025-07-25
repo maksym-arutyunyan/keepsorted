@@ -92,23 +92,19 @@ struct Args {
     )]
     fix: bool,
 
-    /// Formatting mode: check, diff, or fix (default fix)
+    /// Formatting mode controlling how files are processed
     #[arg(
         short = 'm',
         long,
         value_enum,
         default_value_t = Mode::Fix,
         conflicts_with_all = ["check", "diff", "fix"],
-        help = "Formatting mode: check, diff, or fix"
+        help = "Formatting mode"
     )]
     mode: Mode,
 
-    /// Command to run to display diffs
-    #[arg(
-        long,
-        value_name = "COMMAND",
-        help = "Custom diff command run in diff mode"
-    )]
+    /// Command to run for `--mode diff`
+    #[arg(long, value_name = "COMMAND", help = "Custom command for --mode diff")]
     diff_command: Option<String>,
 }
 

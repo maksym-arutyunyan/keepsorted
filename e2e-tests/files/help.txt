@@ -13,8 +13,8 @@ Options:
       --check                   alias for `--mode check`
       --diff                    alias for `--mode diff`
       --fix                     alias for `--mode fix`
-  -m, --mode <MODE>             Formatting mode: check, diff, or fix [default: fix] [possible values: check, diff, fix]
-      --diff-command <COMMAND>  Custom diff command run in diff mode
+  -m, --mode <MODE>             Formatting mode [default: fix] [possible values: check, diff, fix]
+      --diff-command <COMMAND>  Custom command for --mode diff
   -h, --help                    Print help (see more with '--help')
   -V, --version                 Print version
 
