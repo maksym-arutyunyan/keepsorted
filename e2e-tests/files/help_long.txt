@@ -19,6 +19,9 @@ Options:
   -p, --path <PATH>
           File to process (conflicts with positional path)
 
+  -r, --recursive
+          Process directories recursively
+
   -f, --features <FEATURE>
           Enable experimental features
 

@@ -60,7 +60,7 @@ Each file under `src/strategies/` provides a `process` function that sorts lines
 
 ### CLI (`src/main.rs`)
 
-`main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes a single file to `handle_file`. Directory traversal is intentionally left to external scripts so that the binary stays simple and composable. There is deliberately no `-r` or `--recursive` option; use tools like `git ls-files` if you need to process multiple files. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
+`main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and processes files via `handle_file`. The CLI now supports a basic `-r`/`--recursive` flag to walk the provided directory and run `keepsorted` on every supported file it finds. This is convenient for simple use cases where users want to sort all files under the current directory. For more advanced setups that require ignoring particular paths, callers can still generate the file list themselves with tools like `find` or `git ls-files` and pass each path explicitly. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
 
 When `--mode diff` is used, the CLI can delegate diff generation to an external
 program by passing `--diff-command <command>`. The option is parsed and executed
@@ -96,7 +96,7 @@ Rust unit tests inside `tests/` verify the behaviour of individual strategies fo
 
 To stay focused and composable, `keepsorted` does **not** aim to:
 
-- Perform recursive directory traversal (use external tools like `find`, `git ls-files`, or CI filters)
+- Handle advanced directory traversal or ignore rules automatically
 - Act as a full-fledged parser for every supported file type
 - Handle ignore files or exclude paths automatically
 - Automatically detect project structure or configuration files

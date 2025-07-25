@@ -1,7 +1,7 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
 use std::io;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::{self, Command};
 
 /// Exit code used when the command is invoked incorrectly.
@@ -110,6 +110,10 @@ struct Args {
     )]
     positional_path: Option<String>,
 
+    /// Recursively traverse directories for files
+    #[arg(short = 'r', long, help = "Process directories recursively")]
+    recursive: bool,
+
     #[arg(
         short = 'f',
         long,
@@ -190,12 +194,29 @@ fn main() {
     let mut exit_code = 0;
 
     if path.is_dir() {
-        eprintln!(
-            "{}: read {}: is a directory",
-            env!("CARGO_PKG_NAME"),
-            path.display()
-        );
-        process::exit(EXIT_USAGE_ERROR);
+        if !args.recursive {
+            eprintln!(
+                "{}: read {}: is a directory",
+                env!("CARGO_PKG_NAME"),
+                path.display()
+            );
+            process::exit(EXIT_USAGE_ERROR);
+        }
+        let mut files = Vec::new();
+        if let Err(e) = collect_files(path, &mut files) {
+            eprintln!(
+                "{}: failed to read directory {}: {}",
+                env!("CARGO_PKG_NAME"),
+                path.display(),
+                e
+            );
+            process::exit(EXIT_RUNTIME_ERROR);
+        }
+        for file in files {
+            if !handle_file(&file, &features, mode, args.diff_command.as_deref()) {
+                exit_code = EXIT_CHECK_FAILED;
+            }
+        }
     } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
         exit_code = EXIT_CHECK_FAILED;
     }
@@ -334,4 +355,17 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             true
         }
     }
+}
+
+fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
+    for entry in std::fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_dir() {
+            collect_files(&path, out)?;
+        } else if path.is_file() {
+            out.push(path);
+        }
+    }
+    Ok(())
 }

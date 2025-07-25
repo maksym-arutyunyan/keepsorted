@@ -25,7 +25,8 @@ clippy_status=$?
 cargo fmt --all -- --check
 fmt_status=$?
 
-# keepsorted accepts only explicit file paths, so filter tracked files first.
+# keepsorted can walk directories with --recursive, but we filter tracked files
+# explicitly to avoid processing examples or tests during validation.
 git ls-files -z \
   | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
   | xargs -0 -n1 ./target/release/keepsorted \

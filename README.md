@@ -25,15 +25,14 @@ cargo install keepsorted
 - `keepsorted --check <path>` verifies sorting without modifying files.
 - `keepsorted --diff <path>` shows a diff of required changes.
 - `keepsorted --fix <path>` updates files in place.
-- keepsorted only processes a single file at a time. Directory traversal and filtering are left to shell tools like `git ls-files` so that you can easily include or exclude paths. See [Architecture](docs/architecture.md) for details.
+- By default `keepsorted` processes a single file. Use `--recursive` (`-r`) to walk a directory and format every supported file. For complex include/exclude rules, combine `keepsorted` with shell tools like `git ls-files`. See [Architecture](docs/architecture.md) for details.
 
 Run `keepsorted --check` in CI after filtering tracked files with
 `git ls-files` to prevent unsorted changes.
 
 ### Pre-commit hook
 
-keepsorted only accepts explicit file paths. To scan all tracked files except
-the test directories, save this script as `.git/hooks/pre-commit`:
+keepsorted requires explicit paths unless you enable `--recursive`. To scan all tracked files except the test directories, save this script as `.git/hooks/pre-commit`:
 
 ```shell
 #!/bin/sh
