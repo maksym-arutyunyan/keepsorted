@@ -140,10 +140,8 @@ fn main() {
         }
 
         for entry in WalkDir::new(path).into_iter().filter_map(Result::ok) {
-            if entry.file_type().is_file() {
-                if !handle_file(entry.path(), &features, mode) {
-                    exit_code = EXIT_CHECK_FAILED;
-                }
+            if entry.file_type().is_file() && !handle_file(entry.path(), &features, mode) {
+                exit_code = EXIT_CHECK_FAILED;
             }
         }
     } else if !handle_file(path, &features, mode) {
