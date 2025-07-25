@@ -50,6 +50,9 @@ Options:
       --diff-command <COMMAND>
           Custom command for '--mode diff'
 
+  -r, --recursive
+          Process directories recursively
+
   -h, --help
           Print help (see a summary with '-h')
 

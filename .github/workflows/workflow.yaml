@@ -138,7 +138,8 @@ jobs:
       - name: Run KeepSorted
         shell: bash
         run: |
-          # keepsorted works only with file paths; filter tracked files first.
+          # Use --recursive only on filtered file lists to avoid processing
+          # unrelated paths.
           git ls-files -z \
             | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
             | xargs -0 -n1 ./target/release/keepsorted \

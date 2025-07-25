@@ -11,8 +11,8 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
  - `--diff-command` option to delegate diff generation to an external tool
  - Buildifier-style exit codes with `4` indicating failed check mode
 
-### Changed
- - Removed `--recursive` flag; use shell tools to process directories
+### Added
+ - `--recursive` (`-r`) flag to process directories recursively
 
 ### Fixed
 - Show a usage error when an unknown feature is specified

@@ -13,6 +13,7 @@ Options:
       --fix                     alias for '--mode fix'
   -m, --mode <MODE>             Formatting mode [default: fix] [possible values: check, diff, fix]
       --diff-command <COMMAND>  Custom command for '--mode diff'
+  -r, --recursive               Process directories recursively
   -h, --help                    Print help (see more with '--help')
   -V, --version                 Print version
 
