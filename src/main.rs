@@ -22,6 +22,7 @@ fn about() -> String {
 fn long_about() -> String {
     format!(
         "{}\n\
+\n\
 Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. \
 Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. \
 Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. \
