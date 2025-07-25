@@ -3,6 +3,7 @@
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FILES_DIR="$REPO_ROOT/e2e-tests/files"
 BIN="$REPO_ROOT/target/release/keepsorted"
+source "$REPO_ROOT/utils/exit_codes.bash"
 
 setup() {
   TEST_TMPDIR="$(mktemp -d)"

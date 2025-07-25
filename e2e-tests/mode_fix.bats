@@ -8,7 +8,7 @@ load './helpers.bash'
   expected="$FILES_DIR/generic/1_out.txt"
 
   run_keepsorted --mode fix "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 
@@ -18,7 +18,7 @@ load './helpers.bash'
   expected="$FILES_DIR/bazel/1_out.bazel"
 
   run_keepsorted --mode fix "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 
@@ -28,7 +28,7 @@ load './helpers.bash'
   expected="$FILES_DIR/cargo_toml/1/Cargo_out.toml"
 
   run_keepsorted --mode fix "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 
@@ -38,7 +38,7 @@ load './helpers.bash'
   expected="$FILES_DIR/bazel/1_out.bazel"
 
   run_keepsorted --fix "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
   diff -u "$expected" "$file"
 }
 

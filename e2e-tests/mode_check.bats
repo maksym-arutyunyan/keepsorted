@@ -7,7 +7,7 @@ load './helpers.bash'
   file=$(prepare_file generic/1_in.txt)
 
   run_keepsorted --mode check "$file"
-  [ "$status" -ne 0 ]
+  [ "$status" -eq "$EXIT_CHECK_FAILED" ]
 }
 
 @test "test \`--mode check\` succeeds on sorted file" {
@@ -15,7 +15,7 @@ load './helpers.bash'
   file=$(prepare_file generic/1_out.txt)
 
   run_keepsorted --mode check "$file"
-  [ "$status" -eq 0 ]
+  [ "$status" -eq "$EXIT_SUCCESS" ]
 }
 
 @test "test \`--check\` shorthand" {
@@ -23,5 +23,5 @@ load './helpers.bash'
   file=$(prepare_file generic/1_in.txt)
 
   run_keepsorted --check "$file"
-  [ "$status" -ne 0 ]
+  [ "$status" -eq "$EXIT_CHECK_FAILED" ]
 }
