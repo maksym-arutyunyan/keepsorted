@@ -26,17 +26,19 @@ cargo install keepsorted
 - `keepsorted --fix <path>` updates files in place.
 - Use `-r` to scan directories recursively.
 
-Run `keepsorted --check` in CI workflows to prevent unsorted changes.
+Run `keepsorted --check` in CI after filtering tracked files with
+`git ls-files` to prevent unsorted changes.
 
 ### Pre-commit hook
 
-For a simple Git pre-commit hook, save the script below as
-`.git/hooks/pre-commit` in the repository root. It checks all tracked files from
-the current directory. See `keepsorted --help` for more options.
+keepsorted only accepts explicit file paths. To scan all tracked files except
+the test directories, save this script as `.git/hooks/pre-commit`:
 
 ```shell
 #!/bin/sh
-git ls-files -z | xargs -0 keepsorted --check || {
+git ls-files -z \
+  | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
+  | xargs -0 -n1 keepsorted --check || {
     echo 'Run keepsorted --fix' >&2
     exit 1
 }
