@@ -18,6 +18,7 @@ cargo install keepsorted
 - [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
+- [Architecture](docs/architecture.md)
 
 ## Usage
 
@@ -194,14 +195,4 @@ $ keepsorted --check Cargo.toml
 $ keepsorted --diff Cargo.toml
 $ keepsorted --fix Cargo.toml
 ```
-
-### Recursive mode
-
-Use `--recursive` (or `-r`) to walk a directory and process every file inside it.
-Without this flag, passing a directory path results in an error.
-
-```shell
-$ keepsorted -r path/to/project
-```
-
 

@@ -9,7 +9,6 @@ Arguments:
 Options:
   -p, --path <PATH>             File to process (conflicts with positional path)
   -f, --features <FEATURE>      Enable experimental features [possible values: gitignore, codeowners, rust_derive_alphabetical, rust_derive_canonical]
-  -r, --recursive               Process directories recursively
       --check                   alias for '--mode check'
       --diff                    alias for '--mode diff'
       --fix                     alias for '--mode fix'
