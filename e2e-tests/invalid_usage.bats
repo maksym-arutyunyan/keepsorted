@@ -16,3 +16,8 @@ load './helpers.bash'
   run_keepsorted --features rust_derive_alphabetical,rust_derive_canonical e2e-tests/files/rust_derive/1_in.rs
   [ "$status" -eq 2 ]
 }
+
+@test "conflicting rust_derive features on non-rust file" {
+  run_keepsorted --features rust_derive_alphabetical,rust_derive_canonical e2e-tests/files/generic/1_in.txt
+  [ "$status" -eq 2 ]
+}
