@@ -3,14 +3,26 @@
 load './helpers.bash'
 
 @test "--check shorthand" {
-  run_check generic/1.txt false --check
+  local file
+  file=$(prepare_file generic/1.txt)
+
+  run_keepsorted --check "$file"
+  [ "$status" -ne 0 ]
 }
 
 @test "--diff shorthand" {
-  run_diff bazel/1.bazel bazel/1_diff.txt --diff
+  run_keepsorted --diff "e2e-tests/input/bazel/1.bazel"
+  [ "$status" -ne 0 ]
+  diff -u "$EXPECTED_DIR/bazel/1_diff.txt" - <<<"$output"
 }
 
 @test "--fix shorthand" {
-  run_fix bazel/1.bazel bazel/1.bazel --fix
+  local file expected
+  file=$(prepare_file bazel/1.bazel)
+  expected="$EXPECTED_DIR/bazel/1.bazel"
+
+  run_keepsorted --fix "$file"
+  [ "$status" -eq 0 ]
+  diff -u "$expected" "$file"
 }
 

@@ -3,6 +3,12 @@
 load './helpers.bash'
 
 @test "gitignore feature sorts .gitignore" {
-  run_fix gitignore/.gitignore gitignore/.gitignore --mode fix --features gitignore
+  local file expected
+  file=$(prepare_file gitignore/.gitignore)
+  expected="$EXPECTED_DIR/gitignore/.gitignore"
+
+  run_keepsorted --mode fix --features gitignore "$file"
+  [ "$status" -eq 0 ]
+  diff -u "$expected" "$file"
 }
 

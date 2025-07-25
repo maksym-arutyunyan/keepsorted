@@ -20,52 +20,9 @@ prepare_file() {
   echo "$dest"
 }
 
-# run keepsorted on a temporary copy and compare to expected
-run_fix() {
-  local input="$1" expected="$2"
-  shift 2
-  local tmp
-  tmp=$(prepare_file "$input")
-pushd "$REPO_ROOT" >/dev/null
-run "$BIN" "$@" "$tmp"
-popd >/dev/null
-  local exit=$status
-  [ "$exit" -eq 0 ] || { echo "expected success, got $exit" >&2; return 1; }
-  diff -u "$EXPECTED_DIR/$expected" "$tmp"
-}
-
-run_check() {
-  local input="$1" expect_success="$2"
-  shift 2
-  local tmp
-  tmp=$(prepare_file "$input")
+run_keepsorted() {
   pushd "$REPO_ROOT" >/dev/null
-  run "$BIN" "$@" "$tmp"
+  run "$BIN" "$@"
   popd >/dev/null
-  local exit=$status
-  if [ "$expect_success" = true ]; then
-    [ "$exit" -eq 0 ] || { echo "expected success, got $exit" >&2; return 1; }
-  else
-    [ "$exit" -ne 0 ] || { echo "expected failure" >&2; return 1; }
-  fi
-}
-
-run_diff() {
-  local input="$1"; shift
-  pushd "$REPO_ROOT" >/dev/null
-  run "$BIN" "$@" "e2e-tests/input/$input"
-  popd >/dev/null
-  [ "$status" -ne 0 ]
-}
-
-run_diff_success() {
-  local input="$1"; shift
-  local tmp
-  tmp=$(prepare_file "$input")
-  pushd "$REPO_ROOT" >/dev/null
-  "$BIN" --mode fix "$tmp" >/dev/null
-  run "$BIN" "$@" "$tmp"
-  popd >/dev/null
-  [ "$status" -eq 0 ]
 }
 

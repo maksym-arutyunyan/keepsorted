@@ -3,10 +3,22 @@
 load './helpers.bash'
 
 @test "rust_derive_alphabetical feature" {
-  run_fix rust_derive/1.rs rust_derive/1.rs --mode fix --features rust_derive_alphabetical
+  local file expected
+  file=$(prepare_file rust_derive/1.rs)
+  expected="$EXPECTED_DIR/rust_derive/1.rs"
+
+  run_keepsorted --mode fix --features rust_derive_alphabetical "$file"
+  [ "$status" -eq 0 ]
+  diff -u "$expected" "$file"
 }
 
 @test "rust_derive_canonical feature" {
-  run_fix rust_derive/2.rs rust_derive/2.rs --mode fix --features rust_derive_canonical
+  local file expected
+  file=$(prepare_file rust_derive/2.rs)
+  expected="$EXPECTED_DIR/rust_derive/2.rs"
+
+  run_keepsorted --mode fix --features rust_derive_canonical "$file"
+  [ "$status" -eq 0 ]
+  diff -u "$expected" "$file"
 }
 
