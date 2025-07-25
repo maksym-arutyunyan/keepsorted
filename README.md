@@ -25,7 +25,7 @@ cargo install keepsorted
 - `keepsorted --check <path>` verifies sorting without modifying files.
 - `keepsorted --diff <path>` shows a diff of required changes.
 - `keepsorted --fix <path>` updates files in place.
-- Use `-r` to scan directories recursively.
+- keepsorted only processes a single file at a time. Directory traversal and filtering are left to shell tools like `git ls-files` so that you can easily include or exclude paths. See [Architecture](docs/architecture.md) for details.
 
 Run `keepsorted --check` in CI after filtering tracked files with
 `git ls-files` to prevent unsorted changes.
@@ -184,11 +184,11 @@ Use `--diff-command <command>` to delegate diff generation to an external progra
 Use `--mode fix` (or `--fix`) to rewrite the file in place.
 
 The command exits with these codes:
-1. `0` — success
-2. `1` — syntax errors in input
-3. `2` — usage errors: invoked incorrectly
-4. `3` — unexpected runtime errors
-5. `4` — check mode failed (reformat is needed)
+- `0` — success
+- `1` — syntax errors in input
+- `2` — usage errors: invoked incorrectly
+- `3` — unexpected runtime errors
+- `4` — check mode failed (reformat is needed)
 
 ```shell
 $ keepsorted --check Cargo.toml

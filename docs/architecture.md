@@ -7,11 +7,11 @@ This document explains how the main pieces of the `keepsorted` crate fit togethe
 `keepsorted` was inspired by [Buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier), which sorts items in Bazel `BUILD` files. The command-line flags and exit codes follow a similar design so that tooling can integrate either tool with minimal changes.
 
 The CLI returns these codes:
-1. `0` — success
-2. `1` — syntax errors in input
-3. `2` — incorrect command usage
-4. `3` — unexpected runtime failures
-5. `4` — check mode detected unsorted files
+- `0` — success
+- `1` — syntax errors in input
+- `2` — incorrect command usage
+- `3` — unexpected runtime failures
+- `4` — check mode detected unsorted files
 
 ## Sorting Behaviour
 
@@ -20,6 +20,10 @@ The core feature is sorting lines while preserving any comments associated with 
 Some experimental features exist:
 - **Rust derive sorting** temporarily supports alphabetical or canonical ordering of `#[derive(...)]` attributes because `cargo fmt` does not yet implement this. The functionality is intentionally basic and may be removed once rustfmt provides a stable implementation.
 - **Gitignore and CODEOWNERS sorting** helps maintain consistent ordering but should be used carefully since pattern order can affect semantics.
+
+Sorting can be skipped with two special directives:
+- **`# keepsorted: ignore file`** anywhere in a file leaves the entire file unchanged.
+- **`# keepsorted: ignore block`** inside a `# Keep sorted` block preserves that block without reordering.
 
 ## Modules
 
@@ -35,7 +39,9 @@ Each file under `src/strategies/` provides a `process` function that sorts lines
 
 ### CLI (`src/main.rs`)
 
-`main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes a single file to `handle_file`. Directory traversal is intentionally left to external scripts so that the binary stays simple and composable. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
+`main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes a single file to `handle_file`. Directory traversal is intentionally left to external scripts so that the binary stays simple and composable. There is deliberately no `-r` or `--recursive` option; use tools like `git ls-files` if you need to process multiple files. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
+
+keepsorted focuses on sorting and does not try to walk directories itself. Implementing a fully featured crawler would require handling ignore files, generated sources and other project-specific rules. Existing tools already solve these problems, so the CLI expects callers to provide an explicit list of files. This design keeps the binary small while letting users combine it with powerful shell filters.
 
 ### Crate API (`src/lib.rs`)
 
