@@ -140,10 +140,11 @@ The feature is inspired by a closed ticket to update rust style, [link](https://
 
 ### Formatting mode
 
-The `--mode` option controls whether the file is modified. It accepts `check` or
-`fix` (the default).
+The `--mode` option controls whether the file is modified. It accepts `check`,
+`diff`, or `fix` (the default).
 
 Use `--mode check` to verify that a file is already sorted without modifying it.
+Use `--mode diff` to print a unified diff of the required changes.
 Use `--mode fix` to rewrite the file in place.
 
 The command exits with these codes:
@@ -152,6 +153,7 @@ The command exits with these codes:
 
 ```shell
 $ keepsorted --mode check Cargo.toml
+$ keepsorted --mode diff Cargo.toml
 $ keepsorted --mode fix Cargo.toml
 ```
 

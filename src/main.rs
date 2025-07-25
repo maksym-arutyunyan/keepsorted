@@ -3,9 +3,12 @@ use keepsorted::process_file;
 use std::io::{self};
 use std::path::Path;
 
+/// Exit code used when sorting is required or an error occurs.
+const EXIT_CHANGES_NEEDED: i32 = 1;
+
 fn about() -> String {
     format!(
-        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode fix or --mode check and enable extra features with flags. {}",
+        "{}\nThis tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check, --mode diff, or --mode fix and enable extra features with flags. {}",
         env!("CARGO_PKG_DESCRIPTION"),
         env!("CARGO_PKG_REPOSITORY")
     )
@@ -16,6 +19,8 @@ fn about() -> String {
 enum Mode {
     /// Verify that the file is already sorted.
     Check,
+    /// Print a diff of the required changes.
+    Diff,
     /// Rewrite the file with sorted content.
     Fix,
 }
@@ -52,13 +57,13 @@ struct Args {
     )]
     features: Option<Vec<String>>,
 
-    /// Formatting mode: check or fix (default fix)
+    /// Formatting mode: check, diff, or fix (default fix)
     #[arg(
         short = 'm',
         long,
         value_enum,
         default_value_t = Mode::Fix,
-        help = "formatting mode: check or fix (default fix)"
+        help = "formatting mode: check, diff, or fix (default fix)"
     )]
     mode: Mode,
 }
@@ -80,7 +85,7 @@ fn main() -> io::Result<()> {
             env!("CARGO_PKG_NAME"),
             path.display()
         );
-        std::process::exit(1);
+        std::process::exit(EXIT_CHANGES_NEEDED);
     }
 
     // Check for experimental features
@@ -99,7 +104,18 @@ fn main() -> io::Result<()> {
         Mode::Check => {
             let original = std::fs::read_to_string(path)?;
             if original != sorted {
-                std::process::exit(1);
+                std::process::exit(EXIT_CHANGES_NEEDED);
+            }
+        }
+        Mode::Diff => {
+            let original = std::fs::read_to_string(path)?;
+            if original != sorted {
+                use similar::TextDiff;
+                let diff = TextDiff::from_lines(&original, &sorted);
+                let old = format!("a/{}", path.display());
+                let new = format!("b/{}", path.display());
+                print!("{}", diff.unified_diff().header(&old, &new));
+                std::process::exit(EXIT_CHANGES_NEEDED);
             }
         }
         Mode::Fix => {
