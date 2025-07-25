@@ -6,7 +6,7 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
-- (add updates here)
+ - Added `--mode` option with `check`, `diff`, and `fix` variants and added `--check`, `--diff`, and `--fix` convenience flags
 
 ## [0.1.5] - 2025-07-15
 
