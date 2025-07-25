@@ -19,6 +19,25 @@ cargo install keepsorted
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
 
+## Usage
+
+- `keepsorted --check <path>` verifies sorting without modifying files.
+- `keepsorted --diff <path>` shows a diff of required changes.
+- `keepsorted --fix <path>` updates files in place.
+- Use `-r` to scan directories recursively.
+
+Run `keepsorted --check` in CI workflows to prevent unsorted changes.
+
+### Pre-commit hook
+
+```shell
+#!/bin/sh
+keepsorted --check || {
+    echo 'Run keepsorted --fix to sort files' >&2
+    exit 1
+}
+```
+
 `keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
 The tool is inspired by the Bazel build tool `buildifier`, which sorts items marked with `# Keep sorted` comments. `keepsorted` brings this functionality to any text file.
 
