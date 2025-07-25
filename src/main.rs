@@ -1,7 +1,7 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
 use std::path::Path;
-use std::process;
+use std::process::{self, Command};
 use walkdir::WalkDir;
 
 /// Exit code used when the command is invoked incorrectly.
@@ -102,6 +102,14 @@ struct Args {
         help = "formatting mode: check, diff, or fix (default fix)"
     )]
     mode: Mode,
+
+    /// Command to run to display diffs
+    #[arg(
+        long,
+        value_name = "COMMAND",
+        help = "command to run when the formatting mode is diff"
+    )]
+    diff_command: Option<String>,
 }
 
 fn main() {
@@ -140,11 +148,13 @@ fn main() {
         }
 
         for entry in WalkDir::new(path).into_iter().filter_map(Result::ok) {
-            if entry.file_type().is_file() && !handle_file(entry.path(), &features, mode) {
+            if entry.file_type().is_file()
+                && !handle_file(entry.path(), &features, mode, args.diff_command.as_deref())
+            {
                 exit_code = EXIT_CHECK_FAILED;
             }
         }
-    } else if !handle_file(path, &features, mode) {
+    } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
         exit_code = EXIT_CHECK_FAILED;
     }
 
@@ -153,7 +163,7 @@ fn main() {
     }
 }
 
-fn handle_file(path: &Path, features: &[String], mode: Mode) -> bool {
+fn handle_file(path: &Path, features: &[String], mode: Mode, diff_command: Option<&str>) -> bool {
     let sorted = match process_file(path, features.to_vec()) {
         Ok(s) => s,
         Err(e) => {
@@ -197,12 +207,65 @@ fn handle_file(path: &Path, features: &[String], mode: Mode) -> bool {
                 }
             };
             if original != sorted {
-                use similar::TextDiff;
-                let diff = TextDiff::from_lines(&original, &sorted);
-                let old = format!("a/{}", path.display());
-                let new = format!("b/{}", path.display());
-                print!("{}", diff.unified_diff().header(&old, &new));
-                return false;
+                if let Some(cmd) = diff_command {
+                    use tempfile::NamedTempFile;
+                    let tmp = NamedTempFile::new().expect("create temp file");
+                    if let Err(e) = std::fs::write(tmp.path(), &sorted) {
+                        eprintln!(
+                            "{}: failed to write temp file {}: {}",
+                            env!("CARGO_PKG_NAME"),
+                            tmp.path().display(),
+                            e
+                        );
+                        process::exit(EXIT_RUNTIME_ERROR);
+                    }
+                    let parts = match shell_words::split(cmd) {
+                        Ok(p) => p,
+                        Err(e) => {
+                            eprintln!(
+                                "{}: failed to parse diff command '{}': {}",
+                                env!("CARGO_PKG_NAME"),
+                                cmd,
+                                e
+                            );
+                            process::exit(EXIT_RUNTIME_ERROR);
+                        }
+                    };
+                    let (prog, args) = parts.split_first().unwrap_or_else(|| {
+                        eprintln!("{}: diff command is empty", env!("CARGO_PKG_NAME"));
+                        process::exit(EXIT_RUNTIME_ERROR);
+                    });
+                    let output = Command::new(prog)
+                        .args(args)
+                        .arg(path)
+                        .arg(tmp.path())
+                        .output();
+                    match output {
+                        Ok(out) => {
+                            print!("{}", String::from_utf8_lossy(&out.stdout));
+                            if !out.status.success() {
+                                process::exit(out.status.code().unwrap_or(EXIT_RUNTIME_ERROR));
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!(
+                                "{}: failed to run diff command '{}': {}",
+                                env!("CARGO_PKG_NAME"),
+                                cmd,
+                                e
+                            );
+                            process::exit(EXIT_RUNTIME_ERROR);
+                        }
+                    }
+                    return false;
+                } else {
+                    use similar::TextDiff;
+                    let diff = TextDiff::from_lines(&original, &sorted);
+                    let old = format!("a/{}", path.display());
+                    let new = format!("b/{}", path.display());
+                    print!("{}", diff.unified_diff().header(&old, &new));
+                    return false;
+                }
             }
             true
         }
