@@ -51,7 +51,7 @@ struct Args {
     #[arg(
         value_name = "PATH",
         required_unless_present = "path",
-        help = "File to process (required if --path is not used)"
+        help = "File to process (required if '--path' is not used)"
     )]
     positional_path: Option<String>,
 
@@ -72,7 +72,7 @@ struct Args {
     #[arg(
         long,
         conflicts_with_all = ["diff", "fix", "mode"],
-        help = "alias for `--mode check`",
+        help = "alias for '--mode check'",
     )]
     check: bool,
 
@@ -80,7 +80,7 @@ struct Args {
     #[arg(
         long,
         conflicts_with_all = ["check", "fix", "mode"],
-        help = "alias for `--mode diff`",
+        help = "alias for '--mode diff'",
     )]
     diff: bool,
 
@@ -88,7 +88,7 @@ struct Args {
     #[arg(
         long,
         conflicts_with_all = ["check", "diff", "mode"],
-        help = "alias for `--mode fix`",
+        help = "alias for '--mode fix'",
     )]
     fix: bool,
 
@@ -103,7 +103,7 @@ struct Args {
     )]
     mode: Mode,
 
-    /// Command to run for `--mode diff`
+    /// Command to run for '--mode diff'
     #[arg(long, value_name = "COMMAND", help = "Custom command for --mode diff")]
     diff_command: Option<String>,
 }

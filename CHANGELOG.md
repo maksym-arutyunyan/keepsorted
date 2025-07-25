@@ -11,6 +11,7 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Added project website link at the end of `--help` output
 - Simplified help text and clarified `--diff-command`
 - Added documentation link to Cargo.toml
+- Unified quoting style in help output using single quotes
 
 ### Documentation
 - Document installation command and provide docs.rs, source code, and issue tracker links near the top of README
