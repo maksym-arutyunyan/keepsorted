@@ -20,178 +20,199 @@ cargo install keepsorted
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
 - [Architecture](docs/architecture.md)
 
+## Overview
+
+`keepsorted` sorts lists of lines while keeping nearby comments with the lines
+that follow them. Add a comment like **`Keep sorted`** and the tool will reorder
+the next block. Some file types are sorted automatically.
+
 ## Usage
 
-- `keepsorted --check <path>` verifies sorting without modifying files.
-- `keepsorted --diff <path>` shows a diff of required changes.
-- `keepsorted --fix <path>` updates files in place.
-- By default `keepsorted` processes a single file. Use `--recursive` (`-r`) to walk a directory and format every supported file. For complex include/exclude rules, combine `keepsorted` with shell tools like `git ls-files`. See [Architecture](docs/architecture.md) for details.
-
-Run `keepsorted --check` in CI after filtering tracked files with
-`git ls-files` to prevent unsorted changes.
-
-### Pre-commit hook
-
-keepsorted requires explicit paths unless you enable `--recursive`. To scan all tracked files except the test directories, save this script as `.git/hooks/pre-commit`:
-
 ```shell
-#!/bin/sh
-git ls-files -z \
-  | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
-  | xargs -0 -n1 keepsorted --check || {
-    echo 'Run keepsorted --fix' >&2
-    exit 1
-}
+keepsorted --check <path>   # verify without changes
+keepsorted --diff <path>    # preview changes as a diff
+keepsorted --fix <path>     # rewrite files in place (default)
 ```
 
-`keepsorted` is a command-line tool that helps you sort blocks of lines in your code files.
-The tool is inspired by the Bazel build tool `buildifier`, which sorts items marked with `# Keep sorted` comments. `keepsorted` brings this functionality to any text file.
+Use `--recursive` (`-r`) to process directories. Combine with `git ls-files` in
+CI to check only tracked files.
 
-It works by sorting lines within a block that starts with the activation comment `# Keep sorted`.
-In some files, like `Cargo.toml`, it sorts automatically without needing an activation comment.
+### Keywords
 
-The tool can also recognize comments attached to non-comment lines, like this:
+- `Keep sorted` or `keepsorted: keep sorted` – sort the next block.
+- `keepsorted: ignore file` – skip the whole file.
+- `keepsorted: ignore block` – skip a single block.
+
+Markers work with `#`, `//`, or `--` comments. Generic files and Bazel require
+one of these comments. `Cargo.toml`, `.gitignore`, and `CODEOWNERS` are sorted
+automatically when the matching feature flag is enabled.
+
+### Examples
+
+#### Generic text (Python)
 
 ```py
-# Before:
-dependencies = [
-    # Keep sorted.
-    'ddd',
-    'ccc',
-    # TODO: remove this dependency.
-    'bbb',
-    'aaa',
-]
-
-# After:
-dependencies = [
-    # Keep sorted.
-    'aaa',
-    # TODO: remove this dependency.
-    'bbb',
-    'ccc',
-    'ddd',
-]
+# Keep sorted
+# comment B
+b
+# comment A
+a
 ```
 
-You can see more examples in the `./e2e-tests/files/` directory.
+becomes
 
-## Keywords
-
-Comments can begin with `#`, `//`, or `--`. The following examples use `#`.
-
-- `# Keep sorted` or `# keepsorted: keep sorted` sorts the next block of lines
-- `# keepsorted: ignore file` anywhere in the file skips sorting
-- `# keepsorted: ignore block` within a block skips sorting that block
-
-## Supported Files
-
-### Generic Text Files
-
-For generic text files, the tool sorts blocks that start with `# Keep sorted` and end with a newline.
-
-```txt
-# Names
+```py
 # Keep sorted
-Alice
-Bob
-Conrad
-
-# Colors
-# Keep sorted
-Blue
-Green
-Red
+# comment A
+a
+# comment B
+b
 ```
 
-### Bazel
+#### Generic text (C++)
 
-In Bazel files, keepsorted sorts lines within `[...]` blocks that start with `# Keep sorted`.
+```cpp
+// Keep sorted
+// comment two
+second
+// comment one
+first
+```
+
+becomes
+
+```cpp
+// Keep sorted
+// comment one
+first
+// comment two
+second
+```
+
+#### Generic text (SQL/Lua)
+
+```sql
+-- Keep sorted
+-- c comment
+c
+-- a comment
+a
+```
+
+becomes
+
+```sql
+-- Keep sorted
+-- a comment
+a
+-- c comment
+c
+```
+
+#### Bazel
 
 ```bazel
-DEPENDENCIES = [
+srcs = [
     # Keep sorted
+    "b",
+    # note for a
+    "a",
+]
+```
+
+becomes
+
+```bazel
+srcs = [
+    # Keep sorted
+    # note for a
     "a",
     "b",
 ]
 ```
 
-### Cargo.toml
-
-In `Cargo.toml` files, the tool sorts lines within blocks that start with `[dependencies]`, `[dev-dependencies]`, etc., and end with an empty line.
+#### Cargo.toml
 
 ```toml
 [dependencies]
-a = "0.1.0"
-b = { workspace = true }
+b = "2"
+a = "1"
 
 # keepsorted: ignore block
 [dev-dependencies]
-y = { workspace = true }
-x = "0.3.0"
+z = "1"
+y = "2"
 ```
 
-### .gitignore & CODEOWNERS
+becomes
 
-*NOTE: These features are experimental and require feature flags.*
+```toml
+[dependencies]
+a = "1"
+b = "2"
 
-```shell
-$ keepsorted <path> --features gitignore,codeowners
-```
-
-In `.gitignore` and `CODEOWNERS` files, the tool sorts blocks separated by empty lines while keeping comments in place, except for the opening block comment.
-
-**(!) IMPORTANT**: the order of patterns can be important because it gets executed from top to bottom from more generic to more specific rules, therefore use this feature with extra care.
-
-```.gitignore
-# Various build artifacts
-**/build
-**/build-out
-**/build-tmp
-artifacts
-
-# Bazel outdir dirs
 # keepsorted: ignore block
-bazel-c.pb
-user.bazelrc
-bazel-b.txt
-/bazel-*
-bazel-a.txt
+[dev-dependencies]
+z = "1"
+y = "2"
 ```
 
-### Rust Derive
+#### .gitignore
 
-*NOTE: These features are experimental and require feature flags.*
+```gitignore
+# Build
+/b
+/a
+```
+
+becomes
+
+```gitignore
+# Build
+/a
+/b
+```
+
+#### CODEOWNERS
+
+```codeowners
+# Team
+b
+# Lead
+a
+```
+
+becomes
+
+```codeowners
+# Team
+a
+# Lead
+b
+```
+
+### Experimental features
+
+The following features are behind flags because sorting might change behaviour:
+
+- `gitignore` and `codeowners` – order matters, so enable with care.
+- `rust_derive_alphabetical` and `rust_derive_canonical` – temporary helpers for
+  sorting Rust `#[derive(...)]` lists until `rustfmt` gains this ability. These
+  implementations are intentionally simple.
+
+Enable features with `--features`:
 
 ```shell
-$ keepsorted <path> --features rust_derive_alphabetical
-# or
-$ keepsorted <path> --features rust_derive_canonical
+keepsorted file --features gitignore,rust_derive_canonical
 ```
 
-The feature is inspired by a closed ticket to update rust style, [link](https://github.com/rust-lang/style-team/issues/154).
+### Limitations
 
-### Formatting mode
+`keepsorted` intentionally does **not**:
 
-The `--mode` option controls whether the file is modified. It accepts `check`,
-`diff`, or `fix` (the default). The flags `--check`, `--diff`, and `--fix` are
-aliases for `--mode check`, `--mode diff`, and `--mode fix` respectively.
-
-Use `--mode check` (or `--check`) to verify that a file is already sorted without modifying it.
-Use `--mode diff` (or `--diff`) to print a unified diff of the required changes.
-Use `--diff-command <command>` to delegate diff generation to an external program.
-Use `--mode fix` (or `--fix`) to rewrite the file in place.
-
-The command exits with these codes:
-- `0` — success
-- `1` — syntax errors in input
-- `2` — usage errors: invoked incorrectly
-- `3` — unexpected runtime errors
-- `4` — check mode failed (reformat is needed)
-
-```shell
-$ keepsorted --check Cargo.toml
-$ keepsorted --diff Cargo.toml
-$ keepsorted --fix Cargo.toml
-```
+- Handle advanced directory traversal or ignore rules automatically.
+- Act as a full-fledged parser for every file type.
+- Handle ignore files or exclude paths automatically.
+- Automatically detect project structure or configuration files.
+- Replace formatting tools like `rustfmt` or `prettier`.
 
