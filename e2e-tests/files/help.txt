@@ -14,7 +14,7 @@ Options:
       --diff                    alias for '--mode diff'
       --fix                     alias for '--mode fix'
   -m, --mode <MODE>             Formatting mode [default: fix] [possible values: check, diff, fix]
-      --diff-command <COMMAND>  Custom command for --mode diff
+      --diff-command <COMMAND>  Custom command for '--mode diff'
   -h, --help                    Print help (see more with '--help')
   -V, --version                 Print version
 

@@ -104,7 +104,11 @@ struct Args {
     mode: Mode,
 
     /// Command to run for '--mode diff'
-    #[arg(long, value_name = "COMMAND", help = "Custom command for --mode diff")]
+    #[arg(
+        long,
+        value_name = "COMMAND",
+        help = "Custom command for '--mode diff'"
+    )]
     diff_command: Option<String>,
 }
 
