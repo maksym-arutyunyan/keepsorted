@@ -44,25 +44,6 @@ git ls-files -z \
 }
 ```
 
-## Using as a Library
-
-`keepsorted` can be embedded in Rust projects. Two main functions are provided:
-
-```rust
-use keepsorted::{process_lines, Strategy};
-use std::io;
-
-fn main() -> io::Result<()> {
-    // Sort an in-memory list of lines
-    let lines = vec!["# Keep sorted".into(), "b".into(), "a".into()];
-    let sorted = process_lines(Strategy::Generic, lines)?;
-
-    Ok(())
-}
-```
-
-See [Architecture](docs/architecture.md#crate-api-srclibrs) for more details.
-
 ## Experimental Features
 
 Several optional behaviours are disabled by default. Enable them with the comma-separated `--features` flag:
