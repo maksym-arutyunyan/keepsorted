@@ -1,19 +1,21 @@
 A tool for sorting blocks of lines in code files
-This tool sorts lines in blocks marked with '# Keep sorted'. Use --mode check (or --check), --mode diff (or --diff), or --mode fix (or --fix) and enable extra features with flags. https://github.com/maksym-arutyunyan/keepsorted
+Sort lines inside '# Keep sorted' blocks. Use --check to verify, --diff to preview, or --fix to apply changes.
 
 Usage: keepsorted [OPTIONS] [PATH]
 
 Arguments:
-  [PATH]  Path to the file to run on. This is required if the -p option is not used.
+  [PATH]  File to process (required if '--path' is not used)
 
 Options:
-  -p, --path <PATH>             Path to the file to run on. This option is mutually exclusive with the positional path.
-  -f, --features <FEATURE>      Experimental feature flags. Provide a list of features to enable. [possible values: gitignore, codeowners, rust_derive_alphabetical, rust_derive_canonical]
-  -r, --recursive               Recursively process directories
-      --check                   alias for `--mode check`
-      --diff                    alias for `--mode diff`
-      --fix                     alias for `--mode fix`
-  -m, --mode <MODE>             formatting mode: check, diff, or fix (default fix) [default: fix] [possible values: check, diff, fix]
-      --diff-command <COMMAND>  command to run when the formatting mode is diff
+  -p, --path <PATH>             File to process (conflicts with positional path)
+  -f, --features <FEATURE>      Enable experimental features [possible values: gitignore, codeowners, rust_derive_alphabetical, rust_derive_canonical]
+  -r, --recursive               Process directories recursively
+      --check                   alias for '--mode check'
+      --diff                    alias for '--mode diff'
+      --fix                     alias for '--mode fix'
+  -m, --mode <MODE>             Formatting mode [default: fix] [possible values: check, diff, fix]
+      --diff-command <COMMAND>  Custom command for '--mode diff'
   -h, --help                    Print help (see more with '--help')
   -V, --version                 Print version
+
+For more info, visit: https://github.com/maksym-arutyunyan/keepsorted
