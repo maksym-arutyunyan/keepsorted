@@ -25,6 +25,7 @@ cargo install keepsorted
 - `keepsorted --check <path>` verifies sorting without modifying files.
 - `keepsorted --diff <path>` shows a diff of required changes.
 - `keepsorted --fix <path>` updates files in place.
+- keepsorted only processes a single file at a time. Directory traversal and filtering are left to shell tools like `git ls-files` so that you can easily include or exclude paths. See [Architecture](docs/architecture.md) for details.
 
 Run `keepsorted --check` in CI after filtering tracked files with
 `git ls-files` to prevent unsorted changes.
