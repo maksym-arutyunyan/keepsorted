@@ -15,14 +15,19 @@ fn run_test(
     let expected_content = fs::read_to_string(expected_file_path)
         .unwrap_or_else(|_| panic!("Failed to read expected file: {}", expected_file_path));
 
-    // Create a temporary directory
-    let temp_dir = tempdir().expect("Failed to create temporary directory");
-    let temp_input_file_path = temp_dir
-        .path()
-        .join(Path::new(input_file_path).file_name().unwrap());
-
-    // Write the input content to a temporary file
-    fs::write(&temp_input_file_path, &input_content).expect("Failed to write to temporary file");
+    let (run_path, _temp_dir): (std::path::PathBuf, Option<tempfile::TempDir>);
+    if mode == "diff" {
+        run_path = Path::new(input_file_path).to_path_buf();
+        _temp_dir = None;
+    } else {
+        let td = tempdir().expect("Failed to create temporary directory");
+        let tmp = td
+            .path()
+            .join(Path::new(input_file_path).file_name().unwrap());
+        fs::write(&tmp, &input_content).expect("Failed to write to temporary file");
+        run_path = tmp;
+        _temp_dir = Some(td);
+    }
 
     // Determine the path to the keepsorted binary based on the build mode
     let keepsorted_binary = if cfg!(debug_assertions) {
@@ -35,7 +40,7 @@ fn run_test(
     command
         .arg("--mode")
         .arg(mode)
-        .arg(temp_input_file_path.to_str().unwrap());
+        .arg(run_path.to_str().unwrap());
     if !features.is_empty() {
         command.arg("--features").arg(features);
     }
@@ -54,19 +59,24 @@ fn run_test(
     }
 
     // Read the content of the temporary file after running keepsorted
-    let output_content =
-        fs::read_to_string(&temp_input_file_path).expect("Failed to read output file");
+    let output_content = fs::read_to_string(&run_path).expect("Failed to read output file");
 
     if mode == "fix" {
         assert_eq!(
             output_content, expected_content,
-            "The output content does not match the expected content"
+            "The output content does not match the expected content",
         );
     } else {
         assert_eq!(
             output_content, input_content,
-            "--mode check should not modify the file"
+            "--mode {} should not modify the file",
+            mode
         );
+    }
+
+    if mode == "diff" {
+        let diff_output = String::from_utf8_lossy(&output.stdout);
+        assert_eq!(diff_output, expected_content, "Diff output mismatch");
     }
 
     // Ensure the input file is not modified
@@ -232,6 +242,28 @@ fn test_check_succeeds_on_sorted() {
         &dir("generic/1_out.txt"),
         "",
         "check",
+        true,
+    );
+}
+
+#[test]
+fn test_diff_fails_on_unsorted() {
+    run_test(
+        &dir("bazel/1_in.bazel"),
+        &dir("bazel/1_out_diff.bazel"),
+        "",
+        "diff",
+        false,
+    );
+}
+
+#[test]
+fn test_diff_succeeds_on_sorted() {
+    run_test(
+        &dir("bazel/1_out.bazel"),
+        &dir("bazel/1_out_diff_empty.bazel"),
+        "",
+        "diff",
         true,
     );
 }

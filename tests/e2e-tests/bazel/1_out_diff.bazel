@@ -1,0 +1,44 @@
+--- a/./tests/e2e-tests/bazel/1_in.bazel
++++ b/./tests/e2e-tests/bazel/1_in.bazel
+@@ -5,32 +5,32 @@
+     ],
+     proc_macro_deps = [
+         # Keep sorted.
+-        ":bbb",
+         ":aaa",
+-        "//dir/subdir:bbb",
++        ":bbb",
+         "//dir/subdir:aaa",
+-        "@crate_index//:bbb",
++        "//dir/subdir:bbb",
+         "@crate_index//:aaa",
++        "@crate_index//:bbb",
+     ] + select({
+         "@platforms//os:osx": [
+             # Keep sorted.
++            ":aaa",
+             ":bbb",
+-            ":aaa",
++            "//dir/subdir:aaa",
+             "//dir/subdir:bbb",
+-            "//dir/subdir:aaa",
+-            "@crate_index//:bbb",
+             "@crate_index//:aaa",
++            "@crate_index//:bbb",
+         ],
+         "//conditions:default": [
+         ],
+     }),
+     deps = [
+         # Keep sorted.
+-        ":bbb",
+         ":aaa",
+-        "//dir/subdir:bbb",
++        ":bbb",
+         "//dir/subdir:aaa",
++        "//dir/subdir:bbb",
++        "@crate_index//:aaa",
+         "@crate_index//:bbb",
+-        "@crate_index//:aaa",
+     ],
+ )
