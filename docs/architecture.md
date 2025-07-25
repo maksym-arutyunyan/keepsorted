@@ -51,6 +51,10 @@ Each file under `src/strategies/` provides a `process` function that sorts lines
 
 `main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and passes a single file to `handle_file`. Directory traversal is intentionally left to external scripts so that the binary stays simple and composable. There is deliberately no `-r` or `--recursive` option; use tools like `git ls-files` if you need to process multiple files. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
 
+When `--mode diff` is used, the CLI can delegate diff generation to an external
+program by passing `--diff-command <command>`. The option is parsed and executed
+in `src/main.rs` where `Command` spawns the specified tool to show changes.
+
 `keepsorted` focuses on sorting and does not try to walk directories itself. Implementing a fully featured crawler would require handling ignore files, generated sources and other project-specific rules. Existing tools already solve these problems, so the CLI expects callers to provide an explicit list of files. This design keeps the binary small while letting users combine it with powerful shell filters.
 
 ### Crate API (`src/lib.rs`)
