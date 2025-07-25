@@ -28,13 +28,17 @@ fmt_status=$?
 # Run `keepsorted` only on files that are not ignored by `.gitignore`.
 # Also ignore `./misc/` and `./tests/`.
 git ls-files -co --exclude-standard \
-    | grep -vE "^misc/|^tests/|^README.md" \
+    | grep -vE "^misc/|^tests/|^e2e-tests/|^README.md" \
     | xargs -I {} bash -c "./target/release/keepsorted '{}' --features gitignore,rust_derive_canonical" {}
 keepsorted_status=$?
 
 # Check if keepsorted changed any files.
 git diff --exit-code
 git_diff_status=$?
+
+# Run Bats end-to-end tests
+bats e2e-tests
+bats_status=$?
 
 # Check the status of each command and print the final status
 echo ""
@@ -45,6 +49,7 @@ if [ $build_status -eq 0 ] &&\
    [ $fmt_status -eq 0 ] &&\
    [ $keepsorted_status -eq 0 ] &&\
    [ $git_diff_status -eq 0 ] &&\
+   [ $bats_status -eq 0 ] &&\
    true; then
     echo -e "All checks passed ${GREEN}ok${NC}."
 else
@@ -70,6 +75,9 @@ else
     if [ $git_diff_status -ne 0 ]; then
         echo -e " - git diff ${RED}FAILED${NC}"
     fi
+    if [ $bats_status -ne 0 ]; then
+        echo -e " - bats tests ${RED}FAILED${NC}"
+    fi
 fi
 
 # Exit with a status of 1 if any of the steps failed
@@ -80,6 +88,7 @@ if [ $build_status -ne 0 ] ||\
    [ $fmt_status -ne 0 ] ||\
    [ $keepsorted_status -ne 0 ] ||\
    [ $git_diff_status -ne 0 ] ||\
+   [ $bats_status -ne 0 ] ||\
    false; then
     exit 1
 fi
