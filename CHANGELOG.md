@@ -22,6 +22,7 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Remove mention of deprecated `-r` flag from README
 - Explain `# keepsorted: ignore file` and `# keepsorted: ignore block` directives and clarify that directory traversal should be handled externally
 - Expand Experimental Features section with an example of enabling multiple flags
+- Rewrite README for clarity and document crate API, experimental features, and limitations
 
 ## [0.1.5] - 2025-07-15
 
