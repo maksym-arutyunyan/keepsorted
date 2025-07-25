@@ -151,7 +151,7 @@ Use `--mode fix` (or `--fix`) to rewrite the file in place.
 The command exits with these codes:
 1. `0` — success
 2. `1` — syntax errors in input
-3. `2` — usage errors
+3. `2` — usage errors: invoked incorrectly
 4. `3` — unexpected runtime errors
 5. `4` — check mode failed (reformat is needed)
 
@@ -159,6 +159,15 @@ The command exits with these codes:
 $ keepsorted --check Cargo.toml
 $ keepsorted --diff Cargo.toml
 $ keepsorted --fix Cargo.toml
+```
+
+### Recursive mode
+
+Use `--recursive` (or `-r`) to walk a directory and process every file inside it.
+Without this flag, passing a directory path results in an error.
+
+```shell
+$ keepsorted -r path/to/project
 ```
 
 

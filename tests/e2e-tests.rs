@@ -309,3 +309,28 @@ fn test_shorthand_fix() {
         true,
     );
 }
+
+#[test]
+fn test_directory_without_recursive_flag_fails() {
+    let td = tempdir().expect("Failed to create temporary directory");
+    fs::write(
+        td.path().join("file.txt"),
+        fs::read_to_string(dir("generic/1_in.txt")).unwrap(),
+    )
+    .unwrap();
+    let keepsorted_binary = if cfg!(debug_assertions) {
+        "./target/debug/keepsorted"
+    } else {
+        "./target/release/keepsorted"
+    };
+    let output = Command::new(keepsorted_binary)
+        .args(["--mode", "fix"])
+        .arg(td.path())
+        .output()
+        .expect("Failed to execute keepsorted");
+    assert_eq!(
+        output.status.code().unwrap_or_default(),
+        2,
+        "expected usage error exit code"
+    );
+}
