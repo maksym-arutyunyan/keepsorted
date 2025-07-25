@@ -32,7 +32,7 @@ Return codes:\n\
 \t2: usage errors: invoked incorrectly\n\
 \t3: unexpected runtime errors: file I/O problems or internal bugs\n\
 \t4: check mode failed (reformat is needed)"
-       .to_string()
+        .to_string()
 }
 
 fn after_help() -> &'static str {
