@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INPUT_DIR="$REPO_ROOT/e2e-tests/input"
-EXPECTED_DIR="$REPO_ROOT/e2e-tests/expected"
+FILES_DIR="$REPO_ROOT/e2e-tests/files"
 BIN="$REPO_ROOT/target/release/keepsorted"
 
 setup() {
@@ -14,7 +13,7 @@ teardown() {
 }
 
 prepare_file() {
-  local src="$INPUT_DIR/$1"
+  local src="$FILES_DIR/$1"
   local dest="$TEST_TMPDIR/$(basename "$1")"
   cp "$src" "$dest"
   echo "$dest"

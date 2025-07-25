@@ -1,5 +1,5 @@
---- a/e2e-tests/input/bazel/1.bazel
-+++ b/e2e-tests/input/bazel/1.bazel
+--- a/e2e-tests/files/bazel/1_in.bazel
++++ b/e2e-tests/files/bazel/1_in.bazel
 @@ -5,32 +5,32 @@
      ],
      proc_macro_deps = [
