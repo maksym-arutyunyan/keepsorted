@@ -30,10 +30,14 @@ Run `keepsorted --check` in CI workflows to prevent unsorted changes.
 
 ### Pre-commit hook
 
+For a simple Git pre-commit hook, save the script below as
+`.git/hooks/pre-commit` in the repository root. It checks all tracked files from
+the current directory. See `keepsorted --help` for more options.
+
 ```shell
 #!/bin/sh
-keepsorted --check || {
-    echo 'Run keepsorted --fix to sort files' >&2
+git ls-files -z | xargs -0 keepsorted --check || {
+    echo 'Run keepsorted --fix' >&2
     exit 1
 }
 ```
