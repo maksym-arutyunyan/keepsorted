@@ -14,14 +14,15 @@ teardown() {
 
 prepare_file() {
   local src="$FILES_DIR/$1"
-  local dest="$TEST_TMPDIR/$(basename "$1")"
+  local dest
+  dest="$TEST_TMPDIR/$(basename "$1")"
   cp "$src" "$dest"
   echo "$dest"
 }
 
 run_keepsorted() {
-  pushd "$REPO_ROOT" >/dev/null
+  pushd "$REPO_ROOT" >/dev/null || return
   run "$BIN" "$@"
-  popd >/dev/null
+  popd >/dev/null || return
 }
 

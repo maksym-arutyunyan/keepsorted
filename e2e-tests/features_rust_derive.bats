@@ -2,7 +2,7 @@
 
 load './helpers.bash'
 
-@test "rust_derive_alphabetical feature" {
+@test "test \`rust_derive_alphabetical\` feature" {
   local file expected
   file=$(prepare_file rust_derive/1_in.rs)
   expected="$FILES_DIR/rust_derive/1_out.rs"
@@ -12,7 +12,7 @@ load './helpers.bash'
   diff -u "$expected" "$file"
 }
 
-@test "rust_derive_canonical feature" {
+@test "test \`rust_derive_canonical\` feature" {
   local file expected
   file=$(prepare_file rust_derive/2_in.rs)
   expected="$FILES_DIR/rust_derive/2_out.rs"

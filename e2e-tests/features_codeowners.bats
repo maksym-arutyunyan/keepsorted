@@ -2,7 +2,7 @@
 
 load './helpers.bash'
 
-@test "codeowners feature sorts file" {
+@test "test \`codeowners\` feature sorts file" {
   local file expected
   file=$(prepare_file codeowners/CODEOWNERS)
   expected="$FILES_DIR/codeowners/CODEOWNERS_out"

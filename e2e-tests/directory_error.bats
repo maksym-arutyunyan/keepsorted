@@ -2,7 +2,7 @@
 
 load './helpers.bash'
 
-@test "directory without --recursive fails" {
+@test "test directory without \`--recursive\` fails" {
   mkdir "$TEST_TMPDIR/dir"
   cp "$FILES_DIR/generic/1_in.txt" "$TEST_TMPDIR/dir/file.txt"
 

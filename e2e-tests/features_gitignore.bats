@@ -2,7 +2,7 @@
 
 load './helpers.bash'
 
-@test "gitignore feature sorts .gitignore" {
+@test "test \`gitignore\` feature sorts .gitignore" {
   local file expected
   file=$(prepare_file gitignore/.gitignore)
   expected="$FILES_DIR/gitignore/.gitignore_out"
