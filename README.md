@@ -196,9 +196,13 @@ b
 The following features are behind flags because sorting might change behaviour:
 
 - `gitignore` and `codeowners` – order matters, so enable with care.
-- `rust_derive_alphabetical` and `rust_derive_canonical` – temporary helpers for
-  sorting Rust `#[derive(...)]` lists until `rustfmt` gains this ability. These
-  implementations are intentionally simple.
+- `rust_derive_alphabetical` and `rust_derive_canonical` – temporary helpers to
+  reorder `#[derive(...)]` attributes. `cargo fmt` does not yet sort derives
+  ([rust-lang/rustfmt#6574](https://github.com/rust-lang/rustfmt/issues/6574)).
+  These features are hidden behind flags and only perform alphabetical or
+  canonical ordering. Users have been requesting derive sorting since 2017, so
+  `keepsorted` fills the gap for now. Consider upvoting the issue if you want
+  built-in support.
 
 Enable features with `--features`:
 

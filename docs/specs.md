@@ -25,7 +25,7 @@ Sorting can be skipped with two special directives:
 
 Some experimental features exist:
 
-- **Rust derive sorting** temporarily supports alphabetical or canonical ordering of `#[derive(...)]` attributes because `cargo fmt` does not yet implement this. The functionality is intentionally basic and may be removed once rustfmt provides a stable implementation.
+- **Rust derive sorting** is a basic workaround for reordering `#[derive(...)]` attributes. `cargo fmt` does not yet support this capability ([rust-lang/rustfmt#6574](https://github.com/rust-lang/rustfmt/issues/6574)). The feature only performs alphabetical or canonical ordering and is hidden behind a flag. Requests for built-in derive sorting have been open since 2017, so tools like `keepsorted` fill the gap. Upvote the issue if you would like to see native support.
 - **Gitignore and CODEOWNERS sorting** helps maintain consistent ordering but should be used carefully since pattern order can affect semantics.
 
 ## Experimental Features
