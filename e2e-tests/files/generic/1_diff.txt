@@ -1,0 +1,11 @@
+--- a/e2e-tests/files/generic/1_in.txt
++++ b/e2e-tests/files/generic/1_in.txt
+@@ -1,4 +1,4 @@
+ # Expect block without trailing empty line at EOF to be sorted.
+ # Keep sorted.
+-b
+-a
+\ No newline at end of file
++a
++b
+\ No newline at end of file

@@ -31,6 +31,9 @@ Options:
           - rust_derive_alphabetical: Alphabetical ordering for `#[derive(...)]` attributes
           - rust_derive_canonical:    Canonical ordering for `#[derive(...)]` attributes
 
+  -q, --quiet
+          Silence non-error messages
+
       --check
           alias for '--mode check'
 

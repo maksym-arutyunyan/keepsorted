@@ -124,6 +124,10 @@ struct Args {
     )]
     features: Option<Vec<Feature>>,
 
+    /// Suppress informational output
+    #[arg(short = 'q', long, help = "Silence non-error messages")]
+    quiet: bool,
+
     /// Verify that the file is already sorted
     #[arg(
         long,
@@ -213,11 +217,23 @@ fn main() {
             process::exit(EXIT_RUNTIME_ERROR);
         }
         for file in files {
-            if !handle_file(&file, &features, mode, args.diff_command.as_deref()) {
+            if !handle_file(
+                &file,
+                &features,
+                mode,
+                args.diff_command.as_deref(),
+                args.quiet,
+            ) {
                 exit_code = EXIT_CHECK_FAILED;
             }
         }
-    } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
+    } else if !handle_file(
+        path,
+        &features,
+        mode,
+        args.diff_command.as_deref(),
+        args.quiet,
+    ) {
         exit_code = EXIT_CHECK_FAILED;
     }
 
@@ -226,11 +242,19 @@ fn main() {
     }
 }
 
-fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Option<&str>) -> bool {
+fn handle_file(
+    path: &Path,
+    features: &[Feature],
+    mode: Mode,
+    diff_command: Option<&str>,
+    quiet: bool,
+) -> bool {
     match is_text_file(path) {
         Ok(true) => {}
         Ok(false) => {
-            eprintln!("skipping binary file {}", path.display());
+            if !quiet {
+                eprintln!("skipping binary file {}", path.display());
+            }
             return true;
         }
         Err(e) => {
