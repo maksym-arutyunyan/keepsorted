@@ -24,6 +24,6 @@
 - Always format code using `cargo fmt`.
 - Address warnings reported by `cargo clippy` as invoked in `run-all.sh`.
 - Keep entries in `Cargo.toml` and other marked blocks sorted using `keepsorted` comments.
-- Ensure code changes adhere to `docs/architecture.md`, which is the source of truth. Modify this file only when explicitly instructed by a human.
+- Ensure code changes adhere to `docs/specs.md`, which is the source of truth. Modify this file only when explicitly instructed by a human.
 - Update `CHANGELOG.md` for user‑visible changes following the Keep a Changelog format.
 - Commit messages should also follow the Conventional Commits style.

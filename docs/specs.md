@@ -1,6 +1,6 @@
-# Architecture
+# Specification
 
-This document explains how the main pieces of the `keepsorted` crate fit together.
+This specification describes how the `keepsorted` application is expected to behave and outlines its current design. It acts as the source of truth for future code changes.
 
 ## Inspiration
 
