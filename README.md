@@ -35,7 +35,7 @@ keepsorted --fix <path>     # rewrite files in place (default)
 ```
 
 Use `--recursive` (`-r`) to process directories. Combine with `git ls-files` in
-CI to check only tracked files.
+CI to check only tracked files. Binary files are skipped automatically.
 
 ### Keywords
 
