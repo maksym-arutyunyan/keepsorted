@@ -114,6 +114,10 @@ struct Args {
     #[arg(short = 'r', long, help = "Process directories recursively")]
     recursive: bool,
 
+    /// Suppress informational output
+    #[arg(short = 'q', long, help = "Silence non-error messages")]
+    quiet: bool,
+
     #[arg(
         short = 'f',
         long,
@@ -123,10 +127,6 @@ struct Args {
         help = "Enable experimental features"
     )]
     features: Option<Vec<Feature>>,
-
-    /// Suppress informational output
-    #[arg(short = 'q', long, help = "Silence non-error messages")]
-    quiet: bool,
 
     /// Verify that the file is already sorted
     #[arg(

@@ -22,6 +22,9 @@ Options:
   -r, --recursive
           Process directories recursively
 
+  -q, --quiet
+          Silence non-error messages
+
   -f, --features <FEATURE>
           Enable experimental features
 
@@ -30,9 +33,6 @@ Options:
           - codeowners:               Enable sorting for `CODEOWNERS` files
           - rust_derive_alphabetical: Alphabetical ordering for `#[derive(...)]` attributes
           - rust_derive_canonical:    Canonical ordering for `#[derive(...)]` attributes
-
-  -q, --quiet
-          Silence non-error messages
 
       --check
           alias for '--mode check'
