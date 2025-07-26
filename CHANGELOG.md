@@ -6,19 +6,18 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+## [0.1.6] - 2025-07-26
+
 ### Added
 - Recursive directory traversal via `-r`/`--recursive`
-- `--mode` with `check`, `diff` and `fix` plus convenience flags
-- `--diff-command` to delegate diff generation
-- Buildifier-style exit code `4` for failed checks
+- New `--mode` and `--diff-command` options
+- Exit code `4` for failed diff checks
 
 ### Fixed
-- Proper exit code when diff check fails
-- Usage error for unknown features
+- Correct exit codes and usage errors
 
 ### Documentation
 - Expanded README and help text
-- Clarified ignore directives, experimental features and testing strategy
 
 ## [0.1.5] - 2025-07-15
 
