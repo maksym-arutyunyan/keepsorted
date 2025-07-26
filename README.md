@@ -18,7 +18,7 @@ cargo install keepsorted
 - [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
-- [Specs](docs/specs/index.md)
+- [Specs](docs/specs.md)
 
 ## Overview
 
