@@ -227,6 +227,23 @@ fn main() {
 }
 
 fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Option<&str>) -> bool {
+    match is_text_file(path) {
+        Ok(true) => {}
+        Ok(false) => {
+            eprintln!("skipping binary file {}", path.display());
+            return true;
+        }
+        Err(e) => {
+            eprintln!(
+                "{}: failed to read file {}: {}",
+                env!("CARGO_PKG_NAME"),
+                path.display(),
+                e
+            );
+            process::exit(EXIT_RUNTIME_ERROR);
+        }
+    }
+
     let feature_names: Vec<String> = features.iter().map(|f| f.as_str().to_string()).collect();
     let sorted = match process_file(path, feature_names) {
         Ok(s) => s,
@@ -368,4 +385,18 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
         }
     }
     Ok(())
+}
+
+fn is_text_file(path: &Path) -> io::Result<bool> {
+    use std::fs::File;
+    use std::io::Read;
+
+    let mut file = File::open(path)?;
+    let mut buf = [0u8; 8192];
+    let n = file.read(&mut buf)?;
+    let slice = &buf[..n];
+    if slice.contains(&0) {
+        return Ok(false);
+    }
+    Ok(std::str::from_utf8(slice).is_ok())
 }

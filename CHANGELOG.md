@@ -6,6 +6,9 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
 
+### Added
+- Skip binary files during recursive traversal
+
 ## [0.1.6] - 2025-07-26
 
 ### Added
