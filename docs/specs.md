@@ -1,0 +1,103 @@
+# Specification
+
+This specification describes how the `keepsorted` application is expected to behave and outlines its current design. It acts as the source of truth for future code changes.
+
+## Inspiration
+
+`keepsorted` was inspired by [Buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier), which sorts items in Bazel `BUILD` files. The command-line flags and exit codes follow a similar design so that tooling can integrate either tool with minimal changes.
+
+The CLI returns these codes:
+- `0` — success
+- `1` — syntax errors in input
+- `2` — incorrect command usage
+- `3` — unexpected runtime failures
+- `4` — check mode detected unsorted files
+
+## Sorting Behaviour
+
+The core feature is sorting lines while preserving any comments associated with each item. Multi-line items (for example in `Cargo.toml`) are kept intact when possible so that sections remain readable.
+
+Comments are gathered until a non-comment line appears. Lines beginning with `#`, `//` or `--` are treated as comments for this purpose. The collected lines are attached to the next sortable item. When the block ends, any remaining trailing comments are appended at the end. This mirrors the behaviour in `src/strategies/generic.rs`, where each comment group is stored separately from its code line and reinserted after sorting. As a result, remarks or `TODO` notes stay with the relevant entry even after reordering.
+
+Sorting can be skipped with two special directives:
+- **`# keepsorted: ignore file`** anywhere in a file leaves the entire file unchanged.
+- **`# keepsorted: ignore block`** inside a `# Keep sorted` block preserves that block without reordering.
+
+Some experimental features exist:
+
+- **Rust derive sorting** is a basic workaround for reordering `#[derive(...)]` attributes. `cargo fmt` does not yet support this capability ([rust-lang/rustfmt#6574](https://github.com/rust-lang/rustfmt/issues/6574)). The feature only performs alphabetical or canonical ordering and is hidden behind a flag. Requests for built-in derive sorting have been open since 2017, so tools like `keepsorted` fill the gap. Upvote the issue if you would like to see native support.
+- **Gitignore and CODEOWNERS sorting** helps maintain consistent ordering but should be used carefully since pattern order can affect semantics.
+
+## Experimental Features
+
+Several optional features are still evolving and therefore are **disabled by default**. You can opt into them with the `--features` command-line flag or by enabling the corresponding crate features. Features are comma‑separated so you may combine multiple behaviours at once:
+
+```shell
+$ keepsorted <path> --features gitignore,codeowners
+```
+
+Available experimental flags:
+
+- `rust_derive_alphabetical` — sorts `#[derive(...)]` attributes alphabetically
+- `rust_derive_canonical` — sorts `#[derive(...)]` attributes in canonical Rust order
+- `gitignore` — enables sorting logic for `.gitignore` files
+- `codeowners` — enables sorting logic for `CODEOWNERS` files
+
+## Modules
+
+### `strategies` directory
+
+Each file under `src/strategies/` provides a `process` function that sorts lines for a particular file type:
+
+- **`generic.rs`** – handles text blocks marked with `# Keep sorted`.
+- **`bazel.rs`** – sorts lists in Bazel `BUILD`/`.bzl` files.
+- **`cargo_toml.rs`** – sorts dependency tables in `Cargo.toml` files.
+  The strategy tracks multi-line sections and only sorts once the block
+  closes using helpers such as `is_multi_line_code` and
+  `is_code_section_completed`.
+- **`gitignore.rs`** – sorts `.gitignore` or `CODEOWNERS` files when the feature is enabled.
+- **`rust_derive.rs`** – reorders `#[derive(...)]` attributes; may also trigger a generic sort.
+
+### CLI (`src/main.rs`)
+
+`main.rs` implements the command-line interface using `clap`. It parses arguments, selects the formatting mode (check, diff or fix) and processes files via `handle_file`. The CLI now supports a basic `-r`/`--recursive` flag to walk the provided directory and run `keepsorted` on every supported file it finds. This is convenient for simple use cases where users want to sort all files under the current directory. For more advanced setups that require ignoring particular paths, callers can still generate the file list themselves with tools like `find` or `git ls-files` and pass each path explicitly. The helper `handle_file` runs the crate API on each file and applies the chosen mode.
+
+When `--mode diff` is used, the CLI can delegate diff generation to an external
+program by passing `--diff-command <command>`. The option is parsed and executed
+in `src/main.rs` where `Command` spawns the specified tool to show changes.
+
+`keepsorted` focuses on sorting and does not try to walk directories itself. Implementing a fully featured crawler would require handling ignore files, generated sources and other project-specific rules. Existing tools already solve these problems, so the CLI expects callers to provide an explicit list of files. This design keeps the binary small while letting users combine it with powerful shell filters.
+
+### Crate API (`src/lib.rs`)
+
+Library code exposes two key functions:
+
+- `process_file` – reads a file, determines the correct strategy and returns the sorted content.
+- `process_lines` – sorts an in-memory list of lines using a chosen strategy.
+
+Both functions rely on private helpers such as `classify` for strategy selection.
+
+## File Processing Flow
+
+1. CLI parses args and opens the file
+2. `process_file` calls `classify` to select the strategy
+3. The strategy module processes lines via `process_lines`
+4. The result is checked, diffed, or written depending on the mode
+
+## Testing Strategy
+
+End-to-end tests in `e2e-tests` invoke the CLI using a command-line test framework to simulate real usage. Each flag or parameter has its own test file with descriptive names following the Arrange–Act–Assert style. This keeps tests short and focused while covering many combinations.
+
+Tests use real input files and golden outputs. Each test case includes `input.txt` and `expected.txt` stored in the same subdirectory for clarity and simplicity. Shared exit codes live in `utils/exit_codes.bash` so that the CLI and tests use the same constants.
+
+Rust unit tests inside `tests/` verify the behaviour of individual strategies for different file and data types. The `run-all.sh` script runs the full validation sequence and should be executed before committing changes.
+
+## Out of Scope
+
+To stay focused and composable, `keepsorted` does **not** aim to:
+
+- Handle advanced directory traversal or ignore rules automatically
+- Act as a full-fledged parser for every supported file type
+- Handle ignore files or exclude paths automatically
+- Automatically detect project structure or configuration files
+- Replace formatting tools like `rustfmt` or `prettier`
