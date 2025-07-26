@@ -8,6 +8,7 @@ Arguments:
 Options:
   -p, --path <PATH>             File to process (conflicts with positional path)
   -r, --recursive               Process directories recursively
+  -q, --quiet                   Silence non-error messages
   -f, --features <FEATURE>      Enable experimental features [possible values: gitignore, codeowners, rust_derive_alphabetical, rust_derive_canonical]
       --check                   alias for '--mode check'
       --diff                    alias for '--mode diff'

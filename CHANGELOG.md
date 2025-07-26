@@ -8,6 +8,7 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ### Added
 - Skip binary files during recursive traversal
+- `--quiet` flag to suppress informational output
 
 ## [0.1.6] - 2025-07-26
 

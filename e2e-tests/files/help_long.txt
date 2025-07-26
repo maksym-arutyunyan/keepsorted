@@ -22,6 +22,9 @@ Options:
   -r, --recursive
           Process directories recursively
 
+  -q, --quiet
+          Silence non-error messages
+
   -f, --features <FEATURE>
           Enable experimental features
 
