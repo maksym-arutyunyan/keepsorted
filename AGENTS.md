@@ -7,14 +7,14 @@
 - If a PR only changes Markdown documentation (excluding Rust doc comments),
   skip formatting, build and test steps.
 - If Rust source files or `Cargo.toml` were modified, run each command from
-  `./run-all.sh` manually. It may include:
+  `./verify.sh` manually. It may include:
   - `cargo build --release --all-targets`
   - `cargo test`
   - `cargo test --release`
   - `cargo clippy --all-targets -- -D warnings`
   - `cargo fmt --all -- --check`
   - running `keepsorted` over tracked files
-- After running the individual commands, execute `./run-all.sh` to confirm that
+- After running the individual commands, execute `./verify.sh` to confirm that
   no further changes are introduced and that all steps succeed. Always consult
   the script for updates.
   - The PR fails if any command fails or if `git diff` shows changes
@@ -22,7 +22,7 @@
 ## Best Practices
 - Use the Rust version pinned in `rust-toolchain.toml`.
 - Always format code using `cargo fmt`.
-- Address warnings reported by `cargo clippy` as invoked in `run-all.sh`.
+- Address warnings reported by `cargo clippy` as invoked in `verify.sh`.
 - Keep entries in `Cargo.toml` and other marked blocks sorted using `keepsorted` comments.
 - Ensure code changes adhere to `docs/specs.md`, which is the source of truth. Modify this file only when explicitly instructed by a human.
 - Update `CHANGELOG.md` for user‑visible changes following the Keep a Changelog format.

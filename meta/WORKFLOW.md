@@ -7,7 +7,7 @@
 ## Dependencies and Tools
 - Manage libraries with Cargo and enable optional behaviour with feature flags.
 - End-to-end tests require the `bats` runner.
-- `run-all.sh` sequences build, test, lint, format, sorting, and diff checks.
+- `verify.sh` sequences build, test, lint, format, sorting, and diff checks.
 
 ## Local Checks
 For Rust or manifest changes run:
@@ -19,7 +19,7 @@ cargo clippy --all-targets -- -D warnings
 cargo fmt --all -- --check
 ./target/release/keepsorted --features gitignore,rust_derive_canonical $(git ls-files -z | grep -vzE '^tests/|^e2e-tests/|^README.md$' | xargs -0 -n1)
 bats e2e-tests
-./run-all.sh
+./verify.sh
 ```
 Markdown-only edits may skip these steps.
 

@@ -4,7 +4,7 @@ keepsorted is a Rust tool that sorts annotated lists while preserving nearby com
 
 ## Behaviors
 - Follow Conventional Commits for commit messages and PR titles.
-- For Rust or manifest changes, run each command in `run-all.sh` and then the script itself. Doc-only changes may skip these checks.
+- For Rust or manifest changes, run each command in `verify.sh` and then the script itself. Doc-only changes may skip these checks.
 - Use the Rust version pinned in `rust-toolchain.toml`.
 - Keep lists and manifest sections sorted and update `CHANGELOG.md` for user-facing changes.
 - Do not modify `docs/specs.md` unless a human requests it.
