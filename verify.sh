@@ -28,6 +28,7 @@ Tasks:
 EOF
 }
 
+# shellcheck disable=SC2329
 print_header() {
   echo
   echo "============================================================"
