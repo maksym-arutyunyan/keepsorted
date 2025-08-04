@@ -39,6 +39,7 @@ print_header() {
 status_ok=true
 failures=()
 
+# shellcheck disable=SC2329
 run_build() {
   print_header "cargo build"
   if ! cargo build --release --all-targets; then
@@ -47,6 +48,7 @@ run_build() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_test() {
   print_header "cargo test"
   if ! cargo test; then
@@ -55,6 +57,7 @@ run_test() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_test_release() {
   print_header "cargo test --release"
   if ! cargo test --release; then
@@ -63,6 +66,7 @@ run_test_release() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_clippy() {
   print_header "cargo clippy"
   if ! cargo clippy --all-targets -- -D warnings; then
@@ -71,6 +75,7 @@ run_clippy() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_fmt() {
   print_header "cargo fmt"
   if ! cargo fmt --all -- --check; then
@@ -79,6 +84,7 @@ run_fmt() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_keepsorted() {
   print_header "keepsorted"
   if ! git ls-files -z \
@@ -90,6 +96,7 @@ run_keepsorted() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_diff() {
   print_header "git diff"
   if ! git diff --exit-code; then
@@ -98,6 +105,7 @@ run_diff() {
   fi
 }
 
+# shellcheck disable=SC2329
 run_e2e() {
   print_header "bats e2e-tests"
   if ! bats e2e-tests; then
