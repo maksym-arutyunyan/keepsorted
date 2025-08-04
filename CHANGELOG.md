@@ -10,6 +10,9 @@ format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 - Skip binary files during recursive traversal
 - `--quiet` flag to suppress informational output
 
+### Documentation
+- Draft meta guidelines for AI and contributors
+
 ## [0.1.6] - 2025-07-26
 
 ### Added
