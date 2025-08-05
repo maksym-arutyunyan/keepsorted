@@ -1,29 +1,43 @@
-# Instructions for AI Agent
+# AGENTS
 
-## PR Naming
-- Name GitHub pull requests using the **Conventional Commits** specification. Example: `feat(parser): support new syntax` or `fix(ci): correct clippy invocation`.
+Guidelines for working with the contributor documentation in this folder.
 
-## Validation Steps
-- If a PR only changes Markdown documentation (excluding Rust doc comments),
-  skip formatting, build and test steps.
-- If Rust source files or `Cargo.toml` were modified, run each command from
-  `./verify.sh` manually. It may include:
-  - `cargo build --release --all-targets`
-  - `cargo test`
-  - `cargo test --release`
-  - `cargo clippy --all-targets -- -D warnings`
-  - `cargo fmt --all -- --check`
-  - running `keepsorted` over tracked files
-- After running the individual commands, execute `./verify.sh` to confirm that
-  no further changes are introduced and that all steps succeed. Always consult
-  the script for updates.
-  - The PR fails if any command fails or if `git diff` shows changes
+`keepsorted` sorts annotated lists while preserving nearby comments so
+configuration files and code blocks stay tidy.
 
-## Best Practices
+## Commit and PR conventions
+
+- Commit messages and PR titles follow Conventional Commits.
+- File names and commit scopes use `snake_case` and lowercase.
+
+## Validation
+
+- For Rust source or manifest changes:
+  - Run each command from `verify.sh` individually.
+  - Then run `./verify.sh` to confirm success and a clean working tree.
+  - The PR fails if any command errors or if `git diff` shows changes.
+- Documentation-only changes:
+  - Run `mdformat` on modified Markdown files.
+  - Other verify steps may be skipped.
+
+## Environment and tools
+
 - Use the Rust version pinned in `rust-toolchain.toml`.
-- Always format code using `cargo fmt`.
-- Address warnings reported by `cargo clippy` as invoked in `verify.sh`.
-- Keep entries in `Cargo.toml` and other marked blocks sorted using `keepsorted` comments.
-- Ensure code changes adhere to `docs/specs.md`, which is the source of truth. Modify this file only when explicitly instructed by a human.
-- Update `CHANGELOG.md` for user‑visible changes following the Keep a Changelog format.
-- Commit messages should also follow the Conventional Commits style.
+- Keep lists and manifest sections sorted; run `keepsorted` where annotated.
+- Update `CHANGELOG.md` for user-facing changes.
+- Do not modify `docs/specs.md` unless a human requests it.
+- Markdown is formatted with `mdformat`; CI checks formatting.
+
+## Reference
+
+| File | Purpose |
+| ---- | ------- |
+| `SPECS.md` | Product scope, goals, and acceptance criteria. |
+| `SYSTEM.md` | Architecture overview and component responsibilities. |
+| `WORKFLOW.md` | Environment setup, workflow, and conventions. |
+
+## Conventions
+
+- Markdown files use `#` headings, wrap text reasonably, and rely on
+  `mdformat` for consistent style.
+- Paths and examples assume the repository root unless noted.

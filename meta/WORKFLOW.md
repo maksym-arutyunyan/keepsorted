@@ -78,17 +78,26 @@ A pull request is ready to merge when:
 - The worktree is clean after running `./verify.sh`.
 - User-visible changes are recorded in the CHANGELOG.
 
-## Continuous integration
+## CI
 
-GitHub Actions runs `verify.sh` tasks and `mdformat --check` so local runs
-match CI.
+- GitHub Actions invokes `./verify.sh` for build, test, format and other jobs plus a final check.
+- A PR title workflow enforces Conventional Commits.
+- Using the prompt `prepare release vX.Y.Z` triggers a release PR named `chore(release): vX.Y.Z`; merges create tags and run the release workflow.
 
 ## Versioning & releases
 
-- Follow Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- Track changes in `CHANGELOG.md`, grouping entries by prefix in this order:
-  `feat`, `fix`, `refactor`, `test`, `docs`, `chore`. Preserve original order
-  within each group.
+- Use Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- Track version in `VERSION`, changes in `CHANGELOG.md`.
+- Group changelog entries by prefix: `feat`, `fix`, `refactor`, `test`, `docs`, `chore` (in that order). Keep original item order within each group.
+- Add a summary at the top of each release:
+  - **Patch (`x.y.Z`)**: 1–2 lines on key fixes or internal changes.
+  - **Minor (`x.Y.0`)**: Short paragraph on main new features since last minor.
+  - **Major (`X.0.0`)**: Summary of major changes and any breaking updates.
+- Release PR:
+  - Only updates `VERSION`, `CHANGELOG.md`, and `README.md` if needed.
+  - Title: `chore(release): vX.Y.Z`
+- After merge:
+  - CI tags the release and runs final checks.
 
 ### Release procedure
 
@@ -107,14 +116,19 @@ match CI.
 1. Publish to crates.io:
    - Get a token at crates.io.
    - Authenticate:
+
      ```bash
      cargo login
      ```
+
    - Check out the release tag:
+
      ```bash
      git checkout vX.Y.Z
      ```
+
    - Publish the crate:
+
      ```bash
      cargo publish -p keepsorted
      ```

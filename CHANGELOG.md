@@ -1,79 +1,72 @@
 # Changelog
-All notable changes to this project will be documented in this file.
 
-This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
-format and adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+All notable changes to this project are documented here.  
+This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Unreleased
 
-### Added
-- Skip binary files during recursive traversal
-- `--quiet` flag to suppress informational output
+Adds quiet mode and skips binary files during recursive checks. Also drafts new meta documentation for contributors and AI models.
 
-### Documentation
-- Draft meta guidelines for AI and contributors
+- feat: skip binary files during recursive traversal
+- feat: add `--quiet` flag to suppress informational output
+- docs: draft meta guidelines for AI and contributors
 
-## [0.1.6] - 2025-07-26
+## v0.1.6 – 2025-07-26
 
-### Added
-- Recursive directory traversal via `-r`/`--recursive`
-- New `--mode` and `--diff-command` options
-- Exit code `4` for failed diff checks
+Adds recursive traversal, new options, and better CI exit codes. Expands documentation and fixes CLI errors.
 
-### Fixed
-- Correct exit codes and usage errors
+- feat: recursive directory traversal via `-r` / `--recursive`
+- feat: add `--mode` and `--diff-command` options
+- feat: add exit code `4` for failed diff checks
+- fix: correct exit codes and usage errors
+- docs: expand README and help text
 
-### Documentation
-- Expanded README and help text
+## v0.1.5 – 2025-07-15
 
-## [0.1.5] - 2025-07-15
+Adds `--check` mode for CI and pre-commit use. Improves crate documentation and updates README.
 
-- Added `--check` mode to lint command for CI and pre-commit use
-- Improved crate-level documentation
-- Updated README with badges
+- feat: add `--check` mode to lint command
+- docs: improve crate-level documentation
+- docs: update README with badges
 
-## [0.1.4] - 2025-07-14
+## v0.1.4 – 2025-07-14
 
-### Fixed
-- Correct Bazel file detection
-- Support Lua-style `--` comments for ignore directives
+Fixes Bazel file detection and improves comment support. Cleans up documentation and sorting logic.
 
-### Documentation
-- Fix link in the development guide
-- Fix numbering in the publish guide
+- fix: correct Bazel file detection
+- fix: support Lua-style `--` comments for ignore directives
+- docs: fix link in the development guide
+- docs: fix numbering in the publish guide
+- chore: add license file
+- chore: correct alphabetical sort function typo
 
-### Misc
-- Added license file
-- Corrected alphabetical sort function typo
+## v0.1.3 – 2025-07-10
 
-## [0.1.3] - 2025-07-10
+Adds Lua file support and improves interaction with Rust generics. Simplifies CI configuration.
 
-### Added
-- Support for Lua files
+- feat: add support for Lua files
+- fix: improve `rust_derive` and generic sorting interaction
+- chore: simplify workflow configuration
 
-### Fixed
-- Improved `rust_derive` and generic sorting interaction
+## v0.1.2 – 2025-06-03
 
-### CI
-- Simplified workflow configuration
+Fixes multi-line array handling in `Cargo.toml`.
 
-## [0.1.2] - 2025-06-03
+- fix: support multi-line arrays in `Cargo.toml` ([#34](https://github.com/maksym-arutyunyan/keepsorted/issues/34))
 
-### Fixed
-- fix multi-line arrays in Cargo.toml, [issue 34](https://github.com/maksym-arutyunyan/keepsorted/issues/34)
+## v0.1.1 – 2024-10-01
 
-## [0.1.1] - 2024-10-01
+Introduces experimental support for grouped Rust derive tokens.
 
-### Added
+- feat: (experimental) keep Rust derive tokens together (e.g., `Serialize`, `serde::Serialize`)
 
-- (Experimental) Keep Rust derive tokens together, eg. `Serialize` and `serde::Serialize`
+## v0.1.0 – 2024-09-12
 
-## [0.1.0] - 2024-09-12
+Initial release with support for common config file types and experimental sorting features.
 
-### Added
-- Generic keyword sorting functionality
-- Support for Bazel files
-- Support for `Cargo.toml` files
-- (Experimental) Support for `.gitignore` files
-- (Experimental) Support for `CODEOWNERS` files
-- (Experimental) Sorting of Rust `#[derive(...)]` traits
+- feat: add generic keyword sorting
+- feat: support Bazel files
+- feat: support `Cargo.toml` files
+- feat: (experimental) support `.gitignore` files
+- feat: (experimental) support `CODEOWNERS` files
+- feat: (experimental) sort Rust `#[derive(...)]` traits
