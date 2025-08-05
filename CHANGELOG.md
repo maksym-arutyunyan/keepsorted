@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project are documented here.  
+All notable changes to this project are documented here.\
 This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
@@ -10,6 +10,7 @@ Adds quiet mode and skips binary files during recursive checks. Also drafts new 
 - feat: skip binary files during recursive traversal
 - feat: add `--quiet` flag to suppress informational output
 - docs: draft meta guidelines for AI and contributors
+- docs: fix specs link in README and AGENTS
 
 ## v0.1.6 – 2025-07-26
 
