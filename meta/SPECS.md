@@ -18,4 +18,5 @@ Developers and CI systems that need deterministic ordering while keeping human c
 
 ## Out of scope
 
-Custom sort orders for Rust derive macros. Derive attributes are always alphabetized to avoid bespoke rules for individual macros and to keep behavior predictable.
+Custom sort orders for Rust derive macros.
+Derive attributes are either alphabetized or use canonical order.
