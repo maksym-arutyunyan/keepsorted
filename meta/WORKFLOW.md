@@ -33,16 +33,18 @@ Guides contributors through setup, development, testing, and releases.
 
 1. Create a branch and make changes.
 1. Keep lists sorted and update tests and docs alongside code.
-1. For documentation-only changes run `mdformat`.
-1. For Rust or manifest changes run each task in `./verify.sh` and then the
-   script itself:
-   - `cargo build --release --all-targets` – ensures the code compiles.
-   - `cargo test` and `cargo test --release` – verify behaviour.
-   - `cargo clippy --all-targets -- -D warnings` – enforce idiomatic Rust.
-   - `cargo fmt --all -- --check` – maintain consistent formatting.
-   - `keepsorted` – check that annotated lists stay ordered.
-   - `git diff --exit-code` – confirm a clean working tree.
-   - `bats e2e-tests` – exercise the CLI end to end.
+1. Documentation-only changes:
+   - Run `mdformat` on updated files.
+1. Rust or manifest changes:
+   - Run each task in `verify.sh` manually:
+     - `cargo build --release --all-targets` – ensures the code compiles.
+     - `cargo test` and `cargo test --release` – verify behaviour.
+     - `cargo clippy --all-targets -- -D warnings` – enforce idiomatic Rust.
+     - `cargo fmt --all -- --check` – maintain consistent formatting.
+     - `keepsorted` – check that annotated lists stay ordered.
+     - `bats e2e-tests` – exercise the CLI end to end.
+   - Run `./verify.sh` to ensure the tasks succeed and no files were modified.
+   - Use `git diff --exit-code` to confirm a clean working tree.
 1. Update `docs/` and `CHANGELOG.md` for user-facing changes.
 1. Commit with a Conventional Commit message.
 

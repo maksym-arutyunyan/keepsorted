@@ -9,20 +9,25 @@ sorting strategies.
 
 ## Components
 
-- **CLI (`src/main.rs`)** – parses arguments, iterates over files, and maps
-  library results to exit codes.
+- **CLI (`src/main.rs`)** – parses arguments with `clap`, iterates over files,
+  supports `--recursive` and `--diff-command`, and maps library results to exit
+  codes.
 - **Library (`src/lib.rs`)** – exposes `process_file` and `process_lines`,
   selects a strategy for each file, and applies the requested mode.
-- **Strategies (`src/strategies/*`)** – implement format-specific sorting
-  logic and return reordered lines.
+- **Strategies (`src/strategies/*`)** – implement format-specific sorting:
+  - `generic` – handles text blocks marked with `# Keep sorted`.
+  - `bazel` – sorts lists in Bazel `BUILD`/`.bzl` files.
+  - `cargo_toml` – sorts dependency tables in `Cargo.toml`.
+  - `gitignore` – sorts `.gitignore` and `CODEOWNERS` files when enabled.
+  - `rust_derive` – reorders `#[derive(...)]` attributes.
 - **Utilities** – helpers for comment binding, diff generation, and feature
   gating.
 
 ## Data flow
 
 1. The CLI gathers file paths and options from the user.
-1. The library classifies each file and selects an appropriate strategy.
-1. The chosen strategy sorts blocks and yields updated lines.
+1. `process_file` classifies each path and selects a strategy.
+1. The strategy reorders lines and preserves associated comments.
 1. The library applies `check`, `diff`, or `fix` and returns a result.
 1. The CLI writes diffs or files and exits with success or failure.
 
