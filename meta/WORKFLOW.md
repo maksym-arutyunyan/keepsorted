@@ -1,38 +1,69 @@
 # WORKFLOW
 
-## Environment Setup
+Guides contributors through setup, development, testing, and releases.
 
-- Install the Rust toolchain from `rust-toolchain.toml` with `rustup`.
-- Use isolated environments so tool versions do not bleed into other projects.
+## Environment setup
 
-## Local development
+1. Install the Rust toolchain referenced in `rust-toolchain.toml` using
+   `rustup`.
+1. Install `mdformat` for Markdown formatting and `bats` for end-to-end tests.
+1. Use isolated toolchains so dependencies do not leak between projects.
 
-- Format Markdown files with `mdformat`.
-- Run `./verify.sh` before committing. Without arguments it runs every check, or pass task names to limit the run.
+## Project structure
 
-### verify.sh tasks
+- `src/` – library and CLI sources.
+- `tests/` – Rust unit tests.
+- `e2e-tests/` – Bats-based end-to-end tests.
+- `docs/` – user documentation.
+- `meta/` – contributor guides (this folder).
+- Temporary build output lives in `target/` and should not be committed.
 
-| Argument | Runs | CI job |
-| --- | --- | --- |
-| `build` | `cargo build --release --all-targets` | build |
-| `test` | `cargo test` | test |
-| `test-release` | `cargo test --release` | test-release |
-| `clippy` | `cargo clippy --all-targets -- -D warnings` | lint |
-| `fmt` | `cargo fmt --all -- --check` | format |
-| `keepsorted` | run `keepsorted` on tracked files | sort |
-| `diff` | `git diff --exit-code` | diff |
-| `e2e` | `bats e2e-tests` | e2e |
-| `all` | all tasks above (default) | combined |
+## Coding conventions
 
-Documentation-only changes may run `mdformat` and skip `verify.sh`.
+- Rust code is formatted with `cargo fmt`; Clippy warnings are treated as
+  errors.
+- Lists and manifest sections annotated with `keepsorted` comments must remain
+  sorted.
+- Markdown is formatted with `mdformat`.
+- File and directory names use `snake_case`.
+- Commit messages and PR titles follow Conventional Commits.
+- Generated files and build artifacts are excluded from commits.
 
-## Continuous Integration
+## Development workflow
 
-- GitHub Actions invokes `verify.sh` for build, test, lint, format, sort, diff, and end-to-end jobs so local runs match CI.
-- A dedicated job executes `mdformat --check` to enforce Markdown formatting.
-- PR titles must follow the Conventional Commits specification.
+1. Create a branch and make changes.
+1. Keep lists sorted and update tests and docs alongside code.
+1. For documentation-only changes run `mdformat`.
+1. For Rust or manifest changes run each task in `./verify.sh` and then the
+   script itself:
+   - `cargo build --release --all-targets` – ensures the code compiles.
+   - `cargo test` and `cargo test --release` – verify behaviour.
+   - `cargo clippy --all-targets -- -D warnings` – enforce idiomatic Rust.
+   - `cargo fmt --all -- --check` – maintain consistent formatting.
+   - `keepsorted` – check that annotated lists stay ordered.
+   - `git diff --exit-code` – confirm a clean working tree.
+   - `bats e2e-tests` – exercise the CLI end to end.
+1. Update `docs/` and `CHANGELOG.md` for user-facing changes.
+1. Commit with a Conventional Commit message.
 
-## Release automation
+## Definition of done
 
-- Comment `prepare release vX.Y.Z` to begin a release.
-- The workflow opens a PR titled `chore(release): vX.Y.Z`; merging it tags the commit and runs the release pipeline automatically.
+A pull request is ready to merge when:
+
+- Code and docs follow the conventions above.
+- Tests cover new behaviour and all verify tasks pass.
+- Documentation explains the feature and `SPECS.md` is updated if scope
+  changes.
+- The worktree is clean after running `./verify.sh`.
+- User-visible changes are recorded in the CHANGELOG.
+
+## Continuous integration
+
+GitHub Actions runs `verify.sh` tasks and `mdformat --check` so local runs
+match CI.
+
+## Release process
+
+1. Comment `prepare release vX.Y.Z` on the main branch.
+1. A bot opens `chore(release): vX.Y.Z`.
+1. Merge the PR to tag the commit and publish the release.
