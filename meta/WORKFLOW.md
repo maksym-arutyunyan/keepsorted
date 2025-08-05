@@ -36,3 +36,15 @@ Documentation-only changes may run `mdformat` and skip `verify.sh`.
 
 - Comment `prepare release vX.Y.Z` to begin a release.
 - The workflow opens a PR titled `chore(release): vX.Y.Z`; merging it tags the commit and runs the release pipeline automatically.
+
+## Training Module
+
+1. Gather historical data and define the parameter ranges to explore.
+1. Optionally override the default four-month test window.
+1. Execute the training module to backtest each configuration on the train
+   split and score the winner on the held-out test data.
+1. Inspect the generated summary file to compare metrics like return on
+   investment or Sharpe ratio and choose a configuration.
+
+Runs are deterministic, so repeating the process with the same inputs yields
+identical summaries.
