@@ -89,6 +89,32 @@ match CI.
 - Track changes in `CHANGELOG.md`, grouping entries by prefix in this order:
   `feat`, `fix`, `refactor`, `test`, `docs`, `chore`. Preserve original order
   within each group.
-- Comment `prepare release vX.Y.Z` on the main branch to create a release PR.
-- A bot opens `chore(release): vX.Y.Z`; merging tags the commit and publishes
-  the release.
+
+### Release procedure
+
+1. Bump the `keepsorted` version in `Cargo.toml`.
+1. Draft a GitHub release:
+   - Identify the merge commit.
+   - Go to Releases → **Draft a new release**.
+   - Set:
+     - Tag: `vX.Y.Z`
+     - Target: the merge commit
+     - Title: `vX.Y.Z`
+     - Previous tag: last release
+     - Notes: click **Generate release notes**, edit if needed
+   - Summarize highlights in `CHANGELOG.md`.
+   - Click **Publish release**.
+1. Publish to crates.io:
+   - Get a token at crates.io.
+   - Authenticate:
+     ```bash
+     cargo login
+     ```
+   - Check out the release tag:
+     ```bash
+     git checkout vX.Y.Z
+     ```
+   - Publish the crate:
+     ```bash
+     cargo publish -p keepsorted
+     ```
