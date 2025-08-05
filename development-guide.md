@@ -1,36 +1,3 @@
 # Development Guide
 
-This guide describes how to prepare and publish a new release of the `keepsorted` crate to GitHub and [crates.io](https://crates.io/crates/keepsorted).
-
-## 1. Bump Version
-
-1. Update `keepsorted` version in `Cargo.toml`, example PR [#45](https://github.com/maksym-arutyunyan/keepsorted/pull/45/files)
-
-## 2. Create GitHub Release
-
-1. Identify the merge commit.
-2. Go to [Releases](https://github.com/maksym-arutyunyan/keepsorted/releases) → **Draft a new release**.
-3. Set:
-   - Tag: `vX.X.X`
-   - Target: the merge commit
-   - Title: `vX.X.X`
-   - Previous tag: last release
-   - Notes: click **Generate release notes**, edit if needed
-4. Summarize the highlights and add them to `CHANGELOG.md`.
-5. Click **Publish release**.
-
-## 3. Publish to crates.io
-
-1. Get a crates.io token at [Account Settings → API Tokens](https://crates.io/settings/tokens)
-2. Authenticate:
-   ```bash
-   cargo login
-   ```
-3. Check out the release tag:
-   ```bash
-   git checkout vX.X.X
-   ```
-4. Publish the crate:
-   ```bash
-   cargo publish -p keepsorted
-   ```
+Release instructions have moved to [meta/WORKFLOW.md](meta/WORKFLOW.md).
