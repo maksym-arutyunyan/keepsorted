@@ -25,6 +25,33 @@ commentary intact.
 - Automatic discovery of files beyond paths explicitly provided.
 - Modifying unrelated formatting or comments.
 
+## Sorting behaviour
+
+- Groups consecutive comment lines with the following item and preserves that
+  association after sorting.
+- Directives:
+  - `# keepsorted: ignore file` — skip sorting for the entire file.
+  - `# keepsorted: ignore block` — skip the annotated block within a sorted
+    section.
+
+## Exit codes
+
+- `0` — success.
+- `1` — syntax errors in input.
+- `2` — incorrect command usage.
+- `3` — unexpected runtime failures.
+- `4` — check mode detected unsorted files.
+
+## Experimental features
+
+Disabled by default and enabled via `--features` or crate features:
+
+- `rust_derive_alphabetical` — sorts `#[derive(...)]` attributes alphabetically.
+- `rust_derive_canonical` — sorts `#[derive(...)]` attributes in canonical
+  Rust order.
+- `gitignore` — sorts `.gitignore` files.
+- `codeowners` — sorts `CODEOWNERS` files.
+
 ## Acceptance criteria
 
 A format or feature is complete when:
