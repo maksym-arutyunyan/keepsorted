@@ -29,6 +29,17 @@ Guides contributors through setup, development, testing, and releases.
 - Commit messages and PR titles follow Conventional Commits.
 - Generated files and build artifacts are excluded from commits.
 
+## Documentation
+
+- Keep `README.md`, especially the "Getting Started" section, in sync with the
+  codebase and the specs in `meta/`.
+
+## Code quality
+
+- Evaluate contributions in this order: correctness, robustness, simplicity,
+  clarity, performance, readability, maintainability, testability, test
+  coverage, reusability.
+
 ## Development workflow
 
 1. Create a branch and make changes.
@@ -48,6 +59,17 @@ Guides contributors through setup, development, testing, and releases.
 1. Update `docs/` and `CHANGELOG.md` for user-facing changes.
 1. Commit with a Conventional Commit message.
 
+## Testing
+
+- Maintain unit tests in `tests/` and end-to-end tests in `e2e-tests/`.
+- Tests verify behaviour described in `meta/SPECS.md`, `meta/SYSTEM.md`, and
+  this workflow.
+- Organize tests by module, starting with acceptance tests, then focused unit
+  tests.
+- Each test uses "Arrange – Act – Assert" and checks one behaviour.
+- Bug fixes and new features require accompanying tests.
+- CI and local runs must pass all tests before merging.
+
 ## Definition of done
 
 A pull request is ready to merge when:
@@ -64,8 +86,12 @@ A pull request is ready to merge when:
 GitHub Actions runs `verify.sh` tasks and `mdformat --check` so local runs
 match CI.
 
-## Release process
+## Versioning & releases
 
-1. Comment `prepare release vX.Y.Z` on the main branch.
-1. A bot opens `chore(release): vX.Y.Z`.
-1. Merge the PR to tag the commit and publish the release.
+- Follow Semantic Versioning (`MAJOR.MINOR.PATCH`).
+- Track changes in `CHANGELOG.md`, grouping entries by prefix in this order:
+  `feat`, `fix`, `refactor`, `test`, `docs`, `chore`. Preserve original order
+  within each group.
+- Comment `prepare release vX.Y.Z` on the main branch to create a release PR.
+- A bot opens `chore(release): vX.Y.Z`; merging tags the commit and publishes
+  the release.
