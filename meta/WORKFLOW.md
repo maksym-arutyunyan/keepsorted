@@ -64,9 +64,6 @@ Guides contributors through setup, development, testing, and releases.
 - Maintain unit tests in `tests/` and end-to-end tests in `e2e-tests/`.
 - Tests verify behaviour described in `meta/SPECS.md`, `meta/SYSTEM.md`, and
   this workflow.
-- Organize tests by module, starting with acceptance tests, then focused unit
-  tests.
-- Each test uses "Arrange – Act – Assert" and checks one behaviour.
 - Bug fixes and new features require accompanying tests.
 - CI and local runs must pass all tests before merging.
 
