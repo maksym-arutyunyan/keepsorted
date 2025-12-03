@@ -25,7 +25,7 @@ configuration files and code blocks stay tidy.
 - Use the Rust version pinned in `rust-toolchain.toml`.
 - Keep lists and manifest sections sorted; run `keepsorted` where annotated.
 - Update `CHANGELOG.md` for user-facing changes.
-- Do not modify `meta/SPECS.md` unless a human requests it.
+- Do not modify `docs/SPECS.md` unless a human requests it.
 - Markdown is formatted with `mdformat`; CI checks formatting.
 
 ## Reference

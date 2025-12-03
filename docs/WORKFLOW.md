@@ -15,7 +15,7 @@ Guides contributors through setup, development, testing, and releases.
 - `tests/` – Rust unit tests.
 - `e2e-tests/` – Bats-based end-to-end tests.
 - `docs/` – user documentation.
-- `meta/` – contributor guides (this folder).
+- `docs/` – contributor guides (this folder).
 - Temporary build output lives in `target/` and should not be committed.
 
 ## Coding conventions
@@ -32,7 +32,7 @@ Guides contributors through setup, development, testing, and releases.
 ## Documentation
 
 - Keep `README.md`, especially the "Getting Started" section, in sync with the
-  codebase and the specs in `meta/`.
+  codebase and the specs in `docs/`.
 
 ## Code quality
 
@@ -62,7 +62,7 @@ Guides contributors through setup, development, testing, and releases.
 ## Testing
 
 - Maintain unit tests in `tests/` and end-to-end tests in `e2e-tests/`.
-- Tests verify behaviour described in `meta/SPECS.md`, `meta/SYSTEM.md`, and
+- Tests verify behaviour described in `docs/SPECS.md`, `docs/SYSTEM.md`, and
   this workflow.
 - Bug fixes and new features require accompanying tests.
 - CI and local runs must pass all tests before merging.
