@@ -265,3 +265,37 @@ workspace = true
         "#
     );
 }
+
+#[test]
+fn test_cargo_toml_hash_in_string() {
+    test_inner!(
+        CargoToml,
+        r#"
+[package]
+authors = ["Name # Surname"]
+version = "1.0"
+        "#,
+        r#"
+[package]
+authors = ["Name # Surname"]
+version = "1.0"
+        "#
+    );
+}
+
+#[test]
+fn test_cargo_toml_git_url_with_hash() {
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+dep_b = "1.0"
+dep_a = { git = "https://example.com/foo#bar" }
+        "#,
+        r#"
+[dependencies]
+dep_a = { git = "https://example.com/foo#bar" }
+dep_b = "1.0"
+        "#
+    );
+}

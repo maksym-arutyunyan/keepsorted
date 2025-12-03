@@ -10,7 +10,8 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 
     for line in lines {
         let trimmed = line.trim();
-        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+        let (line_without_comment, _comment) = split_code_and_comment(trimmed);
+        let line_without_comment = line_without_comment.trim();
 
         if is_block_start(&line) {
             if let Some(prev_line) = output_lines.last() {
@@ -117,10 +118,33 @@ fn is_multi_line_code(line: &str) -> bool {
 fn is_code_section_completed(line: &str) -> bool {
     // Split the line at the '#' character, take the first part, trim it,
     // and check if it ends with '}' or ']'.
-    let x = line
-        .trim()
-        .split_once('#')
-        .map_or(line, |(code, _comment)| code)
-        .trim();
+    let (code, _comment) = split_code_and_comment(line.trim());
+    let x = code.trim();
     x.ends_with('}') || x.ends_with(']')
+}
+
+fn split_code_and_comment(line: &str) -> (&str, &str) {
+    let mut in_string = false;
+    let mut escape = false;
+    let mut quote_char = '\0';
+    let bytes = line.as_bytes();
+
+    for i in 0..bytes.len() {
+        let c = bytes[i];
+        if in_string {
+            if escape {
+                escape = false;
+            } else if c == b'\\' {
+                escape = true;
+            } else if c == quote_char as u8 {
+                in_string = false;
+            }
+        } else if c == b'"' || c == b'\'' {
+            in_string = true;
+            quote_char = c as char;
+        } else if c == b'#' {
+            return (&line[..i], &line[i..]);
+        }
+    }
+    (line, "")
 }
