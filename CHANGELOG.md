@@ -9,6 +9,8 @@ Adds quiet mode and skips binary files during recursive checks. Also drafts new 
 
 - feat: skip binary files during recursive traversal
 - feat: add `--quiet` flag to suppress informational output
+- fix: correctly parse comments in `rust_derive` when string literals contain `//`
+- fix: print stderr output when diff command fails
 - docs: draft meta guidelines for AI and contributors
 
 ## v0.1.6 – 2025-07-26

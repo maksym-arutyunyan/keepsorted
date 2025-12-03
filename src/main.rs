@@ -352,6 +352,9 @@ fn handle_file(
                         .output();
                     match output {
                         Ok(out) => {
+                            if !out.stderr.is_empty() {
+                                eprint!("{}", String::from_utf8_lossy(&out.stderr));
+                            }
                             print!("{}", String::from_utf8_lossy(&out.stdout));
                             if !out.status.success() {
                                 let code = out.status.code().unwrap_or(EXIT_RUNTIME_ERROR);

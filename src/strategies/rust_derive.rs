@@ -35,7 +35,8 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Proc
             is_sorting_block = true;
             block.push(line.clone());
         }
-        let line_without_comment = line.trim().split("//").next().unwrap_or("").trim();
+        let (line_without_comment, _comment) = split_code_and_comment(line.trim());
+        let line_without_comment = line_without_comment.trim();
         if is_sorting_block && RE_DERIVE_END.is_match(line_without_comment) {
             if !is_derive_begin {
                 block.push(line.clone());
@@ -70,7 +71,8 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
         .map(|line| line.trim_end_matches('\n'))
         .collect();
     let line = format!("{}\n", line);
-    let line_without_comment = line.trim().split("//").next().unwrap_or("").trim();
+    let (line_without_comment, _comment) = split_code_and_comment(line.trim());
+    let line_without_comment = line_without_comment.trim();
 
     // Check if the line contains a #[derive(...)] statement
     if let Some(derive_range) = line_without_comment.find("#[derive(").and_then(|start| {
@@ -173,4 +175,30 @@ fn re_derive_begin() -> Regex {
 
 fn re_derive_end() -> Regex {
     Regex::new(r"\)\]\s*$").expect("Failed to build regex for rust derive end")
+}
+
+fn split_code_and_comment(line: &str) -> (&str, &str) {
+    let mut in_string = false;
+    let mut escape = false;
+    let bytes = line.as_bytes();
+
+    for i in 0..bytes.len() {
+        let c = bytes[i];
+        if in_string {
+            if escape {
+                escape = false;
+            } else if c == b'\\' {
+                escape = true;
+            } else if c == b'"' {
+                in_string = false;
+            }
+        } else {
+            if c == b'"' {
+                in_string = true;
+            } else if c == b'/' && i + 1 < bytes.len() && bytes[i + 1] == b'/' {
+                return (&line[..i], &line[i..]);
+            }
+        }
+    }
+    (line, "")
 }
