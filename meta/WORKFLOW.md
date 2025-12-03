@@ -87,14 +87,14 @@ A pull request is ready to merge when:
 ## Versioning & releases
 
 - Use Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- Track version in `VERSION`, changes in `CHANGELOG.md`.
+- Track version in `Cargo.toml`, changes in `CHANGELOG.md`.
 - Group changelog entries by prefix: `feat`, `fix`, `refactor`, `test`, `docs`, `chore` (in that order). Keep original item order within each group.
 - Add a summary at the top of each release:
   - **Patch (`x.y.Z`)**: 1–2 lines on key fixes or internal changes.
   - **Minor (`x.Y.0`)**: Short paragraph on main new features since last minor.
   - **Major (`X.0.0`)**: Summary of major changes and any breaking updates.
 - Release PR:
-  - Only updates `VERSION`, `CHANGELOG.md`, and `README.md` if needed.
+  - Only updates `Cargo.toml` version, `CHANGELOG.md`, and `README.md` if needed.
   - Title: `chore(release): vX.Y.Z`
 - After merge:
   - CI tags the release and runs final checks.

@@ -178,9 +178,9 @@ a
 becomes
 
 ```codeowners
-# Team
-a
 # Lead
+a
+# Team
 b
 ```
 
