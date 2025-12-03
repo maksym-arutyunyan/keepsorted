@@ -45,13 +45,13 @@ Options:
 
   -m, --mode <MODE>
           Formatting mode
+          
+          [default: fix]
 
           Possible values:
           - check: Verify that the file is already sorted
           - diff:  Print a diff of the required changes
           - fix:   Rewrite the file with sorted content
-          
-          [default: fix]
 
       --diff-command <COMMAND>
           Custom command for '--mode diff'
