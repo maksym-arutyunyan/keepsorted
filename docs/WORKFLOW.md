@@ -15,7 +15,7 @@ Guides contributors through setup, development, testing, and releases.
 - `tests/` – Rust unit tests.
 - `e2e-tests/` – Bats-based end-to-end tests.
 - `docs/` – user documentation.
-- `meta/` – contributor guides (this folder).
+- `docs/` – contributor guides (this folder).
 - Temporary build output lives in `target/` and should not be committed.
 
 ## Coding conventions
@@ -32,7 +32,7 @@ Guides contributors through setup, development, testing, and releases.
 ## Documentation
 
 - Keep `README.md`, especially the "Getting Started" section, in sync with the
-  codebase and the specs in `meta/`.
+  codebase and the specs in `docs/`.
 
 ## Code quality
 
@@ -62,7 +62,7 @@ Guides contributors through setup, development, testing, and releases.
 ## Testing
 
 - Maintain unit tests in `tests/` and end-to-end tests in `e2e-tests/`.
-- Tests verify behaviour described in `meta/SPECS.md`, `meta/SYSTEM.md`, and
+- Tests verify behaviour described in `docs/SPECS.md`, `docs/SYSTEM.md`, and
   this workflow.
 - Bug fixes and new features require accompanying tests.
 - CI and local runs must pass all tests before merging.
@@ -87,14 +87,14 @@ A pull request is ready to merge when:
 ## Versioning & releases
 
 - Use Semantic Versioning (`MAJOR.MINOR.PATCH`).
-- Track version in `VERSION`, changes in `CHANGELOG.md`.
+- Track version in `Cargo.toml`, changes in `CHANGELOG.md`.
 - Group changelog entries by prefix: `feat`, `fix`, `refactor`, `test`, `docs`, `chore` (in that order). Keep original item order within each group.
 - Add a summary at the top of each release:
   - **Patch (`x.y.Z`)**: 1–2 lines on key fixes or internal changes.
   - **Minor (`x.Y.0`)**: Short paragraph on main new features since last minor.
   - **Major (`X.0.0`)**: Summary of major changes and any breaking updates.
 - Release PR:
-  - Only updates `VERSION`, `CHANGELOG.md`, and `README.md` if needed.
+  - Only updates `Cargo.toml` version, `CHANGELOG.md`, and `README.md` if needed.
   - Title: `chore(release): vX.Y.Z`
 - After merge:
   - CI tags the release and runs final checks.

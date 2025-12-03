@@ -12,6 +12,7 @@ Adds quiet mode and skips binary files during recursive checks. Also drafts new 
 - fix: correctly parse comments in `rust_derive` when string literals contain `//`
 - fix: correctly parse comments in `Cargo.toml` when string literals contain `#`
 - fix: correctly parse comments in Bazel files when string literals contain `#`
+- fix: bash 3.2 compatibility in `utils/exit_codes.bash`
 - fix: print stderr output when diff command fails
 - docs: draft meta guidelines for AI and contributors
 

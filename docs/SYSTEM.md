@@ -51,7 +51,7 @@ sorting strategies.
 - Source under `src/`.
 - Unit tests under `tests/`.
 - End-to-end tests using Bats in `e2e-tests/`.
-- Documentation in `docs/` and contributor guides in `meta/`.
+- Documentation in `docs/` and contributor guides in `docs/`.
 - Rust version pinned in `rust-toolchain.toml`; Cargo manages dependencies.
 
 ## Design notes

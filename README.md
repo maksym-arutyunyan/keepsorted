@@ -11,7 +11,7 @@ cargo install keepsorted
 - [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
-- [Specs](meta/SPECS.md)
+- [Specs](docs/SPECS.md)
 
 ## Overview
 
@@ -178,9 +178,9 @@ a
 becomes
 
 ```codeowners
-# Team
-a
 # Lead
+a
+# Team
 b
 ```
 
