@@ -45,7 +45,7 @@ Options:
 
   -m, --mode <MODE>
           Formatting mode
-          
+
           Possible values:
           - check: Verify that the file is already sorted
           - diff:  Print a diff of the required changes
