@@ -411,3 +411,30 @@ block = [
         "#
     );
 }
+
+#[test]
+fn test_bazel_hash_in_string() {
+    test_inner!(
+        Bazel,
+        r#"
+cc_library(
+    name = "foo",
+    deps = [
+        # keep sorted
+        "//lib:a_with_#_hash",
+        "//lib:b",
+    ],
+)
+        "#,
+        r#"
+cc_library(
+    name = "foo",
+    deps = [
+        # keep sorted
+        "//lib:a_with_#_hash",
+        "//lib:b",
+    ],
+)
+        "#
+    );
+}

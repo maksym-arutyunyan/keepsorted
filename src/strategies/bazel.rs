@@ -16,7 +16,8 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
         let trimmed = line.trim();
 
         // Find and remove the portion of the line starting from the '#' character
-        let line_without_comment = trimmed.split('#').next().unwrap_or("").trim();
+        let (line_without_comment, _comment) = split_code_and_comment(trimmed);
+        let line_without_comment = line_without_comment.trim();
 
         if line_without_comment.contains('[') {
             is_scope = true;
@@ -114,7 +115,8 @@ struct BazelSortKey {
 
 impl BazelSortKey {
     fn new(line: &str) -> Self {
-        let line_without_comment = line.trim().split('#').next().unwrap_or("").trim();
+        let (line_without_comment, _comment) = split_code_and_comment(line.trim());
+        let line_without_comment = line_without_comment.trim();
 
         let phase = match line_without_comment {
             l if l.starts_with("\":") => 1,
@@ -145,6 +147,32 @@ impl PartialOrd for BazelSortKey {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
+}
+
+fn split_code_and_comment(line: &str) -> (&str, &str) {
+    let mut in_string = false;
+    let mut escape = false;
+    let mut quote_char = '\0';
+    let bytes = line.as_bytes();
+
+    for i in 0..bytes.len() {
+        let c = bytes[i];
+        if in_string {
+            if escape {
+                escape = false;
+            } else if c == b'\\' {
+                escape = true;
+            } else if c == quote_char as u8 {
+                in_string = false;
+            }
+        } else if c == b'"' || c == b'\'' {
+            in_string = true;
+            quote_char = c as char;
+        } else if c == b'#' {
+            return (&line[..i], &line[i..]);
+        }
+    }
+    (line, "")
 }
 
 #[cfg(test)]
