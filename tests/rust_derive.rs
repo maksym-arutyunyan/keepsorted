@@ -321,3 +321,18 @@ struct Data {}
         "#
     );
 }
+
+#[test]
+fn rust_derive_with_url() {
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+#[derive(B, A, Note = "http://example.com")]
+struct Data {}
+        "#,
+        r#"
+#[derive(A, B, Note = "http://example.com")]
+struct Data {}
+        "#
+    );
+}
