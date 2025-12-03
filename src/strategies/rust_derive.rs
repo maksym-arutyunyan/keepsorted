@@ -192,12 +192,10 @@ fn split_code_and_comment(line: &str) -> (&str, &str) {
             } else if c == b'"' {
                 in_string = false;
             }
-        } else {
-            if c == b'"' {
-                in_string = true;
-            } else if c == b'/' && i + 1 < bytes.len() && bytes[i + 1] == b'/' {
-                return (&line[..i], &line[i..]);
-            }
+        } else if c == b'"' {
+            in_string = true;
+        } else if c == b'/' && i + 1 < bytes.len() && bytes[i + 1] == b'/' {
+            return (&line[..i], &line[i..]);
         }
     }
     (line, "")
