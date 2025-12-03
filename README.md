@@ -1,12 +1,5 @@
 # keepsorted
 
-[gh-image]: https://github.com/maksym-arutyunyan/keepsorted/workflows/CI/badge.svg
-[gh-checks]: https://github.com/maksym-arutyunyan/keepsorted/actions/workflows/workflow.yaml
-[cratesio-image]: https://img.shields.io/crates/v/keepsorted.svg
-[cratesio]: https://crates.io/crates/keepsorted
-[docsrs-image]: https://docs.rs/keepsorted/badge.svg
-[docsrs]: https://docs.rs/keepsorted
-
 [![keepsorted GitHub Actions][gh-image]][gh-checks]
 [![keepsorted on crates.io][cratesio-image]][cratesio]
 [![keepsorted on docs.rs][docsrs-image]][docsrs]
@@ -18,7 +11,7 @@ cargo install keepsorted
 - [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
-- [Specs](docs/specs.md)
+- [Specs](meta/SPECS.md)
 
 ## Overview
 
@@ -220,3 +213,9 @@ keepsorted file --features gitignore,rust_derive_canonical
 - Automatically detect project structure or configuration files.
 - Replace formatting tools like `rustfmt` or `prettier`.
 
+[cratesio]: https://crates.io/crates/keepsorted
+[cratesio-image]: https://img.shields.io/crates/v/keepsorted.svg
+[docsrs]: https://docs.rs/keepsorted
+[docsrs-image]: https://docs.rs/keepsorted/badge.svg
+[gh-checks]: https://github.com/maksym-arutyunyan/keepsorted/actions/workflows/workflow.yaml
+[gh-image]: https://github.com/maksym-arutyunyan/keepsorted/workflows/CI/badge.svg
