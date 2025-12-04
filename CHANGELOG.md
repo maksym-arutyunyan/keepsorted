@@ -17,6 +17,16 @@ Adds quiet mode and skips binary files during recursive checks. Also drafts new 
 - fix: print stderr output when diff command fails
 - docs: draft meta guidelines for AI and contributors
 
+## v0.1.7 – 2025-07-27
+
+Adds quiet mode and skips binary files during recursive checks. Improves documentation clarity.
+
+- feat: skip binary files during recursive traversal
+- feat: add `--quiet` flag to suppress warnings
+- docs: clarify derive sorting feature in README
+- docs: rename architecture doc to specs
+- chore: update `.gitignore`
+
 ## v0.1.6 – 2025-07-26
 
 Adds recursive traversal, new options, and better CI exit codes. Expands documentation and fixes CLI errors.
