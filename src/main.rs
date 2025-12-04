@@ -276,7 +276,12 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
                     process::exit(EXIT_RUNTIME_ERROR);
                 }
             };
-            original == sorted
+            if original == sorted {
+                true
+            } else {
+                println!("{}: needs sorting", path.display());
+                false
+            }
         }
         Mode::Diff => {
             let original = match std::fs::read_to_string(path) {

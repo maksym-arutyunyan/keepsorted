@@ -21,14 +21,35 @@ the next block. Some file types are sorted automatically.
 
 ## Usage
 
+Check a single file:
+
 ```shell
-keepsorted --check <path>   # verify without changes
-keepsorted --diff <path>    # preview changes as a diff
-keepsorted --fix <path>     # rewrite files in place (default)
+keepsorted --check file.txt
 ```
 
-Use `--recursive` (`-r`) to process directories. Combine with `git ls-files` in
-CI to check only tracked files. Binary files are skipped automatically.
+Check a directory recursively:
+
+```shell
+keepsorted --check --recursive .
+```
+
+Check only git-tracked files:
+
+```shell
+git ls-files | xargs -n1 keepsorted --check
+```
+
+Fix files in place (default mode):
+
+```shell
+keepsorted file.txt
+```
+
+### Modes
+
+- `--fix` (default): Rewrites files in place.
+- `--check`: Verifies files are sorted. Returns exit code 4 if not.
+- `--diff`: Prints a diff of changes without modifying files.
 
 ### Keywords
 
