@@ -5,10 +5,11 @@ This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
-Adds quiet mode and skips binary files during recursive checks. Also drafts new meta documentation for contributors and AI models.
+Adds quiet mode and skips binary files during recursive checks. Also drafts new documentation for contributors and AI models.
 
 - feat: skip binary files during recursive traversal
-- feat: add `--quiet` flag to suppress informational output
+- feat: `--check` now prints which files need sorting
+- feat: silence "skipping binary file" warnings by default (removed `--quiet` flag)
 - fix: correctly parse comments in `rust_derive` when string literals contain `//`
 - fix: correctly parse comments in `Cargo.toml` when string literals contain `#`
 - fix: correctly parse comments in Bazel files when string literals contain `#`

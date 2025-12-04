@@ -45,7 +45,7 @@ Guides contributors through setup, development, testing, and releases.
 1. Create a branch and make changes.
 1. Keep lists sorted and update tests and docs alongside code.
 1. Documentation-only changes:
-   - Run `mdformat` on updated files.
+   - Run `mdformat` on updated files (recommended).
 1. Rust or manifest changes:
    - Run each task in `verify.sh` manually:
      - `cargo build --release --all-targets` – ensures the code compiles.

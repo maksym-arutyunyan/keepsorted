@@ -114,10 +114,6 @@ struct Args {
     #[arg(short = 'r', long, help = "Process directories recursively")]
     recursive: bool,
 
-    /// Suppress informational output
-    #[arg(short = 'q', long, help = "Silence non-error messages")]
-    quiet: bool,
-
     #[arg(
         short = 'f',
         long,
@@ -217,23 +213,11 @@ fn main() {
             process::exit(EXIT_RUNTIME_ERROR);
         }
         for file in files {
-            if !handle_file(
-                &file,
-                &features,
-                mode,
-                args.diff_command.as_deref(),
-                args.quiet,
-            ) {
+            if !handle_file(&file, &features, mode, args.diff_command.as_deref()) {
                 exit_code = EXIT_CHECK_FAILED;
             }
         }
-    } else if !handle_file(
-        path,
-        &features,
-        mode,
-        args.diff_command.as_deref(),
-        args.quiet,
-    ) {
+    } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
         exit_code = EXIT_CHECK_FAILED;
     }
 
@@ -242,19 +226,10 @@ fn main() {
     }
 }
 
-fn handle_file(
-    path: &Path,
-    features: &[Feature],
-    mode: Mode,
-    diff_command: Option<&str>,
-    quiet: bool,
-) -> bool {
+fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Option<&str>) -> bool {
     match is_text_file(path) {
         Ok(true) => {}
         Ok(false) => {
-            if !quiet {
-                eprintln!("skipping binary file {}", path.display());
-            }
             return true;
         }
         Err(e) => {
@@ -301,7 +276,12 @@ fn handle_file(
                     process::exit(EXIT_RUNTIME_ERROR);
                 }
             };
-            original == sorted
+            if original == sorted {
+                true
+            } else {
+                println!("{}: needs sorting", path.display());
+                false
+            }
         }
         Mode::Diff => {
             let original = match std::fs::read_to_string(path) {
