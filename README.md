@@ -36,8 +36,7 @@ CI to check only tracked files. Binary files are skipped automatically.
 - `keepsorted: ignore file` – skip the whole file.
 - `keepsorted: ignore block` – skip a single block.
 
-Markers work with `#`, `//`, or `--` comments. Generic files and Bazel require
-one of these comments. `Cargo.toml`, `.gitignore`, and `CODEOWNERS` are sorted
+Markers work with `#`, `//`, or `--` comments. Generic files support any of these. Bazel files require `#`. `Cargo.toml`, `.gitignore`, and `CODEOWNERS` are sorted
 automatically when the matching feature flag is enabled.
 
 ### Examples

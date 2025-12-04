@@ -1,6 +1,6 @@
 # AGENTS
 
-Guidelines for working with the contributor documentation in this folder.
+Guidelines for working with the contributor documentation in the `docs/` folder.
 
 `keepsorted` sorts annotated lists while preserving nearby comments so
 configuration files and code blocks stay tidy.
@@ -26,7 +26,7 @@ configuration files and code blocks stay tidy.
 - Keep lists and manifest sections sorted; run `keepsorted` where annotated.
 - Update `CHANGELOG.md` for user-facing changes.
 - Do not modify `docs/SPECS.md` unless a human requests it.
-- Markdown is formatted with `mdformat`; CI checks formatting.
+- Markdown is formatted with `mdformat`.
 
 ## Reference
 

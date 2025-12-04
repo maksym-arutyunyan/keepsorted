@@ -5,7 +5,7 @@ This changelog follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## Unreleased
 
-Adds quiet mode and skips binary files during recursive checks. Also drafts new meta documentation for contributors and AI models.
+Adds quiet mode and skips binary files during recursive checks. Also drafts new documentation for contributors and AI models.
 
 - feat: skip binary files during recursive traversal
 - feat: add `--quiet` flag to suppress informational output
