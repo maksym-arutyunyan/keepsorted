@@ -299,7 +299,17 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             if original != sorted {
                 if let Some(cmd) = diff_command {
                     use tempfile::NamedTempFile;
-                    let tmp = NamedTempFile::new().expect("create temp file");
+                    let tmp = match NamedTempFile::new() {
+                        Ok(f) => f,
+                        Err(e) => {
+                            eprintln!(
+                                "{}: failed to create temp file: {}",
+                                env!("CARGO_PKG_NAME"),
+                                e
+                            );
+                            process::exit(EXIT_RUNTIME_ERROR);
+                        }
+                    };
                     if let Err(e) = std::fs::write(tmp.path(), &sorted) {
                         eprintln!(
                             "{}: failed to write temp file {}: {}",
@@ -367,7 +377,31 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             true
         }
         Mode::Fix => {
-            if let Err(e) = std::fs::write(path, sorted) {
+            let dir = path.parent().unwrap_or(Path::new("."));
+            let tmp = match tempfile::NamedTempFile::new_in(dir) {
+                Ok(f) => f,
+                Err(e) => {
+                    eprintln!(
+                        "{}: failed to create temp file: {}",
+                        env!("CARGO_PKG_NAME"),
+                        e
+                    );
+                    process::exit(EXIT_RUNTIME_ERROR);
+                }
+            };
+            if let Err(e) = std::fs::write(tmp.path(), &sorted) {
+                eprintln!(
+                    "{}: failed to write file {}: {}",
+                    env!("CARGO_PKG_NAME"),
+                    path.display(),
+                    e
+                );
+                process::exit(EXIT_RUNTIME_ERROR);
+            }
+            if let Ok(metadata) = std::fs::metadata(path) {
+                let _ = std::fs::set_permissions(tmp.path(), metadata.permissions());
+            }
+            if let Err(e) = tmp.persist(path) {
                 eprintln!(
                     "{}: failed to write file {}: {}",
                     env!("CARGO_PKG_NAME"),
@@ -385,9 +419,10 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_dir() {
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
             collect_files(&path, out)?;
-        } else if path.is_file() {
+        } else if file_type.is_file() {
             out.push(path);
         }
     }
