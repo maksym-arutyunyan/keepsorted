@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  RUST_VERSION: 1.76.0           # Must match rust-toolchain.toml
+  RUST_VERSION: 1.86.0           # Must match rust-toolchain.toml
   CARGO_TERM_COLOR: always
   TERM: xterm-256color
 
