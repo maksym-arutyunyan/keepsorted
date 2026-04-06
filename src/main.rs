@@ -416,9 +416,10 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
     for entry in std::fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_dir() {
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
             collect_files(&path, out)?;
-        } else if path.is_file() {
+        } else if file_type.is_file() {
             out.push(path);
         }
     }
