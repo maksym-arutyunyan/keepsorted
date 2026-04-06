@@ -12,31 +12,34 @@ static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
 static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
 
-/// Returns the sorted content of a file using an appropriate strategy.
+/// Returns `(original, sorted)` content of a file using an appropriate strategy.
 ///
 /// The `features` list enables optional experimental strategies.
-pub fn process_file(path: &Path, features: Vec<String>) -> io::Result<String> {
-    let mut content = fs::read_to_string(path)?;
-    let ends_with_newline = content.ends_with('\n');
+/// Both strings are derived from a single file read.
+pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, String)> {
+    let original = fs::read_to_string(path)?;
+    let ends_with_newline = original.ends_with('\n');
+
+    // Build a working copy that is guaranteed to end with '\n'.
+    let mut work = original.clone();
     if !ends_with_newline {
-        // Ensure content ends with a newline to support line reordering.
-        content.push('\n');
+        work.push('\n');
     }
 
-    let lines: Vec<_> = content.split_inclusive('\n').map(String::from).collect();
+    let lines: Vec<_> = work.split_inclusive('\n').map(String::from).collect();
     let strategy = classify(path, features)?;
     let output_lines = process_lines(strategy, lines)?;
 
-    let mut result = String::new();
+    let mut sorted = String::new();
     for (i, line) in output_lines.iter().enumerate() {
         if i + 1 == output_lines.len() && !ends_with_newline {
-            result.push_str(line.trim_end_matches('\n'));
+            sorted.push_str(line.trim_end_matches('\n'));
         } else {
-            result.push_str(line);
+            sorted.push_str(line);
         }
     }
 
-    Ok(result)
+    Ok((original, sorted))
 }
 
 /// Available sorting strategies.
@@ -82,7 +85,7 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
     }
 }
 
-fn classify(path: &Path, features: Vec<String>) -> io::Result<Strategy> {
+fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
     if is_bazel(path) {
         return Ok(Strategy::Bazel);
     }
@@ -120,6 +123,10 @@ fn is_ignore_file(lines: &[String]) -> bool {
 
 fn is_ignore_block(lines: &[String]) -> bool {
     lines.iter().any(|x| RE_IGNORE_BLOCK.is_match(x))
+}
+
+pub(crate) fn is_ignore_block_line(line: &str) -> bool {
+    RE_IGNORE_BLOCK.is_match(line)
 }
 
 fn is_bazel(path: &Path) -> bool {
@@ -226,27 +233,27 @@ fn test_re_keyword_ignore_block() {
 #[test]
 fn test_classify_bazel_files() {
     assert!(matches!(
-        classify(Path::new("BUILD"), vec![]).unwrap(),
+        classify(Path::new("BUILD"), &[]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("WORKSPACE"), vec![]).unwrap(),
+        classify(Path::new("WORKSPACE"), &[]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("foo.bazel"), vec![]).unwrap(),
+        classify(Path::new("foo.bazel"), &[]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("BUILD.bazel"), vec![]).unwrap(),
+        classify(Path::new("BUILD.bazel"), &[]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("WORKSPACE.bazel"), vec![]).unwrap(),
+        classify(Path::new("WORKSPACE.bazel"), &[]).unwrap(),
         Strategy::Bazel
     ));
     assert!(matches!(
-        classify(Path::new("foo.bzl"), vec![]).unwrap(),
+        classify(Path::new("foo.bzl"), &[]).unwrap(),
         Strategy::Bazel
     ));
 }

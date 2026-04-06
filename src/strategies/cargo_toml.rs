@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::is_ignore_block;
+use crate::{is_ignore_block, is_ignore_block_line};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
     let mut output_lines: Vec<String> = Vec::new();
@@ -15,7 +15,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 
         if is_block_start(&line) {
             if let Some(prev_line) = output_lines.last() {
-                is_ignore_block_prev_line = is_ignore_block(&[prev_line.clone()]);
+                is_ignore_block_prev_line = is_ignore_block_line(prev_line);
             }
             is_sorting_block = true;
             output_lines.push(line);
