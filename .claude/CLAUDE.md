@@ -3,20 +3,7 @@
 Run these after making changes to catch CI failures early:
 
 ```bash
-cargo fmt --all -- --check
-cargo clippy --all-targets -- -D warnings
-cargo build --release --all-targets
-cargo test --release --all-targets --workspace --exclude benchmarks
-```
-
-Also verify the project's own sorting rules are satisfied:
-
-```bash
-git ls-files -z \
-  | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
-  | xargs -0 -n1 ./target/release/keepsorted \
-      --features gitignore,rust_derive_canonical
-git diff --exit-code
+./verify.sh
 ```
 
 ## Allowed commit types
