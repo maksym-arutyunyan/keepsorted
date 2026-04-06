@@ -413,6 +413,31 @@ block = [
 }
 
 #[test]
+fn bazel_bracket_in_string_value() {
+    // A dep entry whose code portion contains '[' (e.g. "m[0]") must still be
+    // collected into the sorting block, not escape early into output_lines.
+    test_inner!(
+        Bazel,
+        r#"
+deps = [
+    # Keep sorted.
+    "z",
+    "m[0]",
+    "a",
+]
+        "#,
+        r#"
+deps = [
+    # Keep sorted.
+    "a",
+    "m[0]",
+    "z",
+]
+        "#
+    );
+}
+
+#[test]
 fn test_bazel_hash_in_string() {
     test_inner!(
         Bazel,
