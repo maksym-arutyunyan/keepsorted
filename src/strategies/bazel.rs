@@ -19,7 +19,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
         let (line_without_comment, _comment) = split_code_and_comment(trimmed);
         let line_without_comment = line_without_comment.trim();
 
-        if line_without_comment.contains('[') {
+        if !is_sorting_block && line_without_comment.contains('[') {
             is_scope = true;
             output_lines.push(line);
         } else if is_scope {
@@ -30,7 +30,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
                 is_sorting_block = true;
                 output_lines.push(line);
             } else if is_sorting_block
-                && (line_without_comment.contains(']') || line.trim().is_empty())
+                && (line_without_comment.trim().starts_with(']') || line.trim().is_empty())
             {
                 block = sort(block, is_ignore_block_prev_line);
                 is_ignore_block_prev_line = false;
