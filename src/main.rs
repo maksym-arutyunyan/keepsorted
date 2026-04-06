@@ -377,7 +377,28 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             true
         }
         Mode::Fix => {
-            if let Err(e) = std::fs::write(path, sorted) {
+            let dir = path.parent().unwrap_or(Path::new("."));
+            let tmp = match tempfile::NamedTempFile::new_in(dir) {
+                Ok(f) => f,
+                Err(e) => {
+                    eprintln!(
+                        "{}: failed to create temp file: {}",
+                        env!("CARGO_PKG_NAME"),
+                        e
+                    );
+                    process::exit(EXIT_RUNTIME_ERROR);
+                }
+            };
+            if let Err(e) = std::fs::write(tmp.path(), &sorted) {
+                eprintln!(
+                    "{}: failed to write file {}: {}",
+                    env!("CARGO_PKG_NAME"),
+                    path.display(),
+                    e
+                );
+                process::exit(EXIT_RUNTIME_ERROR);
+            }
+            if let Err(e) = tmp.persist(path) {
                 eprintln!(
                     "{}: failed to write file {}: {}",
                     env!("CARGO_PKG_NAME"),
