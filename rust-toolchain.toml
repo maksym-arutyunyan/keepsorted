@@ -1,2 +1,2 @@
 [toolchain]
-channel = "1.76.0" # Use the same version as in `.github/workflows/workflow.yaml`.
+channel = "1.86.0" # Use the same version as in `.github/workflows/workflow.yaml`.
