@@ -299,7 +299,17 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             if original != sorted {
                 if let Some(cmd) = diff_command {
                     use tempfile::NamedTempFile;
-                    let tmp = NamedTempFile::new().expect("create temp file");
+                    let tmp = match NamedTempFile::new() {
+                        Ok(f) => f,
+                        Err(e) => {
+                            eprintln!(
+                                "{}: failed to create temp file: {}",
+                                env!("CARGO_PKG_NAME"),
+                                e
+                            );
+                            process::exit(EXIT_RUNTIME_ERROR);
+                        }
+                    };
                     if let Err(e) = std::fs::write(tmp.path(), &sorted) {
                         eprintln!(
                             "{}: failed to write temp file {}: {}",
