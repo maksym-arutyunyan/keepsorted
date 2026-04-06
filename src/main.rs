@@ -191,6 +191,7 @@ fn main() {
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
+    let feature_names: Vec<String> = features.iter().map(|f| f.as_str().to_string()).collect();
     let mut exit_code = 0;
 
     if path.is_dir() {
@@ -213,11 +214,11 @@ fn main() {
             process::exit(EXIT_RUNTIME_ERROR);
         }
         for file in files {
-            if !handle_file(&file, &features, mode, args.diff_command.as_deref()) {
+            if !handle_file(&file, &feature_names, mode, args.diff_command.as_deref()) {
                 exit_code = EXIT_CHECK_FAILED;
             }
         }
-    } else if !handle_file(path, &features, mode, args.diff_command.as_deref()) {
+    } else if !handle_file(path, &feature_names, mode, args.diff_command.as_deref()) {
         exit_code = EXIT_CHECK_FAILED;
     }
 
@@ -226,7 +227,12 @@ fn main() {
     }
 }
 
-fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Option<&str>) -> bool {
+fn handle_file(
+    path: &Path,
+    feature_names: &[String],
+    mode: Mode,
+    diff_command: Option<&str>,
+) -> bool {
     match is_text_file(path) {
         Ok(true) => {}
         Ok(false) => {
@@ -243,9 +249,8 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
         }
     }
 
-    let feature_names: Vec<String> = features.iter().map(|f| f.as_str().to_string()).collect();
-    let sorted = match process_file(path, feature_names) {
-        Ok(s) => s,
+    let (original, sorted) = match process_file(path, feature_names) {
+        Ok(pair) => pair,
         Err(e) => {
             if e.kind() == io::ErrorKind::InvalidInput {
                 eprintln!("{}: {}", env!("CARGO_PKG_NAME"), e);
@@ -264,18 +269,6 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
 
     match mode {
         Mode::Check => {
-            let original = match std::fs::read_to_string(path) {
-                Ok(s) => s,
-                Err(e) => {
-                    eprintln!(
-                        "{}: failed to read file {}: {}",
-                        env!("CARGO_PKG_NAME"),
-                        path.display(),
-                        e
-                    );
-                    process::exit(EXIT_RUNTIME_ERROR);
-                }
-            };
             if original == sorted {
                 true
             } else {
@@ -284,18 +277,6 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
             }
         }
         Mode::Diff => {
-            let original = match std::fs::read_to_string(path) {
-                Ok(s) => s,
-                Err(e) => {
-                    eprintln!(
-                        "{}: failed to read file {}: {}",
-                        env!("CARGO_PKG_NAME"),
-                        path.display(),
-                        e
-                    );
-                    process::exit(EXIT_RUNTIME_ERROR);
-                }
-            };
             if original != sorted {
                 if let Some(cmd) = diff_command {
                     use tempfile::NamedTempFile;

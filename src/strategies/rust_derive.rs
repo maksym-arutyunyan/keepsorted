@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::io;
 
-use crate::is_ignore_block;
+use crate::{is_ignore_block, is_ignore_block_line};
 
 static RE_DERIVE_BEGIN: Lazy<Regex> = Lazy::new(re_derive_begin);
 static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
@@ -29,7 +29,7 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Proc
         let mut is_derive_begin = false;
         if RE_DERIVE_BEGIN.is_match(&line) {
             if let Some(prev_line) = output_lines.last() {
-                is_ignore_block_prev_line = is_ignore_block(&[prev_line.clone()]);
+                is_ignore_block_prev_line = is_ignore_block_line(prev_line);
             }
             is_derive_begin = true;
             is_sorting_block = true;
