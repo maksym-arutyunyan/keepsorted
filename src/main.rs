@@ -398,6 +398,9 @@ fn handle_file(path: &Path, features: &[Feature], mode: Mode, diff_command: Opti
                 );
                 process::exit(EXIT_RUNTIME_ERROR);
             }
+            if let Ok(metadata) = std::fs::metadata(path) {
+                let _ = std::fs::set_permissions(tmp.path(), metadata.permissions());
+            }
             if let Err(e) = tmp.persist(path) {
                 eprintln!(
                     "{}: failed to write file {}: {}",
