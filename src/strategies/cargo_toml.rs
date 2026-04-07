@@ -112,7 +112,8 @@ fn is_single_line_comment(line: &str) -> bool {
 }
 
 fn is_multi_line_code(line: &str) -> bool {
-    line.contains('{') || line.contains('[')
+    let (code, _comment) = split_code_and_comment(line.trim());
+    code.contains('{') || code.contains('[')
 }
 
 fn is_code_section_completed(line: &str) -> bool {
