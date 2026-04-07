@@ -397,8 +397,9 @@ fn handle_file(
 }
 
 fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
-    for entry in std::fs::read_dir(dir)? {
-        let entry = entry?;
+    let mut entries = std::fs::read_dir(dir)?.collect::<io::Result<Vec<_>>>()?;
+    entries.sort_by_key(|e| e.path());
+    for entry in entries {
         let path = entry.path();
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
