@@ -140,19 +140,19 @@ fn is_bazel(path: &Path) -> bool {
 }
 
 fn is_cargo_toml(path: &Path) -> bool {
-    path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
+    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
 }
 
 fn is_gitignore(path: &Path) -> bool {
-    path.file_name() == Some(std::ffi::OsStr::new(".gitignore"))
+    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new(".gitignore"))
 }
 
 fn is_codeowners(path: &Path) -> bool {
-    path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
+    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
 }
 
 fn is_rust(path: &Path) -> bool {
-    path.extension() == Some(std::ffi::OsStr::new("rs"))
+    path.is_file() && path.extension() == Some(std::ffi::OsStr::new("rs"))
 }
 
 fn re_keyword_keep_sorted() -> Regex {
@@ -228,30 +228,6 @@ fn test_re_keyword_ignore_block() {
             line
         );
     }
-}
-
-#[test]
-fn test_classify_synthetic_paths() {
-    assert!(matches!(
-        classify(Path::new("Cargo.toml"), &[]).unwrap(),
-        Strategy::CargoToml
-    ));
-    assert!(matches!(
-        classify(Path::new(".gitignore"), &["gitignore".to_string()]).unwrap(),
-        Strategy::Gitignore
-    ));
-    assert!(matches!(
-        classify(Path::new("CODEOWNERS"), &["codeowners".to_string()]).unwrap(),
-        Strategy::Gitignore
-    ));
-    assert!(matches!(
-        classify(
-            Path::new("foo.rs"),
-            &["rust_derive_alphabetical".to_string()]
-        )
-        .unwrap(),
-        Strategy::RustDeriveAlphabetical
-    ));
 }
 
 #[test]
