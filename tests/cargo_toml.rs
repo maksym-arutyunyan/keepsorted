@@ -299,3 +299,22 @@ dep_b = "1.0"
         "#
     );
 }
+
+#[test]
+fn cargo_toml_bracket_in_inline_comment() {
+    // A dep with '[' only in its comment must not trigger multiline mode,
+    // causing the next dependency to be swallowed into the same item.
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+b = "2" # see [dev-dependencies] for the test version
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = "2" # see [dev-dependencies] for the test version
+        "#
+    );
+}
