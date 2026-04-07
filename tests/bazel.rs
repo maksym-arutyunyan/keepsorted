@@ -463,3 +463,32 @@ cc_library(
         "#
     );
 }
+
+#[test]
+fn bazel_scope_resets_after_block() {
+    // After a sorted list closes, is_scope must reset so that '# Keep sorted'
+    // outside any list does not trigger sorting of subsequent entries.
+    test_inner!(
+        Bazel,
+        r#"
+block = [
+    # Keep sorted.
+    "b",
+    "a",
+]
+# Keep sorted.
+"z",
+"y",
+        "#,
+        r#"
+block = [
+    # Keep sorted.
+    "a",
+    "b",
+]
+# Keep sorted.
+"z",
+"y",
+        "#
+    );
+}
