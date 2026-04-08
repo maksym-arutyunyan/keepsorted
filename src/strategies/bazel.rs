@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::io;
 
+use super::common::{is_single_line_comment, split_code_and_comment};
 use crate::{is_ignore_block, is_ignore_block_line, RE_KEEP_SORTED};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -101,10 +102,6 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     result
 }
 
-fn is_single_line_comment(line: &str) -> bool {
-    line.trim().starts_with('#')
-}
-
 // From: https://sourcegraph.com/github.com/bazelbuild/buildtools@92a716d768c05fa90e241fd2c2b0411125a0ef89/-/blob/build/rewrite.go
 //
 // A stringSortKey records information about a single string literal to be
@@ -153,32 +150,6 @@ impl PartialOrd for BazelSortKey {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
-}
-
-fn split_code_and_comment(line: &str) -> (&str, &str) {
-    let mut in_string = false;
-    let mut escape = false;
-    let mut quote_char = '\0';
-    let bytes = line.as_bytes();
-
-    for i in 0..bytes.len() {
-        let c = bytes[i];
-        if in_string {
-            if escape {
-                escape = false;
-            } else if c == b'\\' {
-                escape = true;
-            } else if c == quote_char as u8 {
-                in_string = false;
-            }
-        } else if c == b'"' || c == b'\'' {
-            in_string = true;
-            quote_char = c as char;
-        } else if c == b'#' {
-            return (&line[..i], &line[i..]);
-        }
-    }
-    (line, "")
 }
 
 #[cfg(test)]

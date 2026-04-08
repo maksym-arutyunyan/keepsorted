@@ -1,5 +1,6 @@
 use std::io;
 
+use super::common::is_single_line_comment;
 use crate::{is_ignore_block, is_ignore_block_line};
 
 pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
@@ -75,8 +76,4 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     result.extend(trailing_comments);
 
     result
-}
-
-fn is_single_line_comment(line: &str) -> bool {
-    line.trim().starts_with('#')
 }
