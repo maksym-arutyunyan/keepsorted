@@ -1,16 +1,16 @@
 #![doc = include_str!("../README.md")]
 
-use once_cell::sync::Lazy;
 use regex::Regex;
 use std::fs;
-use std::io::{self};
+use std::io;
 use std::path::Path;
+use std::sync::LazyLock;
 
 mod strategies;
 
-static RE_KEEP_SORTED: Lazy<Regex> = Lazy::new(re_keyword_keep_sorted);
-static RE_IGNORE_FILE: Lazy<Regex> = Lazy::new(re_keyword_ignore_file);
-static RE_IGNORE_BLOCK: Lazy<Regex> = Lazy::new(re_keyword_ignore_block);
+static RE_KEEP_SORTED: LazyLock<Regex> = LazyLock::new(re_keyword_keep_sorted);
+static RE_IGNORE_FILE: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_file);
+static RE_IGNORE_BLOCK: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_block);
 
 /// Returns `(original, sorted)` content of a file using an appropriate strategy.
 ///
@@ -50,7 +50,7 @@ pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, Str
 /// Available sorting strategies.
 ///
 /// `Strategy` values describe how `process_lines` will sort a file.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Strategy {
     /// Generic text sorting activated by the `# Keep sorted` comment.
     Generic,
