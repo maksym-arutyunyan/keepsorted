@@ -50,7 +50,7 @@ pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, Str
 /// Available sorting strategies.
 ///
 /// `Strategy` values describe how `process_lines` will sort a file.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Strategy {
     /// Generic text sorting activated by the `# Keep sorted` comment.
     Generic,
