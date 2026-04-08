@@ -1,5 +1,6 @@
 use clap::{arg, command, Parser, ValueEnum};
 use keepsorted::process_file;
+use std::fmt;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::process::{self, Command};
@@ -77,8 +78,6 @@ impl Feature {
         }
     }
 }
-
-use std::fmt;
 
 impl fmt::Display for Feature {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
