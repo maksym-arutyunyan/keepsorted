@@ -20,13 +20,18 @@ pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, Str
     let original = fs::read_to_string(path)?;
     let ends_with_newline = original.ends_with('\n');
 
-    // Build a working copy that is guaranteed to end with '\n'.
-    let mut work = original.clone();
-    if !ends_with_newline {
-        work.push('\n');
-    }
-
-    let lines: Vec<_> = work.split_inclusive('\n').map(String::from).collect();
+    // Build lines guaranteed to end with '\n', without cloning the full content.
+    let lines: Vec<_> = if ends_with_newline {
+        original.split_inclusive('\n').map(String::from).collect()
+    } else {
+        let mut lines: Vec<_> = original.split_inclusive('\n').map(String::from).collect();
+        if let Some(last) = lines.last_mut() {
+            last.push('\n');
+        } else {
+            lines.push("\n".to_string());
+        }
+        lines
+    };
     let strategy = classify(path, features)?;
     let output_lines = process_lines(strategy, lines)?;
 
