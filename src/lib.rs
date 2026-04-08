@@ -3,7 +3,7 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::fs;
-use std::io::{self};
+use std::io;
 use std::path::Path;
 
 mod strategies;
