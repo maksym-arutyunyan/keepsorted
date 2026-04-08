@@ -92,16 +92,16 @@ fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
     if is_cargo_toml(path) {
         return Ok(Strategy::CargoToml);
     }
-    if features.contains(&"gitignore".to_string()) && is_gitignore(path) {
+    if features.iter().any(|f| f == "gitignore") && is_gitignore(path) {
         return Ok(Strategy::Gitignore);
     }
-    if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
+    if features.iter().any(|f| f == "codeowners") && is_codeowners(path) {
         return Ok(Strategy::Gitignore);
     }
     if is_rust(path) {
         match (
-            features.contains(&"rust_derive_alphabetical".to_string()),
-            features.contains(&"rust_derive_canonical".to_string()),
+            features.iter().any(|f| f == "rust_derive_alphabetical"),
+            features.iter().any(|f| f == "rust_derive_canonical"),
         ) {
             (true, true) => {
                 return Err(io::Error::new(
