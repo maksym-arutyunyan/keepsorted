@@ -1,12 +1,12 @@
 use crate::{Strategy, RE_KEEP_SORTED};
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
 use regex::Regex;
 use std::io;
 
 use crate::{is_ignore_block, is_ignore_block_line};
 
-static RE_DERIVE_BEGIN: Lazy<Regex> = Lazy::new(re_derive_begin);
-static RE_DERIVE_END: Lazy<Regex> = Lazy::new(re_derive_end);
+static RE_DERIVE_BEGIN: LazyLock<Regex> = LazyLock::new(re_derive_begin);
+static RE_DERIVE_END: LazyLock<Regex> = LazyLock::new(re_derive_end);
 
 // These values count the number of characters and an extra '\n'.
 const STAY_ONE_LINE_LEN: usize = 97;
