@@ -1,7 +1,7 @@
 use crate::{Strategy, RE_KEEP_SORTED};
-use std::sync::LazyLock;
 use regex::Regex;
 use std::io;
+use std::sync::LazyLock;
 
 use crate::{is_ignore_block, is_ignore_block_line};
 
