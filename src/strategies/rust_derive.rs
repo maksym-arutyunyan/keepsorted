@@ -26,29 +26,22 @@ pub(crate) fn process(lines: Vec<String>, strategy: Strategy) -> io::Result<Proc
         if !requires_generic_sort && RE_KEEP_SORTED.is_match(&line) {
             requires_generic_sort = true;
         }
-        let mut is_derive_begin = false;
         if RE_DERIVE_BEGIN.is_match(&line) {
             if let Some(prev_line) = output_lines.last() {
                 is_ignore_block_prev_line = is_ignore_block_line(prev_line);
             }
-            is_derive_begin = true;
             is_sorting_block = true;
-            block.push(line.clone());
         }
         let (line_without_comment, _comment) = split_code_and_comment(line.trim());
         let line_without_comment = line_without_comment.trim();
         if is_sorting_block && RE_DERIVE_END.is_match(line_without_comment) {
-            if !is_derive_begin {
-                block.push(line.clone());
-            }
+            block.push(line);
             block = sort(block, is_ignore_block_prev_line, strategy);
             is_ignore_block_prev_line = false;
             is_sorting_block = false;
             output_lines.append(&mut block);
         } else if is_sorting_block {
-            if !is_derive_begin {
-                block.push(line);
-            }
+            block.push(line);
         } else {
             output_lines.push(line);
         }
