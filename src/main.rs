@@ -16,8 +16,8 @@ const EXIT_RUNTIME_ERROR: i32 = 3;
 /// Exit code used when `--mode check` or `--mode diff` detects unsorted files.
 const EXIT_CHECK_FAILED: i32 = 4;
 
-fn about() -> String {
-    env!("CARGO_PKG_DESCRIPTION").to_string()
+fn about() -> &'static str {
+    env!("CARGO_PKG_DESCRIPTION")
 }
 
 fn long_about() -> String {
