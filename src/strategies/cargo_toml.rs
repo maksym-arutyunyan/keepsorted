@@ -81,13 +81,14 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     for line in block {
         if !is_multiline_code && is_single_line_comment(&line) {
             current_item.comment.push(line);
-            is_multiline_code = false;
         } else {
-            current_item.code.push(line.clone());
-            if is_multi_line_code(&line) {
+            let is_multi = is_multi_line_code(&line);
+            let is_completed = is_code_section_completed(&line);
+            current_item.code.push(line);
+            if is_multi {
                 is_multiline_code = true;
             }
-            if !is_multiline_code || is_code_section_completed(&line) {
+            if !is_multiline_code || is_completed {
                 items.push(std::mem::take(&mut current_item));
                 is_multiline_code = false;
             }

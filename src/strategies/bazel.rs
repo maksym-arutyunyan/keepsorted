@@ -79,10 +79,11 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
         if is_single_line_comment(&line) {
             current_item.comment.push(line);
         } else {
+            let sort_key = BazelSortKey::new(&line);
             items.push(Item {
                 comment: std::mem::take(&mut current_item.comment),
-                code: line.clone(),
-                sort_key: BazelSortKey::new(&line),
+                code: line,
+                sort_key,
             });
         }
     }

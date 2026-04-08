@@ -20,13 +20,18 @@ pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, Str
     let original = fs::read_to_string(path)?;
     let ends_with_newline = original.ends_with('\n');
 
-    // Build a working copy that is guaranteed to end with '\n'.
-    let mut work = original.clone();
-    if !ends_with_newline {
-        work.push('\n');
-    }
-
-    let lines: Vec<_> = work.split_inclusive('\n').map(String::from).collect();
+    // Build lines guaranteed to end with '\n', without cloning the full content.
+    let lines: Vec<_> = if ends_with_newline {
+        original.split_inclusive('\n').map(String::from).collect()
+    } else {
+        let mut lines: Vec<_> = original.split_inclusive('\n').map(String::from).collect();
+        if let Some(last) = lines.last_mut() {
+            last.push('\n');
+        } else {
+            lines.push("\n".to_string());
+        }
+        lines
+    };
     let strategy = classify(path, features)?;
     let output_lines = process_lines(strategy, lines)?;
 
@@ -92,16 +97,16 @@ fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
     if is_cargo_toml(path) {
         return Ok(Strategy::CargoToml);
     }
-    if features.contains(&"gitignore".to_string()) && is_gitignore(path) {
+    if features.iter().any(|f| f == "gitignore") && is_gitignore(path) {
         return Ok(Strategy::Gitignore);
     }
-    if features.contains(&"codeowners".to_string()) && is_codeowners(path) {
+    if features.iter().any(|f| f == "codeowners") && is_codeowners(path) {
         return Ok(Strategy::Gitignore);
     }
     if is_rust(path) {
         match (
-            features.contains(&"rust_derive_alphabetical".to_string()),
-            features.contains(&"rust_derive_canonical".to_string()),
+            features.iter().any(|f| f == "rust_derive_alphabetical"),
+            features.iter().any(|f| f == "rust_derive_canonical"),
         ) {
             (true, true) => {
                 return Err(io::Error::new(
