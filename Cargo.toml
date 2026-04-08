@@ -17,6 +17,3 @@ regex = "1"
 shell-words = "1.1.0"
 similar = "2.7.0"
 tempfile = "3.2"
-
-[dev-dependencies]
-tempfile = "3.2"
