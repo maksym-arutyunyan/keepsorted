@@ -1,11 +1,9 @@
-use crate::{
-    classify, re_keyword_ignore_block, re_keyword_ignore_file, re_keyword_keep_sorted, Strategy,
-};
+use crate::{classify, Strategy};
 use std::path::Path;
 
 #[test]
-fn test_re_keyword_keep_sorted() {
-    let re = re_keyword_keep_sorted();
+fn keep_sorted_keyword() {
+    let re = crate::re_keyword_keep_sorted();
     for line in [
         "  #Keep sorted",
         "  # Keep sorted  ",
@@ -26,8 +24,8 @@ fn test_re_keyword_keep_sorted() {
 }
 
 #[test]
-fn test_re_keyword_ignore_file() {
-    let re = re_keyword_ignore_file();
+fn ignore_file_keyword() {
+    let re = crate::re_keyword_ignore_file();
     for line in [
         "  #   keepsorted  : ignore   file  .  ",
         "#keepsorted:ignore file",
@@ -45,8 +43,8 @@ fn test_re_keyword_ignore_file() {
 }
 
 #[test]
-fn test_re_keyword_ignore_block() {
-    let re = re_keyword_ignore_block();
+fn ignore_block_keyword() {
+    let re = crate::re_keyword_ignore_block();
     for line in [
         "  #   keepsorted  : ignore   block  .  ",
         "#keepsorted:ignore block",
@@ -64,7 +62,7 @@ fn test_re_keyword_ignore_block() {
 }
 
 #[test]
-fn test_classify_bazel_files() {
+fn classify_bazel_files() {
     assert!(matches!(
         classify(Path::new("BUILD"), &[]).unwrap(),
         Strategy::Bazel
@@ -92,7 +90,7 @@ fn test_classify_bazel_files() {
 }
 
 #[test]
-fn test_classify_cargo_toml() {
+fn classify_cargo_toml() {
     assert!(matches!(
         classify(Path::new("Cargo.toml"), &[]).unwrap(),
         Strategy::CargoToml
@@ -104,7 +102,7 @@ fn test_classify_cargo_toml() {
 }
 
 #[test]
-fn test_classify_gitignore() {
+fn classify_gitignore() {
     let features = vec!["gitignore".to_string()];
     assert!(matches!(
         classify(Path::new(".gitignore"), &features).unwrap(),
@@ -117,7 +115,7 @@ fn test_classify_gitignore() {
 }
 
 #[test]
-fn test_classify_codeowners() {
+fn classify_codeowners() {
     let features = vec!["codeowners".to_string()];
     assert!(matches!(
         classify(Path::new("CODEOWNERS"), &features).unwrap(),
@@ -130,7 +128,7 @@ fn test_classify_codeowners() {
 }
 
 #[test]
-fn test_classify_rust() {
+fn classify_rust() {
     assert!(matches!(
         classify(Path::new("main.rs"), &[]).unwrap(),
         Strategy::Generic
@@ -148,7 +146,7 @@ fn test_classify_rust() {
 }
 
 #[test]
-fn test_classify_rust_derive_mutually_exclusive() {
+fn classify_rust_derive_mutually_exclusive() {
     let features = vec![
         "rust_derive_alphabetical".to_string(),
         "rust_derive_canonical".to_string(),

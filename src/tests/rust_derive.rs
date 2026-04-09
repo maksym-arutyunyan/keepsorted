@@ -6,11 +6,11 @@ fn rust_derive_alphabetical() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
+#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#,
         r#"
-#[derive(A, B, C, Copy, Ord, Serialize, serde::Serialize, a, b, c)]
+#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#,
     );
@@ -21,7 +21,7 @@ fn rust_derive_canonical() {
     check(
         RustDeriveCanonical,
         r#"
-#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
+#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#,
         r#"
@@ -37,13 +37,13 @@ fn rust_derive_alphabetical_indented() {
         RustDeriveAlphabetical,
         r#"
 mod foo {
-    #[derive(C, B, A, Ord, Copy)]
+    #[derive(Copy, Ord, A, B, C)]
     struct Data {}
 }
         "#,
         r#"
 mod foo {
-    #[derive(A, B, C, Copy, Ord)]
+    #[derive(Copy, Ord, A, B, C)]
     struct Data {}
 }
         "#,
@@ -56,7 +56,7 @@ fn rust_derive_canonical_indented() {
         RustDeriveCanonical,
         r#"
 mod foo {
-    #[derive(C, B, A, Ord, Copy)]
+    #[derive(Copy, Ord, A, B, C)]
     struct Data {}
 }
         "#,
@@ -97,7 +97,9 @@ fn rust_derive_long_breaks_into_three_lines() {
         //         2         3         4         5         6         7         8         9
         //123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
         r#"
-#[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx)]
+#[derive(
+    A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx,
+)]
 struct Data {}
         "#,
         r#"
@@ -142,7 +144,25 @@ fn rust_derive_long_breaks_into_many_lines() {
         //12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
         r#"
 #[derive(
-    A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx, B01, B02xx,
+    A01,
+    A02,
+    A03,
+    A04,
+    A05,
+    A06,
+    A07,
+    A08,
+    A09,
+    A10,
+    A11,
+    A12,
+    A13,
+    A14,
+    A15,
+    A16,
+    A17xx,
+    B01,
+    B02xx,
 )]
 struct Data {}
         "#,
@@ -245,7 +265,7 @@ fn rust_derive_issue_25_1() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Parser, Debug)] // Some comment.
+#[derive(Debug, Parser)] // Some comment.
 struct Data {}
         "#,
         r#"
@@ -260,7 +280,7 @@ fn rust_derive_issue_25_2() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Parser, Debug)] // Some comment.
+#[derive(Debug, Parser)] // Some comment.
 #[command(about = "description", long_about = None)]
 struct Data {}
         "#,
@@ -277,7 +297,7 @@ fn rust_derive_issue_25_3() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Parser, Debug)] // Some comment comment with #[derive(Parser, Debug)].
+#[derive(Debug, Parser)] // Some comment comment with #[derive(Parser, Debug)].
 #[command(about = "description", long_about = None)]
 struct Data {}
         "#,
@@ -297,8 +317,8 @@ fn rust_both_derive_and_generic_sort() {
 fn setup_systems(app: &mut App) {
     app.add_plugins((
         // keepsorted: keep sorted
-        b,
         a,
+        b,
     ));
 }
 
@@ -314,7 +334,7 @@ fn setup_systems(app: &mut App) {
     ));
 }
 
-#[derive(Clone, Copy)]
+#[derive(Copy, Clone)]
 struct Data {}
         "#,
     );
@@ -325,7 +345,7 @@ fn rust_derive_with_url() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(B, A, Note = "http://example.com")]
+#[derive(A, B, Note = "http://example.com")]
 struct Data {}
         "#,
         r#"
