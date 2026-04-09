@@ -174,9 +174,7 @@ jobs:
         run: cargo build --release
 
       - name: Run e2e tests
-        run: ./verfiy.sh e2e
-        env:
-          RUST_BACKTRACE: 1
+        run: ./verify.sh e2e
 
   shell-checks:
     name: ShellCheck
