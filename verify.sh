@@ -52,7 +52,7 @@ run_build() {
 # shellcheck disable=SC2329
 run_test() {
   print_header "cargo test"
-  if ! cargo test; then
+  if ! cargo test --all-targets --workspace -- --color always; then
     failures+=("test")
     status_ok=false
   fi
@@ -61,7 +61,7 @@ run_test() {
 # shellcheck disable=SC2329
 run_test_release() {
   print_header "cargo test --release"
-  if ! cargo test --release --all-targets --workspace --exclude benchmarks -- --color always; then
+  if ! cargo test --release --all-targets --workspace -- --color always; then
     failures+=("test-release")
     status_ok=false
   fi
