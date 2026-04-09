@@ -12,7 +12,7 @@ struct Data {}
         r#"
 #[derive(A, B, C, Copy, Ord, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -27,7 +27,7 @@ struct Data {}
         r#"
 #[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -46,7 +46,7 @@ mod foo {
     #[derive(A, B, C, Copy, Ord)]
     struct Data {}
 }
-        "#,
+        "#
     );
 }
 
@@ -65,7 +65,7 @@ mod foo {
     #[derive(Copy, Ord, A, B, C)]
     struct Data {}
 }
-        "#,
+        "#
     );
 }
 
@@ -84,7 +84,7 @@ struct Data {}
         r#"
 #[derive(A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -105,7 +105,7 @@ struct Data {}
     A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xxx,
 )]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -128,7 +128,7 @@ struct Data {}
     A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx, B01, B02x,
 )]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -169,7 +169,7 @@ struct Data {}
     B02xx,
 )]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -186,7 +186,7 @@ struct Data {}
 // keepsorted: ignore block
 #[derive(C, B, A, Ord, Copy)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -207,7 +207,7 @@ struct Data {}
     C, B, A, Ord, Copy,
 )]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -236,7 +236,7 @@ struct Data {}
     Copy,
 )]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -251,7 +251,7 @@ struct Data {}
         r#"
 #[derive(Debug, Parser)] // Some comment.
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -268,7 +268,7 @@ struct Data {}
 #[derive(Debug, Parser)] // Some comment.
 #[command(about = "description", long_about = None)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -285,7 +285,7 @@ struct Data {}
 #[derive(Debug, Parser)] // Some comment comment with #[derive(Parser, Debug)].
 #[command(about = "description", long_about = None)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -316,7 +316,7 @@ fn setup_systems(app: &mut App) {
 
 #[derive(Clone, Copy)]
 struct Data {}
-        "#,
+        "#
     );
 }
 
@@ -331,6 +331,6 @@ struct Data {}
         r#"
 #[derive(A, B, Note = "http://example.com")]
 struct Data {}
-        "#,
+        "#
     );
 }
