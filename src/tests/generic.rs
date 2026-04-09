@@ -1,7 +1,5 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::Generic;
+use crate::test_inner;
+use crate::Strategy::Generic;
 
 #[test]
 fn generic_simple_block() {
@@ -381,5 +379,5 @@ local candidates = {
   },
   dark = {},
 }"#
-    )
+    );
 }

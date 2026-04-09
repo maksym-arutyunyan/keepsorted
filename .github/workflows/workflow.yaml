@@ -9,6 +9,7 @@ env:
   RUST_VERSION: 1.86.0           # Must match rust-toolchain.toml
   CARGO_TERM_COLOR: always
   TERM: xterm-256color
+  RUST_BACKTRACE: 1
 
 jobs:
   build:
@@ -34,9 +35,7 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Build
-        run: cargo build --release --all-targets
-        env:
-          RUST_BACKTRACE: 1
+        run: ./verify.sh build
 
   test:
     runs-on: ${{ matrix.os }}
@@ -64,9 +63,7 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Run Tests
-        run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
-        env:
-          RUST_BACKTRACE: 1
+        run: ./verify.sh test-release
 
   clippy:
     runs-on: ubuntu-latest
@@ -88,10 +85,8 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add clippy
 
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-targets -- -D warnings
+      - name: Run Clippy
+        run: ./verify.sh clippy
 
   rustfmt:
     runs-on: ubuntu-latest
@@ -105,10 +100,8 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add rustfmt
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Run Clippy
+        run: ./verify.sh fmt
 
   keepsorted:
     runs-on: ubuntu-latest
@@ -137,15 +130,7 @@ jobs:
 
       - name: Run KeepSorted
         shell: bash
-        run: |
-          # keepsorted can walk directories with --recursive, but we filter tracked files
-          # explicitly to avoid processing examples or tests during validation.
-          git ls-files -z \
-            | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
-            | xargs -0 -n1 ./target/release/keepsorted \
-                --features gitignore,rust_derive_canonical
-        env:
-          RUST_BACKTRACE: 1
+        run: ./verify.sh keepsorted
 
       - name: Git Diff
         # Check if keepsorted changed any files.
@@ -180,7 +165,7 @@ jobs:
         run: cargo build --release
 
       - name: Run e2e tests
-        run: bats e2e-tests
+        run: ./verify.sh e2e
 
   shell-checks:
     name: ShellCheck

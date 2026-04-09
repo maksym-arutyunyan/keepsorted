@@ -1,7 +1,5 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::CargoToml;
+use crate::test_inner;
+use crate::Strategy::CargoToml;
 
 #[test]
 fn cargo_toml_simple() {
@@ -267,7 +265,7 @@ workspace = true
 }
 
 #[test]
-fn test_cargo_toml_hash_in_string() {
+fn cargo_toml_hash_in_string() {
     test_inner!(
         CargoToml,
         r#"
@@ -284,7 +282,7 @@ version = "1.0"
 }
 
 #[test]
-fn test_cargo_toml_git_url_with_hash() {
+fn cargo_toml_git_url_with_hash() {
     test_inner!(
         CargoToml,
         r#"

@@ -1,7 +1,5 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::{RustDeriveAlphabetical, RustDeriveCanonical};
+use crate::test_inner;
+use crate::Strategy::{RustDeriveAlphabetical, RustDeriveCanonical};
 
 #[test]
 fn rust_derive_alphabetical() {

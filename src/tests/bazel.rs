@@ -1,7 +1,5 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::Bazel;
+use crate::test_inner;
+use crate::Strategy::Bazel;
 
 #[test]
 fn bazel_single_block() {
@@ -438,7 +436,7 @@ deps = [
 }
 
 #[test]
-fn test_bazel_hash_in_string() {
+fn bazel_hash_in_string() {
     test_inner!(
         Bazel,
         r#"

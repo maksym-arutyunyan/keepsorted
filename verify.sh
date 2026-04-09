@@ -52,7 +52,7 @@ run_build() {
 # shellcheck disable=SC2329
 run_test() {
   print_header "cargo test"
-  if ! cargo test; then
+  if ! cargo test --all-targets --workspace -- --color always; then
     failures+=("test")
     status_ok=false
   fi
@@ -61,7 +61,7 @@ run_test() {
 # shellcheck disable=SC2329
 run_test_release() {
   print_header "cargo test --release"
-  if ! cargo test --release; then
+  if ! cargo test --release --all-targets --workspace -- --color always; then
     failures+=("test-release")
     status_ok=false
   fi
@@ -89,7 +89,7 @@ run_fmt() {
 run_keepsorted() {
   print_header "keepsorted"
   if ! git ls-files -z \
-      | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
+      | grep -vzE '^tests/|^src/tests/|^e2e-tests/|^README.md$' \
       | xargs -0 -n1 ./target/release/keepsorted \
           --features gitignore,rust_derive_canonical; then
     failures+=("keepsorted")

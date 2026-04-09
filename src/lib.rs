@@ -8,6 +8,9 @@ use std::sync::LazyLock;
 
 mod strategies;
 
+#[cfg(test)]
+mod tests;
+
 static RE_KEEP_SORTED: LazyLock<Regex> = LazyLock::new(re_keyword_keep_sorted);
 static RE_IGNORE_FILE: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_file);
 static RE_IGNORE_BLOCK: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_block);
@@ -51,7 +54,7 @@ pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, Str
 ///
 /// `Strategy` values describe how `process_lines` will sort a file.
 #[derive(Copy, Clone, Debug)]
-pub enum Strategy {
+pub(crate) enum Strategy {
     /// Generic text sorting activated by the `# Keep sorted` comment.
     Generic,
     /// Sorting for Bazel `BUILD` and `.bzl` files.
@@ -67,7 +70,7 @@ pub enum Strategy {
 }
 
 /// Sorts `lines` according to the chosen [`Strategy`] and returns the reordered lines.
-pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
+pub(crate) fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<String>> {
     if is_ignore_file(&lines) {
         return Ok(lines);
     }
@@ -90,7 +93,7 @@ pub fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Result<Vec<S
     }
 }
 
-fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
+pub(crate) fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
     if is_bazel(path) {
         return Ok(Strategy::Bazel);
     }
@@ -160,175 +163,17 @@ fn is_rust(path: &Path) -> bool {
     path.extension() == Some(std::ffi::OsStr::new("rs"))
 }
 
-fn re_keyword_keep_sorted() -> Regex {
+pub(crate) fn re_keyword_keep_sorted() -> Regex {
     Regex::new(r"(?i)^\s*(#|\/\/|--)(\s*keepsorted\s*:)?\s*keep\s+sorted\s*\.?\s*$")
         .expect("Failed to build regex for keep sorted")
 }
 
-fn re_keyword_ignore_file() -> Regex {
+pub(crate) fn re_keyword_ignore_file() -> Regex {
     Regex::new(r"(?i)^\s*(#|\/\/|--)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
         .expect("Failed to build regex for ignore file")
 }
 
-fn re_keyword_ignore_block() -> Regex {
+pub(crate) fn re_keyword_ignore_block() -> Regex {
     Regex::new(r"(?i)^\s*(#|\/\/|--)\s*keepsorted\s*:\s*ignore\s+block\s*\.?\s*$")
         .expect("Failed to build regex for ignore block")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_re_keyword_keep_sorted() {
-        let re = re_keyword_keep_sorted();
-        for line in [
-            "  #Keep sorted",
-            "  # Keep sorted  ",
-            "  # Keep   sorted .  ",
-            "  #   keepsorted  : keep   sorted  .  ",
-            "  //  Keep sorted   .  ",
-            "  //keepsorted: keep sorted",
-            "  //   keepsorted  : keep   sorted  .  ",
-            "--keepsorted: keep sorted",
-            "-- keep sorted",
-        ] {
-            assert!(
-                re.is_match(line),
-                "The regex failed to match the valid line: '{}'",
-                line
-            );
-        }
-    }
-
-    #[test]
-    fn test_re_keyword_ignore_file() {
-        let re = re_keyword_ignore_file();
-        for line in [
-            "  #   keepsorted  : ignore   file  .  ",
-            "#keepsorted:ignore file",
-            "  //   keepsorted  : ignore   file  .  ",
-            "//keepsorted:ignore file",
-            "  --   keepsorted  : ignore   file  .  ",
-            "--keepsorted:ignore file",
-        ] {
-            assert!(
-                re.is_match(line),
-                "The regex failed to match the valid line: '{}'",
-                line
-            );
-        }
-    }
-
-    #[test]
-    fn test_re_keyword_ignore_block() {
-        let re = re_keyword_ignore_block();
-        for line in [
-            "  #   keepsorted  : ignore   block  .  ",
-            "#keepsorted:ignore block",
-            "  //   keepsorted  : ignore   block  .  ",
-            "//keepsorted:ignore block",
-            "  --   keepsorted  : ignore   block  .  ",
-            "--keepsorted:ignore block",
-        ] {
-            assert!(
-                re.is_match(line),
-                "The regex failed to match the valid line: '{}'",
-                line
-            );
-        }
-    }
-
-    #[test]
-    fn test_classify_bazel_files() {
-        assert!(matches!(
-            classify(Path::new("BUILD"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-        assert!(matches!(
-            classify(Path::new("WORKSPACE"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-        assert!(matches!(
-            classify(Path::new("foo.bazel"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-        assert!(matches!(
-            classify(Path::new("BUILD.bazel"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-        assert!(matches!(
-            classify(Path::new("WORKSPACE.bazel"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-        assert!(matches!(
-            classify(Path::new("foo.bzl"), &[]).unwrap(),
-            Strategy::Bazel
-        ));
-    }
-
-    #[test]
-    fn test_classify_cargo_toml() {
-        assert!(matches!(
-            classify(Path::new("Cargo.toml"), &[]).unwrap(),
-            Strategy::CargoToml
-        ));
-        assert!(matches!(
-            classify(Path::new("not_cargo.toml"), &[]).unwrap(),
-            Strategy::Generic
-        ));
-    }
-
-    #[test]
-    fn test_classify_gitignore() {
-        let features = vec!["gitignore".to_string()];
-        assert!(matches!(
-            classify(Path::new(".gitignore"), &features).unwrap(),
-            Strategy::Gitignore
-        ));
-        assert!(matches!(
-            classify(Path::new(".gitignore"), &[]).unwrap(),
-            Strategy::Generic
-        ));
-    }
-
-    #[test]
-    fn test_classify_codeowners() {
-        let features = vec!["codeowners".to_string()];
-        assert!(matches!(
-            classify(Path::new("CODEOWNERS"), &features).unwrap(),
-            Strategy::Gitignore
-        ));
-        assert!(matches!(
-            classify(Path::new("CODEOWNERS"), &[]).unwrap(),
-            Strategy::Generic
-        ));
-    }
-
-    #[test]
-    fn test_classify_rust() {
-        assert!(matches!(
-            classify(Path::new("main.rs"), &[]).unwrap(),
-            Strategy::Generic
-        ));
-        let alphabetical = vec!["rust_derive_alphabetical".to_string()];
-        assert!(matches!(
-            classify(Path::new("main.rs"), &alphabetical).unwrap(),
-            Strategy::RustDeriveAlphabetical
-        ));
-        let canonical = vec!["rust_derive_canonical".to_string()];
-        assert!(matches!(
-            classify(Path::new("main.rs"), &canonical).unwrap(),
-            Strategy::RustDeriveCanonical
-        ));
-    }
-
-    #[test]
-    fn test_classify_rust_derive_mutually_exclusive() {
-        let features = vec![
-            "rust_derive_alphabetical".to_string(),
-            "rust_derive_canonical".to_string(),
-        ];
-        assert!(classify(Path::new("main.rs"), &features).is_err());
-    }
 }
