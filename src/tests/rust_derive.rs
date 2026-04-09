@@ -1,9 +1,8 @@
-use super::common::check;
 use crate::Strategy::{RustDeriveAlphabetical, RustDeriveCanonical};
 
 #[test]
 fn rust_derive_alphabetical() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 #[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
@@ -18,7 +17,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_canonical() {
-    check(
+    test_inner!(
         RustDeriveCanonical,
         r#"
 #[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
@@ -33,7 +32,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_alphabetical_indented() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 mod foo {
@@ -52,7 +51,7 @@ mod foo {
 
 #[test]
 fn rust_derive_canonical_indented() {
-    check(
+    test_inner!(
         RustDeriveCanonical,
         r#"
 mod foo {
@@ -73,7 +72,7 @@ mod foo {
 //3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456
 #[test]
 fn rust_derive_long_stays_one_line() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9
         //12345678901234567890123456789012345678901234567890123456789012345678901234567890123456
@@ -92,7 +91,7 @@ struct Data {}
 //34567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
 #[test]
 fn rust_derive_long_breaks_into_three_lines() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9
         //123456789012345678901234567890123456789012345678901234567890123456789012345678901234567
@@ -113,7 +112,7 @@ struct Data {}
 //345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901
 #[test]
 fn rust_derive_long_stays_three_lines() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9         0
         //1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901
@@ -136,7 +135,7 @@ struct Data {}
 //3456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
 #[test]
 fn rust_derive_long_breaks_into_many_lines() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         //         2         3         4         5         6         7         8         9         0
         //12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
@@ -175,7 +174,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_one_line_ignored() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 // keepsorted: ignore block
@@ -192,7 +191,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_three_lines_ignored() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 // keepsorted: ignore block
@@ -213,7 +212,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_many_lines_ignored() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 // keepsorted: ignore block
@@ -242,7 +241,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_issue_25_1() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 #[derive(Parser, Debug)] // Some comment.
@@ -257,7 +256,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_issue_25_2() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 #[derive(Parser, Debug)] // Some comment.
@@ -274,7 +273,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_issue_25_3() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 #[derive(Parser, Debug)] // Some comment comment with #[derive(Parser, Debug)].
@@ -291,7 +290,7 @@ struct Data {}
 
 #[test]
 fn rust_both_derive_and_generic_sort() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 fn setup_systems(app: &mut App) {
@@ -322,7 +321,7 @@ struct Data {}
 
 #[test]
 fn rust_derive_with_url() {
-    check(
+    test_inner!(
         RustDeriveAlphabetical,
         r#"
 #[derive(B, A, Note = "http://example.com")]

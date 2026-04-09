@@ -1,10 +1,23 @@
 use crate::{process_lines, Strategy};
+use std::io;
 
-pub fn check(strategy: Strategy, input: &str, expected: &str) {
-    let lines: Vec<_> = input.lines().map(|l| format!("{l}\n")).collect();
-    let mut result = process_lines(strategy, lines).unwrap();
-    if let Some(last) = result.last_mut() {
-        *last = last.trim_end_matches('\n').to_string();
+pub(super) fn process_input(strategy: Strategy, text: &str) -> io::Result<String> {
+    let lines: Vec<_> = text.lines().map(|line| format!("{}\n", line)).collect();
+    let mut processed_lines = process_lines(strategy, lines)?;
+    if let Some(last) = processed_lines.last_mut() {
+        last.truncate(last.trim_end_matches('\n').len());
     }
-    assert_eq!(result.concat(), expected);
+    Ok(processed_lines.concat())
+}
+
+macro_rules! test_inner {
+    ($strategy:expr, $input:expr, $expected:expr) => {{
+        let result = super::common::process_input($strategy, $input).unwrap();
+        assert!(
+            result == $expected,
+            "Expected:\n{}\nActual:\n{}",
+            $expected,
+            result
+        );
+    }};
 }

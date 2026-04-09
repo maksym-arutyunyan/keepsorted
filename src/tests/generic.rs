@@ -1,9 +1,8 @@
-use super::common::check;
 use crate::Strategy::Generic;
 
 #[test]
 fn generic_simple_block() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -20,7 +19,7 @@ b
 
 #[test]
 fn generic_simple_block_2() {
-    check(
+    test_inner!(
         Generic,
         r#"
 // Keep sorted.
@@ -37,7 +36,7 @@ b
 
 #[test]
 fn generic_simple_block_3() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # keepsorted: keep sorted
@@ -54,7 +53,7 @@ b
 
 #[test]
 fn generic_blocks_with_newline() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -77,7 +76,7 @@ a
 
 #[test]
 fn generic_several_blocks() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -102,7 +101,7 @@ b
 
 #[test]
 fn generic_block_with_multi_line_comment() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -127,7 +126,7 @@ y
 
 #[test]
 fn generic_block_with_trailing_comment() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -148,7 +147,7 @@ b
 
 #[test]
 fn generic_block_with_inline_comment() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -169,7 +168,7 @@ y
 
 #[test]
 fn generic_ignore_file() {
-    check(
+    test_inner!(
         Generic,
         r#"
   # keepsorted: ignore file
@@ -204,7 +203,7 @@ fn generic_ignore_file() {
 
 #[test]
 fn generic_ignore_block_inside() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -239,7 +238,7 @@ fn generic_ignore_block_inside() {
 
 #[test]
 fn generic_ignore_block_before() {
-    check(
+    test_inner!(
         Generic,
         r#"
 # Keep sorted.
@@ -276,12 +275,12 @@ fn generic_ignore_block_before() {
 #[test]
 #[ignore = "multi-line block comments (/* ... */) not yet supported"]
 fn with_multi_line_comment_rust() {
-    check(
+    test_inner!(
         Generic,
         r#"
 // Keep sorted.
 y,
-/*
+/* 
  * Some multi-line comment
  * for the line below.
  */
@@ -293,7 +292,7 @@ a,
 // Keep sorted.
 a,
 b,
-/*
+/* 
  * Some multi-line comment
  * for the line below.
  */
@@ -305,7 +304,7 @@ y,
 
 #[test]
 fn generic_simple_lua_table() {
-    check(
+    test_inner!(
         Generic,
         r#"
 local config = {
@@ -326,7 +325,7 @@ local config = {
 
 #[test]
 fn generic_nested_lua_tables() {
-    check(
+    test_inner!(
         Generic,
         r#"
 local config = {
@@ -359,7 +358,7 @@ local config = {
 
 #[test]
 fn generic_nested_lua_tables_specific_example() {
-    check(
+    test_inner!(
         Generic,
         r#"
 local candidates = {

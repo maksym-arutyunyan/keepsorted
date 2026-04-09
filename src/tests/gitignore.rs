@@ -1,11 +1,10 @@
-use super::common::check;
 use crate::Strategy::Gitignore;
 
 // --- .gitignore ---
 
 #[test]
 fn gitignore_1() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 
@@ -38,7 +37,7 @@ fn gitignore_1() {
 
 #[test]
 fn gitignore_ignore_file() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 # keepsorted: ignore file
@@ -73,7 +72,7 @@ fn gitignore_ignore_file() {
 
 #[test]
 fn gitignore_ignore_block_after_header_comment() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 
@@ -110,7 +109,7 @@ fn gitignore_ignore_block_after_header_comment() {
 
 #[test]
 fn codeowners_simple_block() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 /.d/                 @company/teams/a
@@ -129,7 +128,7 @@ fn codeowners_simple_block() {
 
 #[test]
 fn codeowners_two_blocks() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 /.d/                 @company/teams/a
@@ -150,7 +149,7 @@ fn codeowners_two_blocks() {
 
 #[test]
 fn codeowners_ignore_file() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 # keepsorted: ignore file
@@ -173,7 +172,7 @@ fn codeowners_ignore_file() {
 
 #[test]
 fn codeowners_ignore_block() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 # keepsorted: ignore block
@@ -196,7 +195,7 @@ fn codeowners_ignore_block() {
 
 #[test]
 fn codeowners_1() {
-    check(
+    test_inner!(
         Gitignore,
         r#"
 

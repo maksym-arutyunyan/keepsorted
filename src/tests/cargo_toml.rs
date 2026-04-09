@@ -1,9 +1,8 @@
-use super::common::check;
 use crate::Strategy::CargoToml;
 
 #[test]
 fn cargo_toml_simple() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -20,7 +19,7 @@ b = "2"
 
 #[test]
 fn cargo_toml_list_with_item_comment() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -41,7 +40,7 @@ c = "3"
 
 #[test]
 fn cargo_toml_list_with_inline_comment() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -60,7 +59,7 @@ c = "3"
 
 #[test]
 fn cargo_toml_two_scopes() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -83,7 +82,7 @@ path = "src/lib.rs"
 
 #[test]
 fn cargo_toml_block_with_newline_inside() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -106,7 +105,7 @@ x = "3"
 
 #[test]
 fn cargo_toml_two_blocks() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -131,7 +130,7 @@ y = "4"
 
 #[test]
 fn cargo_toml_ignore_file() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 # keepsorted: ignore file
@@ -158,7 +157,7 @@ x = "3"
 
 #[test]
 fn cargo_toml_ignore_block_inside() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -185,7 +184,7 @@ y = "4"
 
 #[test]
 fn cargo_toml_ignore_block_before() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 # keepsorted: ignore block
@@ -212,7 +211,7 @@ y = "4"
 
 #[test]
 fn cargo_toml_nested_list() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -237,7 +236,7 @@ b = { workspace = true, default-features = false, features = [
 
 #[test]
 fn cargo_toml_features() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -266,7 +265,7 @@ workspace = true
 
 #[test]
 fn cargo_toml_hash_in_string() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [package]
@@ -283,7 +282,7 @@ version = "1.0"
 
 #[test]
 fn cargo_toml_git_url_with_hash() {
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]
@@ -302,7 +301,7 @@ dep_b = "1.0"
 fn cargo_toml_bracket_in_inline_comment() {
     // A dep with '[' only in its comment must not trigger multiline mode,
     // causing the next dependency to be swallowed into the same item.
-    check(
+    test_inner!(
         CargoToml,
         r#"
 [dependencies]

@@ -1,9 +1,8 @@
-use super::common::check;
 use crate::Strategy::Bazel;
 
 #[test]
 fn bazel_single_block() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -24,7 +23,7 @@ block = [
 
 #[test]
 fn bazel_inline_comment() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -49,7 +48,7 @@ block = [
 
 #[test]
 fn bazel_inline_comment_with_braces() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -74,7 +73,7 @@ block = [
 
 #[test]
 fn bazel_multi_line_comment() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -103,7 +102,7 @@ block = [
 
 #[test]
 fn bazel_multi_line_trailing_comment() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -128,7 +127,7 @@ block = [
 
 #[test]
 fn bazel_several_multi_line_comments() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -161,7 +160,7 @@ block = [
 
 #[test]
 fn bazel_single_block_with_comment() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -190,7 +189,7 @@ block = [
 
 #[test]
 fn bazel_blocks() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block_1 = [
@@ -219,7 +218,7 @@ block_2 = [
 
 #[test]
 fn bazel_ignore_file() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 # keepsorted: ignore file
@@ -252,7 +251,7 @@ block_2 = [
 
 #[test]
 fn bazel_ignore_block_inside() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block_1 = [
@@ -285,7 +284,7 @@ block_2 = [
 
 #[test]
 fn bazel_ignore_block_before() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block_1 = [
@@ -318,7 +317,7 @@ block_2 = [
 
 #[test]
 fn bazel_blocks_with_select() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 deps = [
@@ -361,7 +360,7 @@ deps = [
 
 #[test]
 fn bazel_order() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
@@ -414,7 +413,7 @@ block = [
 fn bazel_bracket_in_string_value() {
     // A dep entry whose code portion contains '[' (e.g. "m[0]") must still be
     // collected into the sorting block, not escape early into output_lines.
-    check(
+    test_inner!(
         Bazel,
         r#"
 deps = [
@@ -437,7 +436,7 @@ deps = [
 
 #[test]
 fn bazel_hash_in_string() {
-    check(
+    test_inner!(
         Bazel,
         r#"
 cc_library(
@@ -466,7 +465,7 @@ cc_library(
 fn bazel_scope_resets_after_block() {
     // After a sorted list closes, is_scope must reset so that '# Keep sorted'
     // outside any list does not trigger sorting of subsequent entries.
-    check(
+    test_inner!(
         Bazel,
         r#"
 block = [
