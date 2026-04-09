@@ -165,50 +165,9 @@ fn re_keyword_keep_sorted() -> Regex {
         .expect("Failed to build regex for keep sorted")
 }
 
-#[test]
-fn test_re_keyword_keep_sorted() {
-    let re = re_keyword_keep_sorted();
-    for line in [
-        "  #Keep sorted",
-        "  # Keep sorted  ",
-        "  # Keep   sorted .  ",
-        "  #   keepsorted  : keep   sorted  .  ",
-        "  //  Keep sorted   .  ",
-        "  //keepsorted: keep sorted",
-        "  //   keepsorted  : keep   sorted  .  ",
-        "--keepsorted: keep sorted",
-        "-- keep sorted",
-    ] {
-        assert!(
-            re.is_match(line),
-            "The regex failed to match the valid line: '{}'",
-            line
-        );
-    }
-}
-
 fn re_keyword_ignore_file() -> Regex {
     Regex::new(r"(?i)^\s*(#|\/\/|--)\s*keepsorted\s*:\s*ignore\s+file\s*\.?\s*$")
         .expect("Failed to build regex for ignore file")
-}
-
-#[test]
-fn test_re_keyword_ignore_file() {
-    let re = re_keyword_ignore_file();
-    for line in [
-        "  #   keepsorted  : ignore   file  .  ",
-        "#keepsorted:ignore file",
-        "  //   keepsorted  : ignore   file  .  ",
-        "//keepsorted:ignore file",
-        "  --   keepsorted  : ignore   file  .  ",
-        "--keepsorted:ignore file",
-    ] {
-        assert!(
-            re.is_match(line),
-            "The regex failed to match the valid line: '{}'",
-            line
-        );
-    }
 }
 
 fn re_keyword_ignore_block() -> Regex {
@@ -216,49 +175,95 @@ fn re_keyword_ignore_block() -> Regex {
         .expect("Failed to build regex for ignore block")
 }
 
-#[test]
-fn test_re_keyword_ignore_block() {
-    let re = re_keyword_ignore_block();
-    for line in [
-        "  #   keepsorted  : ignore   block  .  ",
-        "#keepsorted:ignore block",
-        "  //   keepsorted  : ignore   block  .  ",
-        "//keepsorted:ignore block",
-        "  --   keepsorted  : ignore   block  .  ",
-        "--keepsorted:ignore block",
-    ] {
-        assert!(
-            re.is_match(line),
-            "The regex failed to match the valid line: '{}'",
-            line
-        );
-    }
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[test]
-fn test_classify_bazel_files() {
-    assert!(matches!(
-        classify(Path::new("BUILD"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
-    assert!(matches!(
-        classify(Path::new("WORKSPACE"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
-    assert!(matches!(
-        classify(Path::new("foo.bazel"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
-    assert!(matches!(
-        classify(Path::new("BUILD.bazel"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
-    assert!(matches!(
-        classify(Path::new("WORKSPACE.bazel"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
-    assert!(matches!(
-        classify(Path::new("foo.bzl"), &[]).unwrap(),
-        Strategy::Bazel
-    ));
+    #[test]
+    fn test_re_keyword_keep_sorted() {
+        let re = re_keyword_keep_sorted();
+        for line in [
+            "  #Keep sorted",
+            "  # Keep sorted  ",
+            "  # Keep   sorted .  ",
+            "  #   keepsorted  : keep   sorted  .  ",
+            "  //  Keep sorted   .  ",
+            "  //keepsorted: keep sorted",
+            "  //   keepsorted  : keep   sorted  .  ",
+            "--keepsorted: keep sorted",
+            "-- keep sorted",
+        ] {
+            assert!(
+                re.is_match(line),
+                "The regex failed to match the valid line: '{}'",
+                line
+            );
+        }
+    }
+
+    #[test]
+    fn test_re_keyword_ignore_file() {
+        let re = re_keyword_ignore_file();
+        for line in [
+            "  #   keepsorted  : ignore   file  .  ",
+            "#keepsorted:ignore file",
+            "  //   keepsorted  : ignore   file  .  ",
+            "//keepsorted:ignore file",
+            "  --   keepsorted  : ignore   file  .  ",
+            "--keepsorted:ignore file",
+        ] {
+            assert!(
+                re.is_match(line),
+                "The regex failed to match the valid line: '{}'",
+                line
+            );
+        }
+    }
+
+    #[test]
+    fn test_re_keyword_ignore_block() {
+        let re = re_keyword_ignore_block();
+        for line in [
+            "  #   keepsorted  : ignore   block  .  ",
+            "#keepsorted:ignore block",
+            "  //   keepsorted  : ignore   block  .  ",
+            "//keepsorted:ignore block",
+            "  --   keepsorted  : ignore   block  .  ",
+            "--keepsorted:ignore block",
+        ] {
+            assert!(
+                re.is_match(line),
+                "The regex failed to match the valid line: '{}'",
+                line
+            );
+        }
+    }
+
+    #[test]
+    fn test_classify_bazel_files() {
+        assert!(matches!(
+            classify(Path::new("BUILD"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+        assert!(matches!(
+            classify(Path::new("WORKSPACE"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+        assert!(matches!(
+            classify(Path::new("foo.bazel"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+        assert!(matches!(
+            classify(Path::new("BUILD.bazel"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+        assert!(matches!(
+            classify(Path::new("WORKSPACE.bazel"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+        assert!(matches!(
+            classify(Path::new("foo.bzl"), &[]).unwrap(),
+            Strategy::Bazel
+        ));
+    }
 }
