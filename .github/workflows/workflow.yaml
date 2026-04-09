@@ -175,6 +175,8 @@ jobs:
 
       - name: Run e2e tests
         run: ./verfiy.sh e2e
+        env:
+          RUST_BACKTRACE: 1
 
   shell-checks:
     name: ShellCheck
