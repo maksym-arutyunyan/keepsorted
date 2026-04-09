@@ -56,7 +56,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();
     for line in block {
-        if is_single_line_comment(&line) {
+        if is_any_comment(&line) {
             current_item.comment.push(line);
         } else {
             items.push(Item {
@@ -79,7 +79,7 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     result
 }
 
-fn is_single_line_comment(line: &str) -> bool {
+fn is_any_comment(line: &str) -> bool {
     let trimmed = line.trim();
     trimmed.starts_with('#') || trimmed.starts_with("//") || trimmed.starts_with("--")
 }
