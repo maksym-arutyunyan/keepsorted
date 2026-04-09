@@ -89,7 +89,7 @@ run_fmt() {
 run_keepsorted() {
   print_header "keepsorted"
   if ! git ls-files -z \
-      | grep -vzE '^tests/|^e2e-tests/|^README.md$' \
+      | grep -vzE '^tests/|^src/tests/|^e2e-tests/|^README.md$' \
       | xargs -0 -n1 ./target/release/keepsorted \
           --features gitignore,rust_derive_canonical; then
     failures+=("keepsorted")
