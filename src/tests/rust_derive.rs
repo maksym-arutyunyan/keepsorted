@@ -144,25 +144,7 @@ fn rust_derive_long_breaks_into_many_lines() {
         //12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012
         r#"
 #[derive(
-    A01,
-    A02,
-    A03,
-    A04,
-    A05,
-    A06,
-    A07,
-    A08,
-    A09,
-    A10,
-    A11,
-    A12,
-    A13,
-    A14,
-    A15,
-    A16,
-    A17xx,
-    B01,
-    B02xx,
+    A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15, A16, A17xx, B01, B02xx,
 )]
 struct Data {}
         "#,
@@ -265,7 +247,7 @@ fn rust_derive_issue_25_1() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Debug, Parser)] // Some comment.
+#[derive(Parser, Debug)] // Some comment.
 struct Data {}
         "#,
         r#"
@@ -280,7 +262,7 @@ fn rust_derive_issue_25_2() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Debug, Parser)] // Some comment.
+#[derive(Parser, Debug)] // Some comment.
 #[command(about = "description", long_about = None)]
 struct Data {}
         "#,
@@ -297,7 +279,7 @@ fn rust_derive_issue_25_3() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Debug, Parser)] // Some comment comment with #[derive(Parser, Debug)].
+#[derive(Parser, Debug)] // Some comment comment with #[derive(Parser, Debug)].
 #[command(about = "description", long_about = None)]
 struct Data {}
         "#,
@@ -334,7 +316,7 @@ fn setup_systems(app: &mut App) {
     ));
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy)]
 struct Data {}
         "#,
     );
