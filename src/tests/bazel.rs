@@ -1,11 +1,9 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::Bazel;
+use super::common::check;
+use crate::Strategy::Bazel;
 
 #[test]
 fn bazel_single_block() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -20,13 +18,13 @@ block = [
     "a",
     "b",
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_inline_comment() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -45,13 +43,13 @@ block = [
     "x",  # Some in-line comment.
     "y",
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_inline_comment_with_braces() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -70,13 +68,13 @@ block = [
     "x",  # TODO[xxx].
     "y",
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_multi_line_comment() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -99,13 +97,13 @@ block = [
     "x",
     "y",
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_multi_line_trailing_comment() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -124,13 +122,13 @@ block = [
     # Some multi-line comment
     # trailing comment.
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_several_multi_line_comments() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -157,13 +155,13 @@ block = [
     # Some multi-line comment
     # trailing comment.
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_single_block_with_comment() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -186,13 +184,13 @@ block = [
     "d",
     # Trailing comment.
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_blocks() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block_1 = [
@@ -215,13 +213,13 @@ block_2 = [
     "y",
     "x",
 ],
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_ignore_file() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 # keepsorted: ignore file
@@ -248,13 +246,13 @@ block_2 = [
     "y",
     "x",
 ],
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_ignore_block_inside() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block_1 = [
@@ -281,13 +279,13 @@ block_2 = [
     "x",
     "y",
 ],
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_ignore_block_before() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block_1 = [
@@ -314,13 +312,13 @@ block_2 = [
     "x",
     "y",
 ],
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_blocks_with_select() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 deps = [
@@ -357,13 +355,13 @@ deps = [
         "m",
     ],
 })
-        "#
+        "#,
     );
 }
 
 #[test]
 fn bazel_order() {
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -408,7 +406,7 @@ block = [
     requirement("python-gitlab"),
     requirement("pyyaml"),
 ]
-        "#
+        "#,
     );
 }
 
@@ -416,7 +414,7 @@ block = [
 fn bazel_bracket_in_string_value() {
     // A dep entry whose code portion contains '[' (e.g. "m[0]") must still be
     // collected into the sorting block, not escape early into output_lines.
-    test_inner!(
+    check(
         Bazel,
         r#"
 deps = [
@@ -433,13 +431,13 @@ deps = [
     "m[0]",
     "z",
 ]
-        "#
+        "#,
     );
 }
 
 #[test]
-fn test_bazel_hash_in_string() {
-    test_inner!(
+fn bazel_hash_in_string() {
+    check(
         Bazel,
         r#"
 cc_library(
@@ -460,7 +458,7 @@ cc_library(
         "//lib:b",
     ],
 )
-        "#
+        "#,
     );
 }
 
@@ -468,7 +466,7 @@ cc_library(
 fn bazel_scope_resets_after_block() {
     // After a sorted list closes, is_scope must reset so that '# Keep sorted'
     // outside any list does not trigger sorting of subsequent entries.
-    test_inner!(
+    check(
         Bazel,
         r#"
 block = [
@@ -489,6 +487,6 @@ block = [
 # Keep sorted.
 "z",
 "y",
-        "#
+        "#,
     );
 }

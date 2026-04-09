@@ -1,11 +1,9 @@
-#[macro_use]
-mod common;
-
-use keepsorted::Strategy::Generic;
+use super::common::check;
+use crate::Strategy::Generic;
 
 #[test]
 fn generic_simple_block() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -16,13 +14,13 @@ a
 # Keep sorted.
 a
 b
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_simple_block_2() {
-    test_inner!(
+    check(
         Generic,
         r#"
 // Keep sorted.
@@ -33,13 +31,13 @@ a
 // Keep sorted.
 a
 b
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_simple_block_3() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # keepsorted: keep sorted
@@ -50,13 +48,13 @@ a
 # keepsorted: keep sorted
 a
 b
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_blocks_with_newline() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -73,13 +71,13 @@ y
 
 b
 a
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_several_blocks() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -98,13 +96,13 @@ y
 # Keep sorted.
 a
 b
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_block_with_multi_line_comment() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -123,13 +121,13 @@ b
 # for the line below.
 x
 y
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_block_with_trailing_comment() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -144,13 +142,13 @@ a
 b
 # Some multi-line comment
 # trailing comment.
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_block_with_inline_comment() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -165,13 +163,13 @@ a
 b
 x  # Some in-line comment.
 y
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_ignore_file() {
-    test_inner!(
+    check(
         Generic,
         r#"
   # keepsorted: ignore file
@@ -200,13 +198,13 @@ fn generic_ignore_file() {
 # Keep sorted.
 3b
 3a
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_ignore_block_inside() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -235,13 +233,13 @@ fn generic_ignore_block_inside() {
 # Keep sorted.
 3a
 3b
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_ignore_block_before() {
-    test_inner!(
+    check(
         Generic,
         r#"
 # Keep sorted.
@@ -270,7 +268,7 @@ fn generic_ignore_block_before() {
 # Keep sorted.
 3a
 3b
-        "#
+        "#,
     );
 }
 
@@ -278,12 +276,12 @@ fn generic_ignore_block_before() {
 #[test]
 #[ignore = "multi-line block comments (/* ... */) not yet supported"]
 fn with_multi_line_comment_rust() {
-    test_inner!(
+    check(
         Generic,
         r#"
 // Keep sorted.
 y,
-/* 
+/*
  * Some multi-line comment
  * for the line below.
  */
@@ -295,19 +293,19 @@ a,
 // Keep sorted.
 a,
 b,
-/* 
+/*
  * Some multi-line comment
  * for the line below.
  */
 x,
 y,
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_simple_lua_table() {
-    test_inner!(
+    check(
         Generic,
         r#"
 local config = {
@@ -322,13 +320,13 @@ local config = {
     name = "some name",
     setting = true,
 }
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_nested_lua_tables() {
-    test_inner!(
+    check(
         Generic,
         r#"
 local config = {
@@ -355,13 +353,13 @@ local config = {
         "ghijkl",
     }
 }
-        "#
+        "#,
     );
 }
 
 #[test]
 fn generic_nested_lua_tables_specific_example() {
-    test_inner!(
+    check(
         Generic,
         r#"
 local candidates = {
@@ -380,6 +378,6 @@ local candidates = {
     "catppuccin-latte",
   },
   dark = {},
-}"#
-    )
+}"#,
+    );
 }
