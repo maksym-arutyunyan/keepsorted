@@ -18,7 +18,7 @@ block = [
     "a",
     "b",
 ]
-        "#,
+        "#
     );
 }
 
@@ -43,7 +43,7 @@ block = [
     "x",  # Some in-line comment.
     "y",
 ]
-        "#,
+        "#
     );
 }
 
@@ -68,7 +68,7 @@ block = [
     "x",  # TODO[xxx].
     "y",
 ]
-        "#,
+        "#
     );
 }
 
@@ -97,7 +97,7 @@ block = [
     "x",
     "y",
 ]
-        "#,
+        "#
     );
 }
 
@@ -122,7 +122,7 @@ block = [
     # Some multi-line comment
     # trailing comment.
 ]
-        "#,
+        "#
     );
 }
 
@@ -155,7 +155,7 @@ block = [
     # Some multi-line comment
     # trailing comment.
 ]
-        "#,
+        "#
     );
 }
 
@@ -184,7 +184,7 @@ block = [
     "d",
     # Trailing comment.
 ]
-        "#,
+        "#
     );
 }
 
@@ -213,7 +213,7 @@ block_2 = [
     "y",
     "x",
 ],
-        "#,
+        "#
     );
 }
 
@@ -246,7 +246,7 @@ block_2 = [
     "y",
     "x",
 ],
-        "#,
+        "#
     );
 }
 
@@ -279,7 +279,7 @@ block_2 = [
     "x",
     "y",
 ],
-        "#,
+        "#
     );
 }
 
@@ -312,7 +312,7 @@ block_2 = [
     "x",
     "y",
 ],
-        "#,
+        "#
     );
 }
 
@@ -355,7 +355,7 @@ deps = [
         "m",
     ],
 })
-        "#,
+        "#
     );
 }
 
@@ -406,7 +406,7 @@ block = [
     requirement("python-gitlab"),
     requirement("pyyaml"),
 ]
-        "#,
+        "#
     );
 }
 
@@ -431,7 +431,7 @@ deps = [
     "m[0]",
     "z",
 ]
-        "#,
+        "#
     );
 }
 
@@ -458,7 +458,7 @@ cc_library(
         "//lib:b",
     ],
 )
-        "#,
+        "#
     );
 }
 
@@ -487,6 +487,6 @@ block = [
 # Keep sorted.
 "z",
 "y",
-        "#,
+        "#
     );
 }

@@ -14,7 +14,7 @@ a = "1"
 [dependencies]
 a = "1"
 b = "2"
-        "#,
+        "#
     );
 }
 
@@ -35,7 +35,7 @@ a = "1"
 a = "1"
 b = "2"
 c = "3"
-        "#,
+        "#
     );
 }
 
@@ -54,7 +54,7 @@ a = "1"  # Some in-line comment.
 a = "1"  # Some in-line comment.
 b = "2"
 c = "3"
-        "#,
+        "#
     );
 }
 
@@ -77,7 +77,7 @@ b = "2"
 [lib]
 name = "some_name"
 path = "src/lib.rs"
-        "#,
+        "#
     );
 }
 
@@ -100,7 +100,7 @@ b = "2"
 
 y = "4"
 x = "3"
-        "#,
+        "#
     );
 }
 
@@ -125,7 +125,7 @@ b = "2"
 [dev-dependencies]
 x = "3"
 y = "4"
-        "#,
+        "#
     );
 }
 
@@ -152,7 +152,7 @@ a = "1"
 [dev-dependencies]
 y = "4"
 x = "3"
-        "#,
+        "#
     );
 }
 
@@ -179,7 +179,7 @@ a = "1"
 [dev-dependencies]
 x = "3"
 y = "4"
-        "#,
+        "#
     );
 }
 
@@ -206,7 +206,7 @@ a = "1"
 [dev-dependencies]
 x = "3"
 y = "4"
-        "#,
+        "#
     );
 }
 
@@ -231,7 +231,7 @@ b = { workspace = true, default-features = false, features = [
     "y",
     "x",
 ] } # some comment.
-        "#,
+        "#
     );
 }
 
@@ -260,7 +260,7 @@ features = [
   # trailing comment
 ]
 workspace = true
-        "#,
+        "#
     );
 }
 
@@ -277,7 +277,7 @@ version = "1.0"
 [package]
 authors = ["Name # Surname"]
 version = "1.0"
-        "#,
+        "#
     );
 }
 
@@ -294,7 +294,7 @@ dep_a = { git = "https://example.com/foo#bar" }
 [dependencies]
 dep_a = { git = "https://example.com/foo#bar" }
 dep_b = "1.0"
-        "#,
+        "#
     );
 }
 
@@ -313,6 +313,6 @@ a = "1"
 [dependencies]
 a = "1"
 b = "2" # see [dev-dependencies] for the test version
-        "#,
+        "#
     );
 }

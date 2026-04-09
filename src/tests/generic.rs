@@ -14,7 +14,7 @@ a
 # Keep sorted.
 a
 b
-        "#,
+        "#
     );
 }
 
@@ -31,7 +31,7 @@ a
 // Keep sorted.
 a
 b
-        "#,
+        "#
     );
 }
 
@@ -48,7 +48,7 @@ a
 # keepsorted: keep sorted
 a
 b
-        "#,
+        "#
     );
 }
 
@@ -71,7 +71,7 @@ y
 
 b
 a
-        "#,
+        "#
     );
 }
 
@@ -96,7 +96,7 @@ y
 # Keep sorted.
 a
 b
-        "#,
+        "#
     );
 }
 
@@ -121,7 +121,7 @@ b
 # for the line below.
 x
 y
-        "#,
+        "#
     );
 }
 
@@ -142,7 +142,7 @@ a
 b
 # Some multi-line comment
 # trailing comment.
-        "#,
+        "#
     );
 }
 
@@ -163,7 +163,7 @@ a
 b
 x  # Some in-line comment.
 y
-        "#,
+        "#
     );
 }
 
@@ -198,7 +198,7 @@ fn generic_ignore_file() {
 # Keep sorted.
 3b
 3a
-        "#,
+        "#
     );
 }
 
@@ -233,7 +233,7 @@ fn generic_ignore_block_inside() {
 # Keep sorted.
 3a
 3b
-        "#,
+        "#
     );
 }
 
@@ -268,7 +268,7 @@ fn generic_ignore_block_before() {
 # Keep sorted.
 3a
 3b
-        "#,
+        "#
     );
 }
 
@@ -299,7 +299,7 @@ b,
  */
 x,
 y,
-        "#,
+        "#
     );
 }
 
@@ -320,7 +320,7 @@ local config = {
     name = "some name",
     setting = true,
 }
-        "#,
+        "#
     );
 }
 
@@ -353,7 +353,7 @@ local config = {
         "ghijkl",
     }
 }
-        "#,
+        "#
     );
 }
 
@@ -378,6 +378,6 @@ local candidates = {
     "catppuccin-latte",
   },
   dark = {},
-}"#,
+}"#
     );
 }
