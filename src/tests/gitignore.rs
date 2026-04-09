@@ -31,7 +31,7 @@ fn gitignore_1() {
 # [Rust]
 /a
 /b
-        "#,
+        "#
     );
 }
 
@@ -66,7 +66,7 @@ fn gitignore_ignore_file() {
 # [Rust]
 /b
 /a
-        "#,
+        "#
     );
 }
 
@@ -101,7 +101,7 @@ fn gitignore_ignore_block_after_header_comment() {
 # [Rust]
 /a
 /b
-        "#,
+        "#
     );
 }
 
@@ -122,7 +122,7 @@ fn codeowners_simple_block() {
 /.b/workflows        @company/teams/c @company/teams/d
 /.c/                 @company/teams/b
 /.d/                 @company/teams/a
-        "#,
+        "#
     );
 }
 
@@ -143,7 +143,7 @@ fn codeowners_two_blocks() {
 
 /.a/CODEOWNERS       @company/teams/e
 /.b/workflows        @company/teams/c @company/teams/d
-        "#,
+        "#
     );
 }
 
@@ -166,7 +166,7 @@ fn codeowners_ignore_file() {
 
 /.b/workflows        @company/teams/c @company/teams/d
 /.a/CODEOWNERS       @company/teams/e
-        "#,
+        "#
     );
 }
 
@@ -189,7 +189,7 @@ fn codeowners_ignore_block() {
 
 /.a/CODEOWNERS       @company/teams/e
 /.b/workflows        @company/teams/c @company/teams/d
-        "#,
+        "#
     );
 }
 
@@ -224,6 +224,6 @@ fn codeowners_1() {
 # [Rust Lang]
 /a
 /b
-        "#,
+        "#
     );
 }
