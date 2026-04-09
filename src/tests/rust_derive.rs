@@ -6,11 +6,11 @@ fn rust_derive_alphabetical() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
+#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
 struct Data {}
         "#,
         r#"
-#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
+#[derive(A, B, C, Copy, Ord, Serialize, serde::Serialize, a, b, c)]
 struct Data {}
         "#,
     );
@@ -21,7 +21,7 @@ fn rust_derive_canonical() {
     check(
         RustDeriveCanonical,
         r#"
-#[derive(Copy, Ord, A, B, C, Serialize, serde::Serialize, a, b, c)]
+#[derive(serde::Serialize, C, B, A, Ord, Copy, c, b, a, Serialize)]
 struct Data {}
         "#,
         r#"
@@ -37,13 +37,13 @@ fn rust_derive_alphabetical_indented() {
         RustDeriveAlphabetical,
         r#"
 mod foo {
-    #[derive(Copy, Ord, A, B, C)]
+    #[derive(C, B, A, Ord, Copy)]
     struct Data {}
 }
         "#,
         r#"
 mod foo {
-    #[derive(Copy, Ord, A, B, C)]
+    #[#[derive(A, B, C, Copy, Ord)]
     struct Data {}
 }
         "#,
@@ -56,7 +56,7 @@ fn rust_derive_canonical_indented() {
         RustDeriveCanonical,
         r#"
 mod foo {
-    #[derive(Copy, Ord, A, B, C)]
+    #[derive(C, B, A, Ord, Copy)]
     struct Data {}
 }
         "#,
