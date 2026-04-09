@@ -145,19 +145,19 @@ fn is_bazel(path: &Path) -> bool {
 }
 
 fn is_cargo_toml(path: &Path) -> bool {
-    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
+    path.file_name() == Some(std::ffi::OsStr::new("Cargo.toml"))
 }
 
 fn is_gitignore(path: &Path) -> bool {
-    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new(".gitignore"))
+    path.file_name() == Some(std::ffi::OsStr::new(".gitignore"))
 }
 
 fn is_codeowners(path: &Path) -> bool {
-    path.is_file() && path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
+    path.file_name() == Some(std::ffi::OsStr::new("CODEOWNERS"))
 }
 
 fn is_rust(path: &Path) -> bool {
-    path.is_file() && path.extension() == Some(std::ffi::OsStr::new("rs"))
+    path.extension() == Some(std::ffi::OsStr::new("rs"))
 }
 
 fn re_keyword_keep_sorted() -> Regex {
@@ -265,5 +265,70 @@ mod tests {
             classify(Path::new("foo.bzl"), &[]).unwrap(),
             Strategy::Bazel
         ));
+    }
+
+    #[test]
+    fn test_classify_cargo_toml() {
+        assert!(matches!(
+            classify(Path::new("Cargo.toml"), &[]).unwrap(),
+            Strategy::CargoToml
+        ));
+        assert!(matches!(
+            classify(Path::new("not_cargo.toml"), &[]).unwrap(),
+            Strategy::Generic
+        ));
+    }
+
+    #[test]
+    fn test_classify_gitignore() {
+        let features = vec!["gitignore".to_string()];
+        assert!(matches!(
+            classify(Path::new(".gitignore"), &features).unwrap(),
+            Strategy::Gitignore
+        ));
+        assert!(matches!(
+            classify(Path::new(".gitignore"), &[]).unwrap(),
+            Strategy::Generic
+        ));
+    }
+
+    #[test]
+    fn test_classify_codeowners() {
+        let features = vec!["codeowners".to_string()];
+        assert!(matches!(
+            classify(Path::new("CODEOWNERS"), &features).unwrap(),
+            Strategy::Gitignore
+        ));
+        assert!(matches!(
+            classify(Path::new("CODEOWNERS"), &[]).unwrap(),
+            Strategy::Generic
+        ));
+    }
+
+    #[test]
+    fn test_classify_rust() {
+        assert!(matches!(
+            classify(Path::new("main.rs"), &[]).unwrap(),
+            Strategy::Generic
+        ));
+        let alphabetical = vec!["rust_derive_alphabetical".to_string()];
+        assert!(matches!(
+            classify(Path::new("main.rs"), &alphabetical).unwrap(),
+            Strategy::RustDeriveAlphabetical
+        ));
+        let canonical = vec!["rust_derive_canonical".to_string()];
+        assert!(matches!(
+            classify(Path::new("main.rs"), &canonical).unwrap(),
+            Strategy::RustDeriveCanonical
+        ));
+    }
+
+    #[test]
+    fn test_classify_rust_derive_mutually_exclusive() {
+        let features = vec![
+            "rust_derive_alphabetical".to_string(),
+            "rust_derive_canonical".to_string(),
+        ];
+        assert!(classify(Path::new("main.rs"), &features).is_err());
     }
 }
