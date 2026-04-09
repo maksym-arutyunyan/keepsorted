@@ -43,7 +43,7 @@ mod foo {
         "#,
         r#"
 mod foo {
-    #[#[derive(A, B, C, Copy, Ord)]
+    #[derive(A, B, C, Copy, Ord)]
     struct Data {}
 }
         "#,
@@ -317,8 +317,8 @@ fn rust_both_derive_and_generic_sort() {
 fn setup_systems(app: &mut App) {
     app.add_plugins((
         // keepsorted: keep sorted
-        a,
         b,
+        a,
     ));
 }
 
@@ -345,7 +345,7 @@ fn rust_derive_with_url() {
     check(
         RustDeriveAlphabetical,
         r#"
-#[derive(A, B, Note = "http://example.com")]
+#[derive(B, A, Note = "http://example.com")]
 struct Data {}
         "#,
         r#"
