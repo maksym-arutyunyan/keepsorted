@@ -274,9 +274,9 @@ fn generic_ignore_block_before() {
     );
 }
 
-// TODO: move to the appropriate place.
+// Tracked in: https://github.com/maksym-arutyunyan/keepsorted/issues/133
 #[test]
-#[ignore]
+#[ignore = "multi-line block comments (/* ... */) not yet supported"]
 fn with_multi_line_comment_rust() {
     test_inner!(
         Generic,

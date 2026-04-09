@@ -44,24 +44,25 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
 }
 
 fn is_block_start(line: &str) -> bool {
-    // Check if the line starts and ends with brackets.
-    let trimmed = line.trim();
-    if !trimmed.starts_with('[') || !trimmed.ends_with(']') {
-        return false;
-    }
-    for case in ["dependencies", "dev-dependencies", "build-dependencies"] {
-        let patterns = [
-            format!("[{case}]"),           // E.g. [dependencies]
-            format!(".{case}]"),           // E.g. [xxx.dev-dependencies]
-            format!("[{case}."),           // E.g. [dev-dependencies.xxx]
-            format!("[workspace.{case}."), // E.g. [workspace.dependencies.xxx]
-        ];
-        if patterns.iter().any(|pattern| trimmed.contains(pattern)) {
-            return true;
-        }
-    }
-
-    false
+    let inner = match line
+        .trim()
+        .strip_prefix('[')
+        .and_then(|s| s.strip_suffix(']'))
+    {
+        Some(s) if !s.is_empty() => s,
+        _ => return false,
+    };
+    ["dependencies", "dev-dependencies", "build-dependencies"]
+        .iter()
+        .any(|dep| {
+            inner == *dep                                                          // [dependencies]
+                || inner.starts_with(dep) && inner[dep.len()..].starts_with('.') // [dependencies.xxx]
+                || inner.ends_with(dep) && inner[..inner.len() - dep.len()].ends_with('.') // [xxx.dependencies]
+                || inner                                                           // [workspace.dependencies.xxx]
+                    .strip_prefix("workspace.")
+                    .map(|s| s.starts_with(dep) && s[dep.len()..].starts_with('.'))
+                    .unwrap_or(false)
+        })
 }
 
 #[derive(Default)]
@@ -120,4 +121,52 @@ fn is_code_section_completed(line: &str) -> bool {
     let (code, _comment) = split_code_and_comment(line.trim());
     let x = code.trim();
     x.ends_with('}') || x.ends_with(']')
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_block_start_exact() {
+        assert!(is_block_start("[dependencies]"));
+        assert!(is_block_start("[dev-dependencies]"));
+        assert!(is_block_start("[build-dependencies]"));
+    }
+
+    #[test]
+    fn test_is_block_start_dep_first_segment() {
+        assert!(is_block_start("[dependencies.xxx]"));
+        assert!(is_block_start("[dev-dependencies.foo]"));
+        assert!(is_block_start("[build-dependencies.bar]"));
+    }
+
+    #[test]
+    fn test_is_block_start_dep_last_segment() {
+        assert!(is_block_start("[xxx.dependencies]"));
+        assert!(is_block_start("[target.'cfg(unix)'.dev-dependencies]"));
+        assert!(is_block_start("[workspace.build-dependencies]"));
+    }
+
+    #[test]
+    fn test_is_block_start_workspace_prefix() {
+        assert!(is_block_start("[workspace.dependencies.xxx]"));
+        assert!(is_block_start("[workspace.dev-dependencies.foo]"));
+        assert!(is_block_start("[workspace.build-dependencies.bar]"));
+    }
+
+    #[test]
+    fn test_is_block_start_whitespace() {
+        assert!(is_block_start("  [dependencies]  "));
+    }
+
+    #[test]
+    fn test_is_block_start_non_matching() {
+        assert!(!is_block_start("[package]"));
+        assert!(!is_block_start("[features]"));
+        assert!(!is_block_start("[profile.dev]"));
+        assert!(!is_block_start("dependencies = []"));
+        assert!(!is_block_start(""));
+        assert!(!is_block_start("[]"));
+    }
 }

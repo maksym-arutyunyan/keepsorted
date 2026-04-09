@@ -30,12 +30,12 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
                 is_sorting_block = true;
                 output_lines.push(line);
             } else if is_sorting_block
-                && (line_without_comment.trim().starts_with(']') || line.trim().is_empty())
+                && (line_without_comment.starts_with(']') || line.trim().is_empty())
             {
                 block = sort(block, is_ignore_block_prev_line);
                 is_ignore_block_prev_line = false;
                 is_sorting_block = false;
-                if line_without_comment.trim().starts_with(']') {
+                if line_without_comment.starts_with(']') {
                     is_scope = false;
                 }
                 output_lines.append(&mut block);
@@ -43,7 +43,7 @@ pub(crate) fn process(lines: Vec<String>) -> io::Result<Vec<String>> {
             } else if is_sorting_block {
                 block.push(line);
             } else {
-                if line_without_comment.trim().starts_with(']') {
+                if line_without_comment.starts_with(']') {
                     is_scope = false;
                 }
                 output_lines.push(line);

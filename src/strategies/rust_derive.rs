@@ -9,9 +9,12 @@ use crate::{is_ignore_block, is_ignore_block_line};
 static RE_DERIVE_BEGIN: LazyLock<Regex> = LazyLock::new(re_derive_begin);
 static RE_DERIVE_END: LazyLock<Regex> = LazyLock::new(re_derive_end);
 
-// These values count the number of characters and an extra '\n'.
-const STAY_ONE_LINE_LEN: usize = 97;
-const BREAK_INTO_MANY_LINES_LEN: usize = 101;
+// Max line width (characters, excluding '\n') for rustfmt-compatible derive formatting.
+// At or below 96: keep on a single line.
+// At or below 101: use three-line form (#[derive(\n    ...,\n)]).
+// Above 101: expand to one trait per line.
+const MAX_SINGLE_LINE_WIDTH: usize = 96;
+const MAX_THREE_LINE_WIDTH: usize = 101;
 
 pub(crate) type ProcessResult = (Vec<String>, bool);
 
@@ -95,14 +98,14 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
             &line[line_without_comment.len() + line.find(line_without_comment).unwrap_or(0)..];
 
         let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
-        if new_line.len() <= STAY_ONE_LINE_LEN {
+        if new_line.trim_end_matches('\n').len() <= MAX_SINGLE_LINE_WIDTH {
             return vec![new_line];
         }
 
         let mid_line = format!("{}    {},", prefix_whitespace, sorted_traits);
         let mut result = vec![format!("{}#[derive(\n", prefix_whitespace)];
 
-        if mid_line.len() <= BREAK_INTO_MANY_LINES_LEN {
+        if mid_line.len() <= MAX_THREE_LINE_WIDTH {
             result.push(format!("{}\n{})]\n", mid_line, prefix_whitespace));
         } else {
             for trait_item in traits {
