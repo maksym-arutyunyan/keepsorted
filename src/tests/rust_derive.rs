@@ -1,3 +1,4 @@
+use crate::test_inner;
 use crate::Strategy::{RustDeriveAlphabetical, RustDeriveCanonical};
 
 #[test]

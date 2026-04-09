@@ -10,6 +10,7 @@ pub(super) fn process_input(strategy: Strategy, text: &str) -> io::Result<String
     Ok(processed_lines.concat())
 }
 
+#[macro_export]
 macro_rules! test_inner {
     ($strategy:expr, $input:expr, $expected:expr) => {{
         let result = super::common::process_input($strategy, $input).unwrap();
