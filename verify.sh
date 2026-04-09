@@ -61,7 +61,7 @@ run_test() {
 # shellcheck disable=SC2329
 run_test_release() {
   print_header "cargo test --release"
-  if ! cargo test --release; then
+  if ! cargo test --release --all-targets --workspace --exclude benchmarks -- --color always; then
     failures+=("test-release")
     status_ok=false
   fi

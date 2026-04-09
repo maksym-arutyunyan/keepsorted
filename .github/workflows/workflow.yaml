@@ -34,7 +34,7 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Build
-        run: cargo build --release --all-targets
+        run: ./verify.sh build
         env:
           RUST_BACKTRACE: 1
 
@@ -64,7 +64,7 @@ jobs:
           rustup default $RUST_VERSION
 
       - name: Run Tests
-        run: cargo test --release --all-targets --workspace --exclude benchmarks -- --color always
+        run: ./verify.sh test-release
         env:
           RUST_BACKTRACE: 1
 
@@ -88,10 +88,10 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add clippy
 
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-targets -- -D warnings
+      - name: Run Clippy
+        run: ./verify.sh clippy
+        env:
+          RUST_BACKTRACE: 1
 
   rustfmt:
     runs-on: ubuntu-latest
@@ -105,10 +105,10 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add rustfmt
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Run Clippy
+        run: ./verify.sh fmt
+        env:
+          RUST_BACKTRACE: 1
 
   keepsorted:
     runs-on: ubuntu-latest
@@ -137,13 +137,7 @@ jobs:
 
       - name: Run KeepSorted
         shell: bash
-        run: |
-          # keepsorted can walk directories with --recursive, but we filter tracked files
-          # explicitly to avoid processing examples or tests during validation.
-          git ls-files -z \
-            | grep -vzE '^tests/|^src/tests/|^e2e-tests/|^README.md$' \
-            | xargs -0 -n1 ./target/release/keepsorted \
-                --features gitignore,rust_derive_canonical
+        run: ./verify.sh keepsorted
         env:
           RUST_BACKTRACE: 1
 
@@ -180,7 +174,7 @@ jobs:
         run: cargo build --release
 
       - name: Run e2e tests
-        run: bats e2e-tests
+        run: ./verfiy.sh e2e
 
   shell-checks:
     name: ShellCheck
