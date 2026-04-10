@@ -17,7 +17,7 @@ jobs:
             asset_name: keepsorted-macos
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
       - name: Build
         run: cargo build --release --all-targets
@@ -29,7 +29,7 @@ jobs:
           tar -czvf ${{ matrix.asset_name }}.tar.gz -C release ${{ matrix.asset_name }}
 
       - name: Upload Compressed Release Asset (tar.gz)
-        uses: actions/upload-release-asset@v1.0.2
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2 — SHA-pinned; tags are mutable (CVE-2025-30066)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -39,7 +39,7 @@ jobs:
           asset_content_type: application/gzip
 
       - name: Upload Original Binary
-        uses: actions/upload-release-asset@v1.0.2
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2 — SHA-pinned; tags are mutable (CVE-2025-30066)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
