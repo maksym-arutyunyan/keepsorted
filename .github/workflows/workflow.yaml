@@ -28,9 +28,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ~/.rustup
             target
-          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust
         run: |
@@ -66,9 +65,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ~/.rustup
             target
-          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust
         run: |
@@ -91,9 +89,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            ~/.rustup
             target
-          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust + Clippy
         run: |
