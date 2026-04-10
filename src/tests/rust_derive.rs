@@ -334,3 +334,25 @@ struct Data {}
         "#
     );
 }
+
+#[test]
+fn rust_derive_indented_with_comment_containing_derive() {
+    // The comment contains the exact derive text. The offset calculation must
+    // use the leading-whitespace length directly, not find() — otherwise the
+    // indentation could be computed from the wrong occurrence.
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+mod foo {
+    #[derive(B, A)] // replaces #[derive(B, A)]
+    struct Data {}
+}
+        "#,
+        r#"
+mod foo {
+    #[derive(A, B)] // replaces #[derive(B, A)]
+    struct Data {}
+}
+        "#
+    );
+}

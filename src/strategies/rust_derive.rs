@@ -68,8 +68,8 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
         .map(|line| line.trim_end_matches('\n'))
         .collect();
     let line = format!("{}\n", line);
-    let (line_without_comment, _comment) = split_code_and_line_comment(line.trim());
-    let line_without_comment = line_without_comment.trim();
+    let (code_raw, _comment) = split_code_and_line_comment(line.trim());
+    let line_without_comment = code_raw.trim();
 
     // Check if the line contains a #[derive(...)] statement
     if let Some(derive_range) = line_without_comment.find("#[derive(").and_then(|start| {
@@ -92,10 +92,11 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
         let sorted_traits = traits.join(", ");
         let new_derive = format!("#[derive({})]", sorted_traits);
 
-        // Preserve the prefix and suffix whitespace
-        let prefix_whitespace = &line[..line.find(line_without_comment).unwrap_or(0)];
-        let suffix_whitespace =
-            &line[line_without_comment.len() + line.find(line_without_comment).unwrap_or(0)..];
+        // Compute prefix and suffix by measuring leading whitespace directly.
+        // Using find() would be fragile if line_without_comment appeared earlier in line.
+        let prefix_len = line.len() - line.trim_start().len();
+        let prefix_whitespace = &line[..prefix_len];
+        let suffix_whitespace = &line[prefix_len + line_without_comment.len()..];
 
         let new_line = format!("{}{}{}", prefix_whitespace, new_derive, suffix_whitespace);
         if new_line.trim_end_matches('\n').len() <= MAX_SINGLE_LINE_WIDTH {
