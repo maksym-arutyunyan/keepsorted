@@ -28,8 +28,9 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.rustup
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust
         run: |
@@ -38,6 +39,13 @@ jobs:
 
       - name: Build
         run: ./verify.sh build
+
+      - name: Upload binary
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
+        with:
+          name: keepsorted-linux
+          path: target/release/keepsorted
 
   test:
     runs-on: ${{ matrix.os }}
@@ -58,8 +66,9 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.rustup
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust
         run: |
@@ -82,8 +91,9 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.rustup
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          key: ${{ runner.os }}-rust-${{ env.RUST_VERSION }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
 
       - name: Install Rust + Clippy
         run: |
@@ -120,22 +130,14 @@ jobs:
         with:
           lfs: true
 
-      - name: Restore cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
+      - name: Download binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          name: keepsorted-linux
+          path: target/release
 
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
-
-      - name: Build Project
-        run: cargo build --release
+      - name: Mark binary executable
+        run: chmod +x target/release/keepsorted
 
       - name: Run KeepSorted
         shell: bash
@@ -155,25 +157,17 @@ jobs:
         with:
           lfs: true
 
-      - name: Restore cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
+      - name: Download binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          name: keepsorted-linux
+          path: target/release
 
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+      - name: Mark binary executable
+        run: chmod +x target/release/keepsorted
 
       - name: Install Bats
-        run: sudo apt-get update && sudo apt-get install -y bats
-
-      - name: Build Project
-        run: cargo build --release
+        run: sudo apt-get install -y bats
 
       - name: Run e2e tests
         run: ./verify.sh e2e
