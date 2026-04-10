@@ -365,6 +365,9 @@ fn handle_file(
             Ok(true)
         }
         Mode::Fix => {
+            if original == sorted {
+                return Ok(true);
+            }
             let dir = path.parent().unwrap_or(Path::new("."));
             let tmp = tempfile::NamedTempFile::new_in(dir)
                 .map_err(|e| AppError::runtime(format!("failed to create temp file: {}", e)))?;
