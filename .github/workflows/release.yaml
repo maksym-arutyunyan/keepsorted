@@ -20,7 +20,8 @@ jobs:
             asset_name: keepsorted-macos-x86_64
 
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
       - name: Build
         run: cargo build --release --all-targets
