@@ -110,17 +110,62 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     result
 }
 
+fn contains_unquoted_bracket_or_brace(s: &str) -> bool {
+    let mut in_string = false;
+    let mut escape = false;
+    let mut quote_char = b'\0';
+    for &c in s.as_bytes() {
+        if in_string {
+            if escape {
+                escape = false;
+            } else if c == b'\\' {
+                escape = true;
+            } else if c == quote_char {
+                in_string = false;
+            }
+        } else if c == b'"' || c == b'\'' {
+            in_string = true;
+            quote_char = c;
+        } else if c == b'{' || c == b'[' {
+            return true;
+        }
+    }
+    false
+}
+
+fn ends_with_unquoted_closing(s: &str) -> bool {
+    let mut in_string = false;
+    let mut escape = false;
+    let mut quote_char = b'\0';
+    let mut last_unquoted: Option<u8> = None;
+    for &c in s.as_bytes() {
+        if in_string {
+            if escape {
+                escape = false;
+            } else if c == b'\\' {
+                escape = true;
+            } else if c == quote_char {
+                in_string = false;
+            }
+        } else if c == b'"' || c == b'\'' {
+            in_string = true;
+            quote_char = c;
+            last_unquoted = None;
+        } else if !c.is_ascii_whitespace() {
+            last_unquoted = Some(c);
+        }
+    }
+    matches!(last_unquoted, Some(b'}') | Some(b']'))
+}
+
 fn is_multi_line_code(line: &str) -> bool {
     let (code, _comment) = split_code_and_comment(line.trim());
-    code.contains('{') || code.contains('[')
+    contains_unquoted_bracket_or_brace(code)
 }
 
 fn is_code_section_completed(line: &str) -> bool {
-    // Split the line at the '#' character, take the first part, trim it,
-    // and check if it ends with '}' or ']'.
     let (code, _comment) = split_code_and_comment(line.trim());
-    let x = code.trim();
-    x.ends_with('}') || x.ends_with(']')
+    ends_with_unquoted_closing(code.trim())
 }
 
 #[cfg(test)]
