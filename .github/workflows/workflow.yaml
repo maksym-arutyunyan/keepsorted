@@ -100,7 +100,7 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add rustfmt
 
-      - name: Run Clippy
+      - name: Run rustfmt
         run: ./verify.sh fmt
 
   keepsorted:
