@@ -28,22 +28,10 @@ jobs:
           cp target/release/keepsorted release/${{ matrix.asset_name }}
           tar -czvf ${{ matrix.asset_name }}.tar.gz -C release ${{ matrix.asset_name }}
 
-      - name: Upload Compressed Release Asset (tar.gz)
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2 — SHA-pinned; tags are mutable (CVE-2025-30066)
+      - name: Upload Release Assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ matrix.asset_name }}.tar.gz
-          asset_name: ${{ matrix.asset_name }}.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload Original Binary
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1.0.2 — SHA-pinned; tags are mutable (CVE-2025-30066)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./release/${{ matrix.asset_name }}
-          asset_name: ${{ matrix.asset_name }}
-          asset_content_type: application/octet-stream
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            "${{ matrix.asset_name }}.tar.gz" \
+            "release/${{ matrix.asset_name }}"
