@@ -13,8 +13,11 @@ jobs:
             name: linux64
             asset_name: keepsorted-linux64
           - os: macos-latest
-            name: macos
-            asset_name: keepsorted-macos
+            name: macos-aarch64
+            asset_name: keepsorted-macos-aarch64
+          - os: macos-13
+            name: macos-x86_64
+            asset_name: keepsorted-macos-x86_64
 
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4 — SHA-pinned; tags are mutable (CVE-2025-30066)
