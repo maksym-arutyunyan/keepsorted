@@ -316,3 +316,70 @@ b = "2" # see [dev-dependencies] for the test version
         "#
     );
 }
+
+#[test]
+fn cargo_toml_brace_in_string_value() {
+    // A dep with '{' inside its string value must not trigger multiline mode,
+    // which would swallow the next dependency into the same item.
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+b = "url/{version}/dist"
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = "url/{version}/dist"
+        "#
+    );
+}
+
+#[test]
+fn cargo_toml_bracket_in_string_value() {
+    // A dep with '[' inside its string value must not trigger multiline mode.
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+b = "feat[ure]"
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = "feat[ure]"
+        "#
+    );
+}
+
+#[test]
+fn cargo_toml_nested_brackets_dont_close_early() {
+    // The inner ']' on the features line must not close multi-line mode —
+    // the outer '{' is still open. Without depth tracking, the two stray '}'
+    // lines sort independently and one of them ends up attached to the wrong item.
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+c = {
+    features = ["x", "y"]
+}
+b = {
+    features = ["x", "y"]
+}
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = {
+    features = ["x", "y"]
+}
+c = {
+    features = ["x", "y"]
+}
+        "#
+    );
+}

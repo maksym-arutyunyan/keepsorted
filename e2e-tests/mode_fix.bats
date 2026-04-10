@@ -42,3 +42,15 @@ load './helpers.bash'
   diff -u "$expected" "$file"
 }
 
+@test "test \`--mode fix\` does not rewrite already-sorted file" {
+  local file inode_before inode_after
+  file=$(prepare_file generic/1_out.txt)
+  inode_before=$(stat -c '%i' "$file")
+
+  run_keepsorted --mode fix "$file"
+  [ "$status" -eq "$EXIT_SUCCESS" ]
+
+  inode_after=$(stat -c '%i' "$file")
+  [ "$inode_before" -eq "$inode_after" ]
+}
+
