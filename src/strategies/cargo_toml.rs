@@ -79,20 +79,16 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     let n = block.len();
     let mut items = Vec::with_capacity(n);
     let mut current_item = Item::default();
-    let mut is_multiline_code = false;
+    let mut depth = 0i32;
     for line in block {
-        if !is_multiline_code && is_single_line_comment(&line) {
+        if depth == 0 && is_single_line_comment(&line) {
             current_item.comment.push(line);
         } else {
-            let is_multi = is_multi_line_code(&line);
-            let is_completed = is_code_section_completed(&line);
+            depth += bracket_depth_delta(&line);
             current_item.code.push(line);
-            if is_multi {
-                is_multiline_code = true;
-            }
-            if !is_multiline_code || is_completed {
+            if depth <= 0 {
                 items.push(std::mem::take(&mut current_item));
-                is_multiline_code = false;
+                depth = 0;
             }
         }
     }
@@ -110,11 +106,17 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool) -> Vec<String> {
     result
 }
 
-fn contains_unquoted_bracket_or_brace(s: &str) -> bool {
+/// Returns the net change in bracket/brace nesting depth for a line.
+///
+/// Counts unquoted `{` and `[` as +1, unquoted `}` and `]` as -1.
+/// Characters inside quoted strings are ignored.
+fn bracket_depth_delta(line: &str) -> i32 {
+    let (code, _comment) = split_code_and_comment(line.trim());
     let mut in_string = false;
     let mut escape = false;
     let mut quote_char = b'\0';
-    for &c in s.as_bytes() {
+    let mut delta = 0i32;
+    for &c in code.as_bytes() {
         if in_string {
             if escape {
                 escape = false;
@@ -127,45 +129,12 @@ fn contains_unquoted_bracket_or_brace(s: &str) -> bool {
             in_string = true;
             quote_char = c;
         } else if c == b'{' || c == b'[' {
-            return true;
+            delta += 1;
+        } else if c == b'}' || c == b']' {
+            delta -= 1;
         }
     }
-    false
-}
-
-fn ends_with_unquoted_closing(s: &str) -> bool {
-    let mut in_string = false;
-    let mut escape = false;
-    let mut quote_char = b'\0';
-    let mut last_unquoted: Option<u8> = None;
-    for &c in s.as_bytes() {
-        if in_string {
-            if escape {
-                escape = false;
-            } else if c == b'\\' {
-                escape = true;
-            } else if c == quote_char {
-                in_string = false;
-            }
-        } else if c == b'"' || c == b'\'' {
-            in_string = true;
-            quote_char = c;
-            last_unquoted = None;
-        } else if !c.is_ascii_whitespace() {
-            last_unquoted = Some(c);
-        }
-    }
-    matches!(last_unquoted, Some(b'}') | Some(b']'))
-}
-
-fn is_multi_line_code(line: &str) -> bool {
-    let (code, _comment) = split_code_and_comment(line.trim());
-    contains_unquoted_bracket_or_brace(code)
-}
-
-fn is_code_section_completed(line: &str) -> bool {
-    let (code, _comment) = split_code_and_comment(line.trim());
-    ends_with_unquoted_closing(code.trim())
+    delta
 }
 
 #[cfg(test)]

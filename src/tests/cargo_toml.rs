@@ -353,3 +353,33 @@ b = "feat[ure]"
         "#
     );
 }
+
+#[test]
+fn cargo_toml_nested_brackets_dont_close_early() {
+    // The inner ']' on the features line must not close multi-line mode —
+    // the outer '{' is still open. Without depth tracking, the two stray '}'
+    // lines sort independently and one of them ends up attached to the wrong item.
+    test_inner!(
+        CargoToml,
+        r#"
+[dependencies]
+c = {
+    features = ["x", "y"]
+}
+b = {
+    features = ["x", "y"]
+}
+a = "1"
+        "#,
+        r#"
+[dependencies]
+a = "1"
+b = {
+    features = ["x", "y"]
+}
+c = {
+    features = ["x", "y"]
+}
+        "#
+    );
+}
