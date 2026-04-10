@@ -23,7 +23,7 @@ Tasks:
   keepsorted    Run keepsorted on tracked files
   diff          Check that keepsorted made no changes
   e2e           Run Bats end-to-end tests
-  all           Run all checks (default)
+  all           Run all checks: test-release clippy fmt keepsorted diff e2e (default)
   -h, --help    Show this help message
 EOF
 }
@@ -124,7 +124,7 @@ for task in "${args[@]}"; do
       exit 0
       ;;
     all)
-      expanded_tasks+=(build test test-release clippy fmt keepsorted diff e2e)
+      expanded_tasks+=(test-release clippy fmt keepsorted diff e2e)
       ;;
     build|test|test-release|clippy|fmt|keepsorted|diff|e2e)
       expanded_tasks+=("$task")

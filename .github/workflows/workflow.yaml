@@ -19,9 +19,11 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
-      - uses: actions/cache@v4
+      - name: Restore cache
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           path: |
             ~/.cargo/registry
@@ -37,6 +39,13 @@ jobs:
       - name: Build
         run: ./verify.sh build
 
+      - name: Upload binary
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7 — SHA-pinned; tags are mutable (CVE-2025-30066)
+        with:
+          name: keepsorted-linux
+          path: target/release/keepsorted
+
   test:
     runs-on: ${{ matrix.os }}
     needs: build
@@ -45,11 +54,13 @@ jobs:
         os: [ubuntu-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           lfs: true
 
-      - uses: actions/cache@v4
+      - name: Restore cache
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           path: |
             ~/.cargo/registry
@@ -69,9 +80,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
-      - uses: actions/cache@v4
+      - name: Restore cache
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           path: |
             ~/.cargo/registry
@@ -92,7 +105,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
       - name: Install Rust + Rustfmt
         run: |
@@ -100,7 +114,7 @@ jobs:
           rustup default $RUST_VERSION
           rustup component add rustfmt
 
-      - name: Run Clippy
+      - name: Run rustfmt
         run: ./verify.sh fmt
 
   keepsorted:
@@ -108,25 +122,19 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           lfs: true
 
-      - uses: actions/cache@v4
+      - name: Download binary
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          name: keepsorted-linux
+          path: target/release
 
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
-
-      - name: Build Project
-        run: cargo build --release
+      - name: Mark binary executable
+        run: chmod +x target/release/keepsorted
 
       - name: Run KeepSorted
         shell: bash
@@ -141,28 +149,22 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
           lfs: true
 
-      - uses: actions/cache@v4
+      - name: Download binary
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8 — SHA-pinned; tags are mutable (CVE-2025-30066)
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-1
+          name: keepsorted-linux
+          path: target/release
 
-      - name: Install Rust
-        run: |
-          rustup update $RUST_VERSION --no-self-update
-          rustup default $RUST_VERSION
+      - name: Mark binary executable
+        run: chmod +x target/release/keepsorted
 
       - name: Install Bats
-        run: sudo apt-get update && sudo apt-get install -y bats
-
-      - name: Build Project
-        run: cargo build --release
+        run: sudo apt-get install -y bats
 
       - name: Run e2e tests
         run: ./verify.sh e2e
@@ -172,9 +174,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6 — SHA-pinned; tags are mutable (CVE-2025-30066)
 
-      - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@00b27aa7cb85167568cb48a3838b75f4265f2bca # master — SHA-pinned; tags are mutable (CVE-2025-30066)
         env:
           SHELLCHECK_OPTS: -e SC1090 -e SC2119 -e SC1091
