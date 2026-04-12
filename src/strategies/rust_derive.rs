@@ -63,13 +63,23 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     if is_ignore_block_prev_line || is_ignore_block(&block) {
         return block;
     }
-    let line: String = block
+    // Strip // comments from each line before joining, so inner comments don't
+    // break the #[derive(...)] parser. Capture the trailing comment from the
+    // )] line for suffix preservation.
+    let mut trailing_comment = String::new();
+    let joined_code: String = block
         .iter()
-        .map(|line| line.trim_end_matches('\n'))
+        .map(|line| {
+            let stripped = line.trim_end_matches('\n');
+            let (code, comment) = split_code_and_line_comment(stripped);
+            if code.contains(")]") && !comment.is_empty() {
+                trailing_comment = comment.to_string();
+            }
+            code
+        })
         .collect();
-    let line = format!("{}\n", line);
-    let (code_raw, _comment) = split_code_and_line_comment(line.trim());
-    let line_without_comment = code_raw.trim();
+    let line = format!("{}{}\n", joined_code, trailing_comment);
+    let line_without_comment = joined_code.trim();
 
     // Check if the line contains a #[derive(...)] statement
     if let Some(derive_range) = line_without_comment.find("#[derive(").and_then(|start| {

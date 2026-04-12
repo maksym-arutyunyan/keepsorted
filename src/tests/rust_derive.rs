@@ -336,6 +336,27 @@ struct Data {}
 }
 
 #[test]
+fn rust_derive_multiline_with_inner_comment() {
+    // A // comment on an inner line must not prevent sorting.
+    // The inner comment is dropped because multi-line derives are collapsed.
+    test_inner!(
+        RustDeriveAlphabetical,
+        r#"
+#[derive(
+    C,
+    B, // keep this
+    A,
+)]
+struct Data {}
+        "#,
+        r#"
+#[derive(A, B, C)]
+struct Data {}
+        "#
+    );
+}
+
+#[test]
 fn rust_derive_indented_with_comment_containing_derive() {
     // The comment contains the exact derive text. The offset calculation must
     // use the leading-whitespace length directly, not find() — otherwise the
