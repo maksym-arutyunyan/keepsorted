@@ -15,9 +15,6 @@ jobs:
           - os: macos-latest
             name: macos-aarch64
             asset_name: keepsorted-macos-aarch64
-          - os: macos-13
-            name: macos-x86_64
-            asset_name: keepsorted-macos-x86_64
 
     steps:
       - name: Checkout
