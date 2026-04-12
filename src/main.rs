@@ -396,7 +396,13 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
         let path = entry.path();
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
-            collect_files(&path, out)?;
+            let is_hidden = path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .is_some_and(|n| n.starts_with('.'));
+            if !is_hidden {
+                collect_files(&path, out)?;
+            }
         } else if file_type.is_file() {
             out.push(path);
         }
