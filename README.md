@@ -54,8 +54,10 @@ keepsorted file.txt
 - `keepsorted: ignore file` – skip the whole file.
 - `keepsorted: ignore block` – skip a single block.
 
-Markers work with `#`, `//`, or `--` comments. Generic files support any of these. Bazel files require `#`. `Cargo.toml`, `.gitignore`, and `CODEOWNERS` are sorted
-automatically when the matching feature flag is enabled.
+Markers work with `#`, `//`, or `--` comments. Generic files support any of these.
+Bazel files require `#`.
+`Cargo.toml` is sorted automatically.
+`.gitignore` and `CODEOWNERS` require `--features` (see below).
 
 ### Examples
 
