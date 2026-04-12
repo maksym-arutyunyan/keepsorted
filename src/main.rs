@@ -219,7 +219,7 @@ fn main() {
 
     // Check for experimental features
     let features = args.features.unwrap_or_default();
-    let feature_names: Vec<String> = features.iter().map(|f| f.as_str().to_string()).collect();
+    let feature_names: Vec<&str> = features.iter().map(|f| f.as_str()).collect();
     let mut exit_code = 0;
 
     if path.is_dir() {
@@ -273,7 +273,7 @@ fn main() {
 /// or `Err` with an exit code and message for any fatal condition.
 fn handle_file(
     path: &Path,
-    feature_names: &[String],
+    feature_names: &[&str],
     mode: Mode,
     diff_command: Option<&str>,
 ) -> Result<bool, AppError> {

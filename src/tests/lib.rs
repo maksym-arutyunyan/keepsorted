@@ -103,7 +103,7 @@ fn classify_cargo_toml() {
 
 #[test]
 fn classify_gitignore() {
-    let features = vec!["gitignore".to_string()];
+    let features = vec!["gitignore"];
     assert!(matches!(
         classify(Path::new(".gitignore"), &features).unwrap(),
         Strategy::Gitignore
@@ -116,7 +116,7 @@ fn classify_gitignore() {
 
 #[test]
 fn classify_codeowners() {
-    let features = vec!["codeowners".to_string()];
+    let features = vec!["codeowners"];
     assert!(matches!(
         classify(Path::new("CODEOWNERS"), &features).unwrap(),
         Strategy::Gitignore
@@ -133,12 +133,12 @@ fn classify_rust() {
         classify(Path::new("main.rs"), &[]).unwrap(),
         Strategy::Generic
     ));
-    let alphabetical = vec!["rust_derive_alphabetical".to_string()];
+    let alphabetical = vec!["rust_derive_alphabetical"];
     assert!(matches!(
         classify(Path::new("main.rs"), &alphabetical).unwrap(),
         Strategy::RustDeriveAlphabetical
     ));
-    let canonical = vec!["rust_derive_canonical".to_string()];
+    let canonical = vec!["rust_derive_canonical"];
     assert!(matches!(
         classify(Path::new("main.rs"), &canonical).unwrap(),
         Strategy::RustDeriveCanonical
@@ -147,9 +147,6 @@ fn classify_rust() {
 
 #[test]
 fn classify_rust_derive_mutually_exclusive() {
-    let features = vec![
-        "rust_derive_alphabetical".to_string(),
-        "rust_derive_canonical".to_string(),
-    ];
+    let features = vec!["rust_derive_alphabetical", "rust_derive_canonical"];
     assert!(classify(Path::new("main.rs"), &features).is_err());
 }

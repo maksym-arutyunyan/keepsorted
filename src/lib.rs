@@ -19,7 +19,7 @@ static RE_IGNORE_BLOCK: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_block)
 ///
 /// The `features` list enables optional experimental strategies.
 /// Both strings are derived from a single file read.
-pub fn process_file(path: &Path, features: &[String]) -> io::Result<(String, String)> {
+pub fn process_file(path: &Path, features: &[&str]) -> io::Result<(String, String)> {
     let original = fs::read_to_string(path)?;
     let ends_with_newline = original.ends_with('\n');
 
@@ -93,23 +93,23 @@ pub(crate) fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Resul
     }
 }
 
-pub(crate) fn classify(path: &Path, features: &[String]) -> io::Result<Strategy> {
+pub(crate) fn classify(path: &Path, features: &[&str]) -> io::Result<Strategy> {
     if is_bazel(path) {
         return Ok(Strategy::Bazel);
     }
     if is_cargo_toml(path) {
         return Ok(Strategy::CargoToml);
     }
-    if features.iter().any(|f| f == "gitignore") && is_gitignore(path) {
+    if features.contains(&"gitignore") && is_gitignore(path) {
         return Ok(Strategy::Gitignore);
     }
-    if features.iter().any(|f| f == "codeowners") && is_codeowners(path) {
+    if features.contains(&"codeowners") && is_codeowners(path) {
         return Ok(Strategy::Gitignore);
     }
     if is_rust(path) {
         match (
-            features.iter().any(|f| f == "rust_derive_alphabetical"),
-            features.iter().any(|f| f == "rust_derive_canonical"),
+            features.contains(&"rust_derive_alphabetical"),
+            features.contains(&"rust_derive_canonical"),
         ) {
             (true, true) => {
                 return Err(io::Error::new(
