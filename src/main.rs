@@ -25,9 +25,13 @@ fn long_about() -> String {
         "{}\n\
 \n\
 Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. \
-Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. \
+Cargo.toml is sorted automatically. .gitignore and CODEOWNERS require --features. \
 Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. \
 Comments starting with '#', '//' or '--' are preserved.\n\
+\n\
+Caution: in .gitignore and CODEOWNERS files, pattern order affects semantics — later \
+patterns override earlier ones, and negation patterns must follow what they negate. \
+Use '# keepsorted: ignore block' before any block where order matters.\n\
 \n\
 Return codes:\n\
 \t0: success, everything went well\n\
@@ -58,9 +62,9 @@ enum Mode {
 #[derive(Copy, Clone, Debug, ValueEnum)]
 #[clap(rename_all = "snake")]
 enum Feature {
-    /// Enable sorting for `.gitignore` files.
+    /// Enable sorting for `.gitignore` files. Caution: pattern order affects semantics; use '# keepsorted: ignore block' where order matters.
     Gitignore,
-    /// Enable sorting for `CODEOWNERS` files.
+    /// Enable sorting for `CODEOWNERS` files. Caution: last matching pattern wins; use '# keepsorted: ignore block' where order matters.
     Codeowners,
     /// Alphabetical ordering for `#[derive(...)]` attributes.
     RustDeriveAlphabetical,
@@ -392,7 +396,13 @@ fn collect_files(dir: &Path, out: &mut Vec<PathBuf>) -> io::Result<()> {
         let path = entry.path();
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
-            collect_files(&path, out)?;
+            let is_hidden = path
+                .file_name()
+                .and_then(|n| n.to_str())
+                .is_some_and(|n| n.starts_with('.'));
+            if !is_hidden {
+                collect_files(&path, out)?;
+            }
         } else if file_type.is_file() {
             out.push(path);
         }
