@@ -1,6 +1,7 @@
 ---
 name: keepsorted
 description: Work with keepsorted — a tool that sorts annotated blocks in code files while keeping comments attached to their lines. Use when the user wants to check sorting, fix sorting, add sort markers, or set up keepsorted in a project.
+# keepsorted: ignore file — this file contains example markers that must not be sorted
 ---
 
 # keepsorted
@@ -60,21 +61,21 @@ Comments directly above a line stay attached to that line during sorting:
 
 ```python
 # Keep sorted.
-# comment B
-b
+```
 # comment A
 a
-```
+# comment B
+b
 
 becomes:
 
 ```python
 # Keep sorted.
+```
 # comment A
 a
 # comment B
 b
-```
 
 ## Adding markers to code
 
