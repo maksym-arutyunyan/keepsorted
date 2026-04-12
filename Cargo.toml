@@ -5,7 +5,6 @@ edition = "2021"
 description = "A tool for sorting blocks of lines in code files"
 authors = ["Maksym Arutyunyan"]
 repository = "https://github.com/maksym-arutyunyan/keepsorted"
-documentation = "https://docs.rs/keepsorted"
 readme = "README.md"
 license = "Apache-2.0"
 keywords = ["sorting", "code", "command-line"]
