@@ -61,8 +61,10 @@ pub(crate) enum Strategy {
     Bazel,
     /// Sorting for the dependency sections of `Cargo.toml`.
     CargoToml,
-    /// Sorting for `.gitignore` and `CODEOWNERS` files.
+    /// Sorting for `.gitignore` files.
     Gitignore,
+    /// Sorting for `CODEOWNERS` files.
+    Codeowners,
     /// Alphabetical ordering for `#[derive(...)]` attributes in Rust code.
     RustDeriveAlphabetical,
     /// Canonical ordering for `#[derive(...)]` attributes in Rust code.
@@ -78,7 +80,7 @@ pub(crate) fn process_lines(strategy: Strategy, lines: Vec<String>) -> io::Resul
         Strategy::Generic => crate::strategies::generic::process(lines),
         Strategy::Bazel => crate::strategies::bazel::process(lines),
         Strategy::CargoToml => crate::strategies::cargo_toml::process(lines),
-        Strategy::Gitignore => crate::strategies::gitignore::process(lines),
+        Strategy::Gitignore | Strategy::Codeowners => crate::strategies::gitignore::process(lines),
         Strategy::RustDeriveAlphabetical | Strategy::RustDeriveCanonical => {
             crate::strategies::rust_derive::process(lines, strategy).and_then(
                 |(lines, requires_generic_sort)| {
@@ -104,7 +106,7 @@ pub(crate) fn classify(path: &Path, features: &[&str]) -> io::Result<Strategy> {
         return Ok(Strategy::Gitignore);
     }
     if features.contains(&"codeowners") && is_codeowners(path) {
-        return Ok(Strategy::Gitignore);
+        return Ok(Strategy::Codeowners);
     }
     if is_rust(path) {
         match (
