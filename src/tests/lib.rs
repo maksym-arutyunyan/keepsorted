@@ -119,7 +119,7 @@ fn classify_codeowners() {
     let features = vec!["codeowners"];
     assert!(matches!(
         classify(Path::new("CODEOWNERS"), &features).unwrap(),
-        Strategy::Gitignore
+        Strategy::Codeowners
     ));
     assert!(matches!(
         classify(Path::new("CODEOWNERS"), &[]).unwrap(),

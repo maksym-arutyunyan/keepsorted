@@ -1,5 +1,6 @@
 mod bazel;
 mod cargo_toml;
+mod codeowners;
 mod common;
 mod generic;
 mod gitignore;
