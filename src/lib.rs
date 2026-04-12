@@ -19,6 +19,7 @@ static RE_IGNORE_BLOCK: LazyLock<Regex> = LazyLock::new(re_keyword_ignore_block)
 ///
 /// The `features` list enables optional experimental strategies.
 /// Both strings are derived from a single file read.
+#[doc(hidden)]
 pub fn process_file(path: &Path, features: &[&str]) -> io::Result<(String, String)> {
     let original = fs::read_to_string(path)?;
     let ends_with_newline = original.ends_with('\n');

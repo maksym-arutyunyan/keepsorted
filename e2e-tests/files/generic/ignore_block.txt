@@ -1,0 +1,8 @@
+# Keep sorted.
+a
+b
+
+# keepsorted: ignore block
+# Keep sorted.
+b
+a

@@ -1,6 +1,8 @@
 A tool for sorting blocks of lines in code files
 
-Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. Cargo.toml, .gitignore and CODEOWNERS are sorted automatically. Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. Comments starting with '#', '//' or '--' are preserved.
+Sort lists inside '# Keep sorted' blocks. Generic and Bazel files require the comment. Cargo.toml is sorted automatically. .gitignore and CODEOWNERS require --features. Skip sorting with '# keepsorted: ignore file' or '# keepsorted: ignore block'. Comments starting with '#', '//' or '--' are preserved.
+
+Caution: in .gitignore and CODEOWNERS files, pattern order affects semantics — later patterns override earlier ones, and negation patterns must follow what they negate. Use '# keepsorted: ignore block' before any block where order matters.
 
 Return codes:
 	0: success, everything went well
@@ -26,8 +28,8 @@ Options:
           Enable experimental features
 
           Possible values:
-          - gitignore:                Enable sorting for `.gitignore` files
-          - codeowners:               Enable sorting for `CODEOWNERS` files
+          - gitignore:                Enable sorting for `.gitignore` files. Caution: pattern order affects semantics; use '# keepsorted: ignore block' where order matters
+          - codeowners:               Enable sorting for `CODEOWNERS` files. Caution: last matching pattern wins; use '# keepsorted: ignore block' where order matters
           - rust_derive_alphabetical: Alphabetical ordering for `#[derive(...)]` attributes
           - rust_derive_canonical:    Canonical ordering for `#[derive(...)]` attributes
 

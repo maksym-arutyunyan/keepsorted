@@ -1,0 +1,4 @@
+# keepsorted: ignore file
+# Keep sorted.
+b
+a

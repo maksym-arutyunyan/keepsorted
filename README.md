@@ -2,16 +2,13 @@
 
 [![keepsorted GitHub Actions][gh-image]][gh-checks]
 [![keepsorted on crates.io][cratesio-image]][cratesio]
-[![keepsorted on docs.rs][docsrs-image]][docsrs]
 
 ```shell
 cargo install keepsorted
 ```
 
-- [Documentation](https://docs.rs/keepsorted)
 - [Source code](https://github.com/maksym-arutyunyan/keepsorted)
 - [Issue tracker](https://github.com/maksym-arutyunyan/keepsorted/issues)
-- [Specs](docs/SPECS.md)
 
 ## Overview
 
@@ -235,7 +232,5 @@ keepsorted file --features gitignore,rust_derive_canonical
 
 [cratesio]: https://crates.io/crates/keepsorted
 [cratesio-image]: https://img.shields.io/crates/v/keepsorted.svg
-[docsrs]: https://docs.rs/keepsorted
-[docsrs-image]: https://docs.rs/keepsorted/badge.svg
 [gh-checks]: https://github.com/maksym-arutyunyan/keepsorted/actions/workflows/workflow.yaml
 [gh-image]: https://github.com/maksym-arutyunyan/keepsorted/workflows/CI/badge.svg
