@@ -63,9 +63,24 @@ fn sort(block: Vec<String>, is_ignore_block_prev_line: bool, strategy: Strategy)
     if is_ignore_block_prev_line || is_ignore_block(&block) {
         return block;
     }
-    // Strip // comments from each line before joining, so inner comments don't
-    // break the #[derive(...)] parser. Capture the trailing comment from the
-    // )] line for suffix preservation.
+
+    // If any inner item line carries an inline comment, leave the block unsorted
+    // rather than silently discarding the comments. Long-term, the fix is to
+    // pair each item with its comment, sort items while carrying comments along,
+    // and re-emit the block in multiline form — see the tracking issue for that.
+    let has_inner_comment = block.iter().any(|line| {
+        let stripped = line.trim_end_matches('\n');
+        let (code, comment) = split_code_and_line_comment(stripped);
+        // Allow comments on the opening `#[derive(` and closing `)]` lines;
+        // only bail out for comments attached to trait items in between.
+        !comment.is_empty() && !code.trim().starts_with("#[derive(") && !code.contains(")]")
+    });
+    if has_inner_comment {
+        return block;
+    }
+
+    // Strip // comments from each line before joining. Capture the trailing
+    // comment from the )] line for suffix preservation.
     let mut trailing_comment = String::new();
     let joined_code: String = block
         .iter()

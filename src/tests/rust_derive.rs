@@ -337,8 +337,9 @@ struct Data {}
 
 #[test]
 fn rust_derive_multiline_with_inner_comment() {
-    // A // comment on an inner line must not prevent sorting.
-    // The inner comment is dropped because multi-line derives are collapsed.
+    // When an item line carries an inline comment, the block is left unsorted
+    // to avoid silently discarding the comment. Sorting with comment
+    // preservation is tracked as a follow-up improvement.
     test_inner!(
         RustDeriveAlphabetical,
         r#"
@@ -350,7 +351,11 @@ fn rust_derive_multiline_with_inner_comment() {
 struct Data {}
         "#,
         r#"
-#[derive(A, B, C)]
+#[derive(
+    C,
+    B, // keep this
+    A,
+)]
 struct Data {}
         "#
     );
